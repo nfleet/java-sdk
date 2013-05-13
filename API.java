@@ -3,6 +3,7 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -61,8 +62,10 @@ public class API {
             result = sendCredentials(this.baseUrl + l.getUri(), headers);
             if (result.length() < 1) {
                 ErrorData d = new ErrorData();
+                ArrayList<ErrorData> errors = new ArrayList<ErrorData>();
                 ResultData a = new ResultData();
-                a.setData(d);
+                errors.add(d);
+                a.setData(errors);
                 return (T) a;
             }
             result = result.substring(result.indexOf("/tokens"), result.length());
@@ -200,7 +203,7 @@ public class API {
         String result = "";
         try {
             serverAddress = new URL(url);
-            //connection = (HttpURLConnection) serverAddress.openConnection();
+            // connection = (HttpURLConnection) serverAddress.openConnection();
             connection = (HttpsURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setRequestMethod("GET");
@@ -258,6 +261,7 @@ public class API {
         try {
             serverAddress = new URL(url);
             connection = (HttpsURLConnection) serverAddress.openConnection();
+            //connection =(HttpURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
