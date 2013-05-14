@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Time: 10:37
  * To change this template use File | Settings | File Templates.
  */
-public class RouteData extends GeneralDataType {
+public class RouteData extends BaseData {
     private ArrayList<Integer> Items;
 
     public ArrayList<Integer> getItems() {

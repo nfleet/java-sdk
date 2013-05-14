@@ -7,7 +7,7 @@ import java.util.Date;
  * Time: 10:39
  * To change this template use File | Settings | File Templates.
  */
-public class TimeWindowData extends GeneralDataType {
+public class TimeWindowData extends BaseData {
     private Date Start;
     private Date End;
 

@@ -1,5 +1,3 @@
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: japelait
@@ -8,7 +6,7 @@ import java.util.List;
  *
  * LocationData only accepts coordinates at the moment, will update SDK when this will be changed.
  */
-public class LocationData extends GeneralDataType {
+public class LocationData extends BaseData {
 
     private CoordinateData Coordinate;
     private int Id;

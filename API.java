@@ -1,5 +1,6 @@
 import com.google.gson.*;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;
@@ -35,7 +36,7 @@ public class API {
         this.password = password;
         ResultData result = navigate(ResultData.class, getAuthLink());
 
-        if (result == null || result.getData() != null) {
+        if (result == null || result.getItems() != null) {
             return false;
         }
 
@@ -45,12 +46,11 @@ public class API {
         return true;
     }
 
-    public <T extends GeneralDataType> T navigate(Class<T> tClass, Link l) {
+    public <T extends BaseData> T navigate(Class<T> tClass, Link l) {
         String result;
 
         if (tClass.equals(AuthenticationData.class)) {
             result = sendGet(this.baseUrl + l.getUri());
-            System.out.println(result);
             return gson.fromJson(result, tClass);
         }
 
@@ -65,7 +65,7 @@ public class API {
                 ArrayList<ErrorData> errors = new ArrayList<ErrorData>();
                 ResultData a = new ResultData();
                 errors.add(d);
-                a.setData(errors);
+                a.setItems(errors);
                 return (T) a;
             }
             result = result.substring(result.indexOf("/tokens"), result.length());
@@ -88,12 +88,11 @@ public class API {
             data.setLocation(new Link("location", result, "GET"));
             return (T) data;
         }
-        System.out.println(result);
         return gson.fromJson(result, tClass);
     }
 
 
-    public <T extends GeneralDataType> T navigate(Class<T> tClass, Link l, Object object ) {
+    public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object ) {
         String result = "";
 
         if (l.getMethod().equals("PUT")) {
@@ -102,7 +101,6 @@ public class API {
 
         if (l.getMethod().equals("POST") ) {
             String url = this.baseUrl + l.getUri();
-            System.out.println(url);
             result = sendPost(createJsonFromDto(object), url);
         }
 
@@ -110,13 +108,14 @@ public class API {
             ResultData data = new ResultData();
             if (result.contains("/problems")){
                 result = result.substring(result.indexOf("/problems"), result.length());
-            } else {
+            } else if (result.contains("/api")) {
                 result = result.substring(result.indexOf("/api"), result.length());
+            } else {
+                data = gson.fromJson(result, ResultData.class);
             }
             data.setLocation(new Link("location", result, "GET"));
             return (T) data;
         }
-
         return gson.fromJson(result, tClass);
     }
     private String sendPut(String json, String address) {
@@ -166,7 +165,7 @@ public class API {
                     sb.append(s);
                 }
                 System.out.println("Please check the request " + connection.getResponseMessage() + sb.toString()+ " " + address) ;
-                return result;
+                return sb.toString();
             }
 
             InputStream is = connection.getInputStream();

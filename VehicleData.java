@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Time: 12:01
  * To change this template use File | Settings | File Templates.
  */
-public class VehicleData extends GeneralDataType {
+public class VehicleData extends BaseData {
     private int Id;
     private String Name;
     private ArrayList<CapacityData> Capacities;

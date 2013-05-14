@@ -12,7 +12,7 @@ public class UsingCoSkyAPIv2 {
 
     public static void main (String[] args) {
         API api = new API("https://api.co-sky.fi");
-        boolean success = api.authenticate("username", "secret");
+        boolean success = api.authenticate("testi", "user");
 
         if (success) {
 
@@ -68,12 +68,12 @@ public class UsingCoSkyAPIv2 {
 
             result = api.navigate(ResultData.class, problem1.getLink("create-vehicle"), vehicleData);
 
+
             VehicleDataSetResult d = api.navigate(VehicleDataSetResult.class, problem1.getLink("list-vehicles"));
 
             for( VehicleDataResult zdf : d.getItems()) {
                 System.out.println(zdf);
             }
-
 
             ArrayList<TaskEventData> taskEvents = new ArrayList<TaskEventData>();
             taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, capacities));
@@ -93,8 +93,8 @@ public class UsingCoSkyAPIv2 {
 
             result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
             ErrorData errorData;
-            if (result.getData() != null) {
-                System.out.println(result.getData());
+            if (result.getItems() != null) {
+                System.out.println(result.getItems());
             }
 
             TaskDataSet taskData = api.navigate(TaskDataSet.class, problem1.getLink("list-tasks") );
@@ -108,7 +108,6 @@ public class UsingCoSkyAPIv2 {
             System.out.println(result);
 
             OptimizationData optData = api.navigate(OptimizationData.class, result.getLocation());
-                      /*
             while (true) {
                 try {
                     Thread.sleep(500);
@@ -123,7 +122,6 @@ public class UsingCoSkyAPIv2 {
             for (VehicleData vd : optData.getResults().getItems()) {
                 System.out.println("Vehicles route " + vd.getRoute());
             }
-                        */
         }  else {
             System.out.println("Credentials were wrong, or the service is unavailable");
         }

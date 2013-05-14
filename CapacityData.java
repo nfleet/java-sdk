@@ -5,7 +5,7 @@
  * Time: 10:31
  * To change this template use File | Settings | File Templates.
  */
-public class CapacityData extends GeneralDataType {
+public class CapacityData extends BaseData {
     private String Name;
     private int Amount;
 

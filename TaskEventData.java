@@ -8,7 +8,7 @@ import java.util.List;
  * Time: 15:15
  * To change this template use File | Settings | File Templates.
  */
-public class TaskEventData extends GeneralDataType{
+public class TaskEventData extends BaseData {
     private int Id;
     private Type Type;
     private State State;

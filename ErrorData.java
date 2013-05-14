@@ -5,12 +5,10 @@
  * Time: 13:37
  * To change this template use File | Settings | File Templates.
  */
-public class ErrorData extends GeneralDataType {
+public class ErrorData extends BaseData {
     private int Code;
     private String Message;
-    private String InvalidValue;
-
-    public ErrorData() {
+        public ErrorData() {
     }
 
     public void setCode(int code) {
@@ -21,11 +19,8 @@ public class ErrorData extends GeneralDataType {
         this.Message = message;
     }
 
-    public void setInvalidValue(String message) {
-        this.InvalidValue = message;
-    }
 
     public String toString() {
-        return "Code: " + Code + " Message: " + Message + " InvalidValue: " + InvalidValue;
+        return "Code: " + Code + " Message: " + Message;
     }
 }

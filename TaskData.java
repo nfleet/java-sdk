@@ -7,7 +7,7 @@ import java.util.List;
  * Time: 15:11
  * To change this template use File | Settings | File Templates.
  */
-public class TaskData extends GeneralDataType{
+public class TaskData extends BaseData {
     private String Name;
     private String Info;
     private List<TaskEventData> TaskEvents;

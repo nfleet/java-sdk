@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: japelait
@@ -8,6 +5,6 @@ import java.util.List;
  * Time: 14:11
  * To change this template use File | Settings | File Templates.
  */
-public class ApiData extends GeneralDataType {
+public class ApiData extends BaseData {
 
 }

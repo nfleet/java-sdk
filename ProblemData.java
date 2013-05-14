@@ -7,7 +7,7 @@ import java.util.Date;
  * Time: 11:59
  * To change this template use File | Settings | File Templates.
  */
-public class ProblemData extends GeneralDataType{
+public class ProblemData extends BaseData {
     private int Id;
     private Date CreationDate;
     private Date ModifiedDate;

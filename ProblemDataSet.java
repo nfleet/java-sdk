@@ -7,7 +7,7 @@ import java.util.List;
  * Time: 11:16
  * To change this template use File | Settings | File Templates.
  */
-public class ProblemDataSet extends GeneralDataType{
+public class ProblemDataSet extends BaseData {
     private List<ProblemData> Items;
 
     public List<ProblemData> getItems() {

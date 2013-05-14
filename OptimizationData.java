@@ -5,7 +5,7 @@
  * Time: 12:34
  * To change this template use File | Settings | File Templates.
  */
-public class OptimizationData extends GeneralDataType {
+public class OptimizationData extends BaseData {
     private int Id;
     private String State;
     private VehicleDataSet Results;

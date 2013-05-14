@@ -7,18 +7,18 @@ import java.util.ArrayList;
  * Time: 9:17
  * To change this template use File | Settings | File Templates.
  */
-public class ResultData extends GeneralDataType {
+public class ResultData extends BaseData {
     private Link Location;
-    private ArrayList<ErrorData> ErrorDataSet;
+    private ArrayList<ErrorData> Items;
     private int Id;
     private String Message;
 
-    public ArrayList<ErrorData> getErrorDataSet() {
-        return ErrorDataSet;
+    public ArrayList<ErrorData> getItems() {
+        return Items;
     }
 
-    public void setErrorDataSet(ArrayList<ErrorData> errorDataSet) {
-        ErrorDataSet = errorDataSet;
+    public void setItems(ArrayList<ErrorData> items) {
+        Items = items;
     }
 
     public int getId() {
@@ -35,14 +35,6 @@ public class ResultData extends GeneralDataType {
 
     public void setMessage(String message) {
         Message = message;
-    }
-
-    public ArrayList<ErrorData> getData() {
-        return ErrorDataSet;
-    }
-
-    public void setData(ArrayList<ErrorData> data) {
-        this.ErrorDataSet = data;
     }
 
     public Link getLocation() {

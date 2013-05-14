@@ -1,5 +1,3 @@
-import java.util.Date;
-
 /**
  * Created with IntelliJ IDEA.
  * User: japelait
@@ -7,7 +5,7 @@ import java.util.Date;
  * Time: 8:41
  * To change this template use File | Settings | File Templates.
  */
-public class AuthenticationData extends GeneralDataType {
+public class AuthenticationData extends BaseData {
     private boolean Success;
     private int UserId;
     private String TokenType;
