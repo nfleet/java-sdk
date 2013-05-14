@@ -34,5 +34,5 @@ public class CoordinateData {
         System = system;
     }
 
-    enum CoordinateSystem{WGS84};
+    enum CoordinateSystem{WGS84, Euclidian};
 }

@@ -129,8 +129,8 @@ public class API {
         HttpURLConnection connection = null;
         try {
             serverAddress = new URL(address);
-            //connection = (HttpURLConnection) serverAddress.openConnection();
-            connection = (HttpsURLConnection) serverAddress.openConnection();
+            connection = (HttpURLConnection) serverAddress.openConnection();
+            //connection = (HttpsURLConnection) serverAddress.openConnection();
             connection.setDoOutput(true);
             connection.setInstanceFollowRedirects(false);
             connection.setRequestMethod("POST");
@@ -202,8 +202,8 @@ public class API {
         String result = "";
         try {
             serverAddress = new URL(url);
-            // connection = (HttpURLConnection) serverAddress.openConnection();
-            connection = (HttpsURLConnection) serverAddress.openConnection();
+             connection = (HttpURLConnection) serverAddress.openConnection();
+            //connection = (HttpsURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setRequestMethod("GET");
             if (authenticationData != null) {
@@ -259,8 +259,8 @@ public class API {
         String result = "";
         try {
             serverAddress = new URL(url);
-            connection = (HttpsURLConnection) serverAddress.openConnection();
-            //connection =(HttpURLConnection) serverAddress.openConnection();
+            //connection = (HttpsURLConnection) serverAddress.openConnection();
+            connection =(HttpURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");

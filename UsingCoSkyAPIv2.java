@@ -11,8 +11,8 @@ import java.util.Date;
 public class UsingCoSkyAPIv2 {
 
     public static void main (String[] args) {
-        API api = new API("https://api.co-sky.fi");
-        boolean success = api.authenticate("testi", "user");
+        API api = new API("url");
+        boolean success = api.authenticate("username", "secret");
 
         if (success) {
 
@@ -41,7 +41,7 @@ public class UsingCoSkyAPIv2 {
             //Jossain keskustassa
             coordinateData.setLatitude(62.244588);
             coordinateData.setLongitude(25.742683);
-            coordinateData.setSystem(CoordinateData.CoordinateSystem.WGS84);
+            coordinateData.setSystem(CoordinateData.CoordinateSystem.Euclidian);
             LocationData locationData = new LocationData();
             locationData.setCoordinatesData(coordinateData);
 
@@ -49,7 +49,7 @@ public class UsingCoSkyAPIv2 {
             //Vaajakoski
             pickup.setLatitude(62.247906);
             pickup.setLongitude(25.867395);
-            pickup.setSystem(CoordinateData.CoordinateSystem.WGS84);
+            pickup.setSystem(CoordinateData.CoordinateSystem.Euclidian);
             LocationData pickupLocation = new LocationData();
             pickupLocation.setCoordinatesData(pickup);
 
@@ -57,12 +57,12 @@ public class UsingCoSkyAPIv2 {
             //Tikkakoskella
             delivery.setLatitude(62.386909);
             delivery.setLongitude(25.654106);
-            delivery.setSystem(CoordinateData.CoordinateSystem.WGS84);
+            delivery.setSystem(CoordinateData.CoordinateSystem.Euclidian);
             LocationData deliveryLocation = new LocationData();
             deliveryLocation.setCoordinatesData(delivery);
 
             ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-            capacities.add(new CapacityData("Weight", 10));
+            capacities.add(new CapacityData("Weight", 100000));
 
             VehicleData vehicleData = new VehicleData("demoVehicle",capacities, locationData, locationData);
 
@@ -75,9 +75,35 @@ public class UsingCoSkyAPIv2 {
                 System.out.println(zdf);
             }
 
+            ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
+            capacities.add(new CapacityData("Weight", 1));
+            for (int i = 0 ; i < 4; i++) {
+                ArrayList<TaskEventData> taskEvents = new ArrayList<TaskEventData>();
+                taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, taskCapacity));
+                taskEvents.add(new TaskEventData(Type.Delivery, deliveryLocation, taskCapacity));
+                TaskData task = new TaskData(taskEvents);
+                task.setName("testTask");
+
+                ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+                Date morning = new Date();
+                morning.setHours(7);
+                Date evening = new Date();
+                evening.setHours(16);
+                timeWindows.add(new TimeWindowData(morning, evening));
+
+                taskEvents.get(0).setTimeWindows(timeWindows);
+                taskEvents.get(1).setTimeWindows(timeWindows);
+
+                result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
+
+            }
+
+
+
+
             ArrayList<TaskEventData> taskEvents = new ArrayList<TaskEventData>();
-            taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, capacities));
-            taskEvents.add(new TaskEventData(Type.Delivery, deliveryLocation, capacities));
+            taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, taskCapacity));
+            taskEvents.add(new TaskEventData(Type.Delivery, deliveryLocation, taskCapacity));
             TaskData task = new TaskData(taskEvents);
             task.setName("testTask");
 
@@ -88,8 +114,8 @@ public class UsingCoSkyAPIv2 {
             evening.setHours(16);
             timeWindows.add(new TimeWindowData(morning, evening));
 
-            taskEvents.get(0).setTimeWindows(timeWindows);
-            taskEvents.get(1).setTimeWindows(timeWindows);
+            //taskEvents.get(0).setTimeWindows(timeWindows);
+            //taskEvents.get(1).setTimeWindows(timeWindows);
 
             result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
             ErrorData errorData;
@@ -110,16 +136,18 @@ public class UsingCoSkyAPIv2 {
             OptimizationData optData = api.navigate(OptimizationData.class, result.getLocation());
             while (true) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1500);
                     optData = api.navigate(OptimizationData.class, optData.getLink("self"));
-                    if (optData.getState().equals("Stopped")) break;
                     System.out.println(optData);
+                    if (optData.getState().equals("Stopped")) break;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-            for (VehicleData vd : optData.getResults().getItems()) {
+            VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, optData.getLink("results"));
+
+            for (VehicleData vd : vehicles.getItems()) {
                 System.out.println("Vehicles route " + vd.getRoute());
             }
         }  else {
