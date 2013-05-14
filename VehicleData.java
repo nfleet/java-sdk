@@ -31,6 +31,10 @@ public class VehicleData extends BaseData {
         this.Name = name;
     }
 
+    public int getId() {
+        return this.Id;
+    }
+
     public void setCapacities(ArrayList<CapacityData> capa) {
         this.Capacities = capa;
     }
