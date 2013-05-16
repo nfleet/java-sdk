@@ -72,6 +72,7 @@ public class API {
             data.setLocation(new Link("location", result, "GET"));
             return (T) data;
         }
+        String method = l.getMethod();
 
         if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("start-new-optimization")) {
             result = sendGet(this.baseUrl + l.getUri());
@@ -80,7 +81,6 @@ public class API {
         }  else {
             result = sendGet(l.getUri());
         }
-
 
         if (tClass.equals(ResultData.class)) {
             ResultData data = new ResultData();
@@ -118,7 +118,76 @@ public class API {
         return gson.fromJson(result, tClass);
     }
     private String sendPut(String json, String address) {
-        return "not supported yet " + json + " " + address;
+        URL serverAddress;
+        BufferedReader br;
+        String result = "";
+        HttpURLConnection connection = null;
+        try {
+            serverAddress = new URL(address);
+            connection = (HttpURLConnection) serverAddress.openConnection();
+            connection.setDoOutput(true);
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestMethod("PUT");
+            connection.addRequestProperty("Content-Type", "application/json");
+            connection.addRequestProperty("Accept", "application/json");
+            connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
+
+            if (authenticationData != null) {
+                connection.addRequestProperty("Authorization" , authenticationData.getTokenType() + " " + authenticationData.getAccessToken());
+            }
+
+            OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
+            os.write(json);
+            os.flush();
+            os.close();
+            connection.connect();
+
+            if ( connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
+                return connection.getHeaderField("Location");
+            }
+
+            if ( connection.getResponseCode() == 401 ) {
+                authenticate(this.username, this.password);
+                return sendPost(json, address);
+            }
+
+            if ( connection.getResponseCode() != 200 ) {
+                InputStream is = connection.getErrorStream();
+                br = new BufferedReader(new InputStreamReader(is));
+                StringBuilder sb = new StringBuilder();
+                String s;
+                while ((s = br.readLine()) != null) {
+                    sb.append(s);
+                }
+                System.out.println("Please check the request " + connection.getResponseMessage() + sb.toString()+ " " + address) ;
+                return sb.toString();
+            }
+
+            InputStream is = connection.getInputStream();
+            br = new BufferedReader(new InputStreamReader(is));
+
+            StringBuilder sb = new StringBuilder();
+            String sa;
+            while (( sa = br.readLine()) != null) {
+                sb.append(sa).append("\n");
+            }
+            result = sb.toString();
+        } catch (MalformedURLException e) {
+            System.out.println("Troubles with the url " + address );
+            return "";
+        } catch (ProtocolException e) {
+            System.out.println("Troubles reaching the service, please check service status");
+            return "";
+        } catch (UnsupportedEncodingException e) {
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        } finally {
+            assert connection != null;
+            connection.disconnect();
+        }
+        return result;
     }
 
     private String sendPost(String json, String address) {
@@ -129,7 +198,6 @@ public class API {
         try {
             serverAddress = new URL(address);
             connection = (HttpURLConnection) serverAddress.openConnection();
-            //connection = (HttpsURLConnection) serverAddress.openConnection();
             connection.setDoOutput(true);
             connection.setInstanceFollowRedirects(false);
             connection.setRequestMethod("POST");
@@ -201,8 +269,7 @@ public class API {
         String result = "";
         try {
             serverAddress = new URL(url);
-             connection = (HttpURLConnection) serverAddress.openConnection();
-            //connection = (HttpsURLConnection) serverAddress.openConnection();
+            connection = (HttpURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setRequestMethod("GET");
             if (authenticationData != null) {
@@ -251,6 +318,10 @@ public class API {
         return result;
     }
 
+    private String sendDelete(String url) {
+        return "not implemented";
+    }
+
     private String sendCredentials(String url, HashMap<String, String> headers) {
         URL serverAddress;
         HttpURLConnection connection;
@@ -258,7 +329,6 @@ public class API {
         String result = "";
         try {
             serverAddress = new URL(url);
-            //connection = (HttpsURLConnection) serverAddress.openConnection();
             connection =(HttpURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setDoOutput(true);

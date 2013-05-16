@@ -66,11 +66,13 @@ public class UsingCoSkyAPIv2 {
             result = api.navigate(ResultData.class, problem1.getLink("create-vehicle"), vehicleData);
 
 
-            VehicleDataSetResult d = api.navigate(VehicleDataSetResult.class, problem1.getLink("list-vehicles"));
+            VehicleDataSet d = api.navigate(VehicleDataSet.class, problem1.getLink("list-vehicles"));
 
-            for( VehicleDataResult zdf : d.getItems()) {
+            for( VehicleData zdf : d.getItems()) {
                 System.out.println(zdf);
             }
+
+
 
             ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
             capacities.add(new CapacityData("Weight", 1));
@@ -87,9 +89,6 @@ public class UsingCoSkyAPIv2 {
                 result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
 
             }
-
-
-
 
             ArrayList<TaskEventData> taskEvents = new ArrayList<TaskEventData>();
             taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, taskCapacity));
@@ -134,6 +133,7 @@ public class UsingCoSkyAPIv2 {
                 System.out.println("Vehicles route " + vd.getRoute());
             }
 
+            //Get list of tasks from the optimization, can view the plannedArrival and departure times.
             TaskDataSet tasks = api.navigate(TaskDataSet.class, optData.getLink("resulttasks"));
             for(TaskData td : tasks.getItems()) {
                 System.out.println("Task " + td);
