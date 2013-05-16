@@ -16,7 +16,6 @@ import java.util.HashMap;
  * Time: 10:28
  * API-class to handle the communication between SDK-user and CO-SKY optimization's REST-API.
  *
- * TODO: There will be an change to the ResultData class and thus some changes will occur.
  */
 public class API {
     private String baseUrl;
