@@ -9,6 +9,15 @@ public class OptimizationData extends BaseData {
     private int Id;
     private String State;
     private VehicleDataSet Results;
+    private int Progress;
+
+    public int getProgress() {
+        return Progress;
+    }
+
+    public void setProgress(int progress) {
+        Progress = progress;
+    }
 
     public int getId() {
         return Id;
