@@ -17,7 +17,7 @@ public class UsingCoSkyAPIv2 {
         if (success) {
             ApiData data = api.navigate(ApiData.class, api.getRoot());
 
-            ResultData result  = api.navigate(ResultData.class, data.getLink("list-problems"));
+            ResultData result = api.navigate(ResultData.class, data.getLink("list-problems"));
 
             ProblemData newProblem = new ProblemData("example");
             result = api.navigate(ResultData.class, data.getLink("create-problem"), newProblem );
@@ -120,7 +120,8 @@ public class UsingCoSkyAPIv2 {
                 try {
                     Thread.sleep(1500);
                     optData = api.navigate(OptimizationData.class, optData.getLink("self"));
-                    System.out.println(optData);
+                    //get the percentage of completion.
+                    System.out.println("Optimization is at : " + optData.getProgress() + " %");
                     if (optData.getState().equals("Stopped")) break;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -138,6 +139,7 @@ public class UsingCoSkyAPIv2 {
             for(TaskData td : tasks.getItems()) {
                 System.out.println("Task " + td);
                 for (TaskEventData ted : td.getTaskEvents()) {
+                    //arrival: ted.getPlannedArrivalTime() departure: ted.getPlannedDepartureTime()
                     System.out.println("-TaskEvent " + ted);
                 }
             }
