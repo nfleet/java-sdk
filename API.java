@@ -49,7 +49,7 @@ public class API {
         String result;
 
         if (tClass.equals(AuthenticationData.class)) {
-            result = sendGet(this.baseUrl + l.getUri());
+            result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
             return gson.fromJson(result, tClass);
         }
 
@@ -75,11 +75,11 @@ public class API {
         String method = l.getMethod();
 
         if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("start-new-optimization")) {
-            result = sendGet(this.baseUrl + l.getUri());
+            result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
         } else if (l.getRel().equals("start-new-optimization")) {
-            result = sendPost("", this.baseUrl + l.getUri());
+            result = sendRequest(Verb.POST, this.baseUrl + l.getUri(), "");
         }  else {
-            result = sendGet(l.getUri());
+            result = sendRequest(Verb.GET, l.getUri(), "");
         }
 
         if (tClass.equals(ResultData.class)) {
@@ -95,12 +95,12 @@ public class API {
         String result = "";
 
         if (l.getMethod().equals("PUT")) {
-            result = sendPut(createJsonFromDto(object), this.baseUrl + l.getUri());
+            result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), createJsonFromDto(object));
         }
 
         if (l.getMethod().equals("POST") ) {
             String url = this.baseUrl + l.getUri();
-            result = sendPost(createJsonFromDto(object), url);
+            result = sendRequest(Verb.POST, url, createJsonFromDto(object));
         }
 
         if (tClass.equals(ResultData.class) && result.length() > 0) {
@@ -117,176 +117,70 @@ public class API {
         }
         return gson.fromJson(result, tClass);
     }
-    private String sendPut(String json, String address) {
-        URL serverAddress;
-        BufferedReader br;
-        String result = "";
-        HttpURLConnection connection = null;
-        try {
-            serverAddress = new URL(address);
-            connection = (HttpURLConnection) serverAddress.openConnection();
-            connection.setDoOutput(true);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("PUT");
-            connection.addRequestProperty("Content-Type", "application/json");
-            connection.addRequestProperty("Accept", "application/json");
-            connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
 
-            if (authenticationData != null) {
-                connection.addRequestProperty("Authorization" , authenticationData.getTokenType() + " " + authenticationData.getAccessToken());
-            }
 
-            OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
-            os.write(json);
-            os.flush();
-            os.close();
-            connection.connect();
-
-            if ( connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
-                return connection.getHeaderField("Location");
-            }
-
-            if ( connection.getResponseCode() == 401 ) {
-                authenticate(this.username, this.password);
-                return sendPost(json, address);
-            }
-
-            if ( connection.getResponseCode() != 200 ) {
-                InputStream is = connection.getErrorStream();
-                br = new BufferedReader(new InputStreamReader(is));
-                StringBuilder sb = new StringBuilder();
-                String s;
-                while ((s = br.readLine()) != null) {
-                    sb.append(s);
-                }
-                System.out.println("Please check the request " + connection.getResponseMessage() + sb.toString()+ " " + address) ;
-                return sb.toString();
-            }
-
-            InputStream is = connection.getInputStream();
-            br = new BufferedReader(new InputStreamReader(is));
-
-            StringBuilder sb = new StringBuilder();
-            String sa;
-            while (( sa = br.readLine()) != null) {
-                sb.append(sa).append("\n");
-            }
-            result = sb.toString();
-        } catch (MalformedURLException e) {
-            System.out.println("Troubles with the url " + address );
-            return "";
-        } catch (ProtocolException e) {
-            System.out.println("Troubles reaching the service, please check service status");
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            return "";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        } finally {
-            assert connection != null;
-            connection.disconnect();
+    private String method(Verb verb) {
+        switch (verb) {
+            case GET:
+                return "GET";
+            case PUT:
+                return "PUT";
+            case POST:
+                return "POST";
+            case DELETE:
+                return "DELETE";
         }
-        return result;
+        return "";
     }
 
-    private String sendPost(String json, String address) {
+    private String sendRequest(Verb verb, String url, String json) {
         URL serverAddress;
         BufferedReader br;
         String result = "";
         HttpURLConnection connection = null;
-        try {
-            serverAddress = new URL(address);
-            connection = (HttpURLConnection) serverAddress.openConnection();
-            connection.setDoOutput(true);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("POST");
-
-            connection.addRequestProperty("Content-Type", "application/json");
-            connection.addRequestProperty("Accept", "application/json");
-            connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
-            if (authenticationData != null) {
-                connection.addRequestProperty("Authorization" , authenticationData.getTokenType() + " " + authenticationData.getAccessToken());
-            }
-            OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
-            os.write(json);
-            os.flush();
-            os.close();
-            connection.connect();
-
-            if ( connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
-                return connection.getHeaderField("Location");
-            }
-
-            if ( connection.getResponseCode() == 401 ) {
-                authenticate(this.username, this.password);
-                return sendPost(json, address);
-            }
-
-            if ( connection.getResponseCode() != 200 ) {
-                InputStream is = connection.getErrorStream();
-                br = new BufferedReader(new InputStreamReader(is));
-                StringBuilder sb = new StringBuilder();
-                String s;
-                while ((s = br.readLine()) != null) {
-                    sb.append(s);
-                }
-                System.out.println("Please check the request " + connection.getResponseMessage() + sb.toString()+ " " + address) ;
-                return sb.toString();
-            }
-
-            InputStream is = connection.getInputStream();
-            br = new BufferedReader(new InputStreamReader(is));
-
-            StringBuilder sb = new StringBuilder();
-            String sa;
-            while (( sa = br.readLine()) != null) {
-                sb.append(sa).append("\n");
-            }
-            result = sb.toString();
-        } catch (MalformedURLException e) {
-            System.out.println("Troubles with the url " + address );
-            return "";
-        } catch (ProtocolException e) {
-            System.out.println("Troubles reaching the service, please check service status");
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            return "";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        } finally {
-            assert connection != null;
-            connection.disconnect();
-        }
-        return result;
-    }
-
-    private String sendGet(String url) {
-        URL serverAddress;
-        HttpURLConnection connection = null;
-        BufferedReader br;
-        String result = "";
         try {
             serverAddress = new URL(url);
-            connection = (HttpURLConnection) serverAddress.openConnection();
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("GET");
+            connection = (HttpsURLConnection) serverAddress.openConnection();
+
+            boolean doOutput = (verb != Verb.GET);
+            connection.setDoOutput(doOutput);
+            connection.setRequestMethod( method(verb) );
+
             if (authenticationData != null) {
-                connection.addRequestProperty("Authorization" , authenticationData.getTokenType() + " " + authenticationData.getAccessToken());
+                connection.addRequestProperty("Authorization", authenticationData.getTokenType() + " " + authenticationData.getAccessToken());
             }
-            connection.addRequestProperty("Accept", "application/json");
-            connection.addRequestProperty("Content-Type", "application/json" );
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+
+            if (json.length() > 0 || verb == Verb.POST) {
+                connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
+                OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+                osw.write(json);
+                osw.flush();
+                osw.close();
+            }
 
             connection.connect();
 
-            if (connection.getResponseCode() == 401) {
-                authenticate(username, password);
-                return sendGet(url);
+            if (connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
+                return connection.getHeaderField("Location");
             }
+
+            if (connection.getResponseCode() == 401) {
+                authenticate(this.username, this.password);
+                return sendRequest(verb, url, json);
+            }
+
             if (connection.getResponseCode() != 200) {
-                System.out.println("Troubles with the request, please check, " + url + " " + connection.getResponseMessage() );
-                return "";
+                InputStream stream = connection.getErrorStream();
+                br = new BufferedReader(new InputStreamReader(stream));
+                StringBuilder sb = new StringBuilder();
+                String s;
+                while ((s = br.readLine()) != null) {
+                    sb.append(s);
+                }
+                System.out.println("Please check the request " + connection.getResponseMessage() + sb.toString()+ " " + url) ;
+                return sb.toString();
             }
 
             InputStream is = connection.getInputStream();
@@ -299,7 +193,7 @@ public class API {
             }
             result = sb.toString();
         } catch (MalformedURLException e) {
-            System.out.println("Troubles with the url: " + url);
+            System.out.println("Troubles with the url " + url);
             return "";
         } catch (ProtocolException e) {
             System.out.println("Troubles reaching the service, please check service status");
@@ -307,20 +201,15 @@ public class API {
         } catch (UnsupportedEncodingException e) {
             return "";
         } catch (IOException e) {
-            try {
-                String s = (connection != null) ? connection.getResponseMessage() : "";
-                System.out.println("Troubles with IO : " + s);
-            } catch (Exception e1){
-
-            }
+            e.printStackTrace();
             return "";
+        } finally {
+            assert connection != null;
+            connection.disconnect();
         }
-        return result;
-    }
+            return result;
+        }
 
-    private String sendDelete(String url) {
-        return "not implemented";
-    }
 
     private String sendCredentials(String url, HashMap<String, String> headers) {
         URL serverAddress;
@@ -385,5 +274,8 @@ public class API {
     public Link getRoot() {
         return new Link("self", baseUrl, "GET");
     }
+
+    private enum Verb {GET, PUT, POST, DELETE}
 }
+
 
