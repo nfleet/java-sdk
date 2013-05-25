@@ -1,18 +1,16 @@
 import java.util.ArrayList;
 import java.util.Date;
 
+
 /**
- * Created with IntelliJ IDEA.
- * User: Jarkko Laitinen
- * Date: 21.3.2013
- * Time: 9:21
- * To change this template use File | Settings | File Templates.
+ * Example program to demonstrate how to use the CO-SKY RESTful API
+ * For reporting bugs in the SDK, please contact jarkko.p.laitinen (at) jyu.fi
  */
 public class UsingCoSkyAPIv2 {
 
     public static void main (String[] args) {
         API api = new API("url");
-        boolean success = api.authenticate("username", "secret");
+        boolean success = api.authenticate("USER", "SECRET");
 
         if (success) {
             ApiData data = api.navigate(ApiData.class, api.getRoot());
@@ -22,7 +20,6 @@ public class UsingCoSkyAPIv2 {
             ProblemData newProblem = new ProblemData("example");
             result = api.navigate(ResultData.class, data.getLink("create-problem"), newProblem );
 
-            ProblemData problemData = api.navigate(ProblemData.class, result.getLocation());
 
             ProblemDataSet problems = api.navigate(ProblemDataSet.class, data.getLink("list-problems"));
             ProblemData problem1 = problems.getItems().get(0);
@@ -63,7 +60,6 @@ public class UsingCoSkyAPIv2 {
 
             VehicleData vehicleData = new VehicleData("demoVehicle",capacities, locationData, locationData);
             vehicleData.setTimeWindows(timeWindows);
-            result = api.navigate(ResultData.class, problem1.getLink("create-vehicle"), vehicleData);
 
 
             VehicleDataSet d = api.navigate(VehicleDataSet.class, problem1.getLink("list-vehicles"));
@@ -71,8 +67,6 @@ public class UsingCoSkyAPIv2 {
             for( VehicleData zdf : d.getItems()) {
                 System.out.println(zdf);
             }
-
-
 
             ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
             capacities.add(new CapacityData("Weight", 1));
@@ -85,6 +79,8 @@ public class UsingCoSkyAPIv2 {
                 task.setName("testTask");
                 taskEvents.get(0).setTimeWindows(timeWindows);
                 taskEvents.get(1).setTimeWindows(timeWindows);
+                taskEvents.get(0).setServiceTime(10);
+                taskEvents.get(1).setServiceTime(10);
 
                 result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
 
@@ -99,7 +95,7 @@ public class UsingCoSkyAPIv2 {
             taskEvents.get(0).setTimeWindows(timeWindows);
             taskEvents.get(1).setTimeWindows(timeWindows);
 
-            result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
+
             ErrorData errorData;
             if (result.getItems() != null) {
                 System.out.println(result.getItems());
@@ -116,35 +112,38 @@ public class UsingCoSkyAPIv2 {
             System.out.println(result);
 
             OptimizationData optData = api.navigate(OptimizationData.class, result.getLocation());
+
             while (true) {
                 try {
+
                     Thread.sleep(1500);
                     optData = api.navigate(OptimizationData.class, optData.getLink("self"));
                     //get the percentage of completion.
-                    System.out.println("Optimization is at : " + optData.getProgress() + " %");
+                    System.out.println("Optimization is at : " + optData.getProgress());
                     if (optData.getState().equals("Stopped")) break;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-            VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, optData.getLink("results"));
+            VehicleDataSet vehicleDataSet = api.navigate(VehicleDataSet.class, optData.getLink("results"));
 
-            for (VehicleData vd : vehicles.getItems()) {
+            for (VehicleData vd : vehicleDataSet.getItems()) {
                 System.out.println("Vehicles route " + vd.getRoute());
             }
 
             //Get list of tasks from the optimization, can view the plannedArrival and departure times.
-            TaskDataSet tasks = api.navigate(TaskDataSet.class, optData.getLink("resulttasks"));
-            for(TaskData td : tasks.getItems()) {
+            TaskDataSet taskDataSet = api.navigate(TaskDataSet.class, optData.getLink("resulttasks"));
+            for(TaskData td : taskDataSet.getItems()) {
                 System.out.println("Task " + td);
-                for (TaskEventData ted : td.getTaskEvents()) {
-                    //arrival: ted.getPlannedArrivalTime() departure: ted.getPlannedDepartureTime()
-                    System.out.println("-TaskEvent " + ted);
-                }
-            }
+                TaskEventData previous = null;
+                for (TaskEventData current : td.getTaskEvents()) {
+                    System.out.println("-TaskEvent " + " type " + current.getType() + " " + current.getPlannedArrivalTime() + " " + current.getPlannedDepartureTime() + " " + current.getServiceTime());
 
-        }  else {
+                }
+
+            }
+        } else {
             System.out.println("Credentials were wrong, or the service is unavailable");
         }
     }

@@ -72,7 +72,6 @@ public class API {
             data.setLocation(new Link("location", result, "GET"));
             return (T) data;
         }
-        String method = l.getMethod();
 
         if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("start-new-optimization")) {
             result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
@@ -89,7 +88,6 @@ public class API {
         }
         return gson.fromJson(result, tClass);
     }
-
 
     public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object ) {
         String result = "";
@@ -118,21 +116,6 @@ public class API {
         return gson.fromJson(result, tClass);
     }
 
-
-    private String method(Verb verb) {
-        switch (verb) {
-            case GET:
-                return "GET";
-            case PUT:
-                return "PUT";
-            case POST:
-                return "POST";
-            case DELETE:
-                return "DELETE";
-        }
-        return "";
-    }
-
     private String sendRequest(Verb verb, String url, String json) {
         URL serverAddress;
         BufferedReader br;
@@ -140,7 +123,7 @@ public class API {
         HttpURLConnection connection = null;
         try {
             serverAddress = new URL(url);
-            connection = (HttpsURLConnection) serverAddress.openConnection();
+            connection = (HttpURLConnection) serverAddress.openConnection();
 
             boolean doOutput = (verb != Verb.GET);
             connection.setDoOutput(doOutput);
@@ -167,7 +150,7 @@ public class API {
             }
 
             if (connection.getResponseCode() == 401) {
-                authenticate(this.username, this.password);
+                this.authenticate(this.username, this.password);
                 return sendRequest(verb, url, json);
             }
 
@@ -273,6 +256,20 @@ public class API {
 
     public Link getRoot() {
         return new Link("self", baseUrl, "GET");
+    }
+
+    private String method(Verb verb) {
+        switch (verb) {
+            case GET:
+                return "GET";
+            case PUT:
+                return "PUT";
+            case POST:
+                return "POST";
+            case DELETE:
+                return "DELETE";
+        }
+        return "";
     }
 
     private enum Verb {GET, PUT, POST, DELETE}
