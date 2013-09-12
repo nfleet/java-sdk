@@ -1,5 +1,3 @@
-import sun.awt.image.ImageWatched;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.text.DateFormat;

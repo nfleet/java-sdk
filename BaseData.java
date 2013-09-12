@@ -28,7 +28,7 @@ public class BaseData {
     }
 
     private Link concatLink(Link self, Link rel) {
-        return new Link(rel.getRel(), self.getUri()+rel.getUri(), rel.getMethod());
+        return new Link(rel.getRel(), self.getUri()+rel.getUri(), rel.getMethod(), rel.isEnabled());
     }
 
     @Override

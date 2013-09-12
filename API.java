@@ -1,7 +1,6 @@
 import com.google.gson.*;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ public class API {
     private String password;
     private ApiData apiData;
     private AuthenticationData authenticationData;
-
     public static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSX").create();
 
     public API(String baseUrl) {
@@ -58,7 +56,7 @@ public class API {
             HashMap<String, String> headers = new HashMap<String, String>();
             String authorization = "Basic " + Base64.encode((username + ":" + password).getBytes());
             headers.put("authorization", authorization);
-            result = sendCredentials(this.baseUrl + l.getUri(), headers);
+            result = sendRequestWithAddedHeaders(this.baseUrl + l.getUri(), headers);
             if (result.length() < 1) {
                 ErrorData d = new ErrorData();
                 ArrayList<ErrorData> errors = new ArrayList<ErrorData>();
@@ -75,7 +73,7 @@ public class API {
 
         if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("start-new-optimization")) {
             result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
-        } else if (l.getRel().equals("start-new-optimization")) {
+        } else if (l.getRel().equals("start-new-optimization") || l.getRel().equals("start")) {
             result = sendRequest(Verb.POST, this.baseUrl + l.getUri(), "");
         }  else {
             result = sendRequest(Verb.GET, l.getUri(), "");
@@ -110,10 +108,15 @@ public class API {
             } else {
                 data = gson.fromJson(result, ResultData.class);
             }
-            data.setLocation(new Link("location", result, "GET"));
+            data.setLocation(new Link("location", result, "GET", true));
+
             return (T) data;
         }
         return gson.fromJson(result, tClass);
+    }
+
+    public Link getRoot() {
+        return new Link("self", baseUrl, "GET", true);
     }
 
     private String sendRequest(Verb verb, String url, String json) {
@@ -150,7 +153,9 @@ public class API {
             }
 
             if (connection.getResponseCode() == 401) {
+                System.out.println("Authentication expired");
                 this.authenticate(this.username, this.password);
+                System.out.println("Authenticated again");
                 return sendRequest(verb, url, json);
             }
 
@@ -193,8 +198,7 @@ public class API {
             return result;
         }
 
-
-    private String sendCredentials(String url, HashMap<String, String> headers) {
+    private String sendRequestWithAddedHeaders(String url, HashMap<String, String> headers) {
         URL serverAddress;
         HttpURLConnection connection;
         BufferedReader br;
@@ -234,28 +238,28 @@ public class API {
             result = sb.toString();
         } catch (MalformedURLException e) {
             System.out.println("Url is not correct, please check");
+            System.out.println(e.toString());
             return "";
         } catch (ProtocolException e) {
             System.out.println("Please check if the service is up");
+            System.out.println(e.toString());
             return "";
         } catch (UnsupportedEncodingException e) {
+            System.out.println(e.toString());
             return "";
         } catch (IOException e) {
+            System.out.println(e.toString());
             return "";
         }
         return result;
     }
 
     private Link getAuthLink() {
-        return new Link("authenticate", "/tokens", "POST");
+        return new Link("authenticate", "/tokens", "POST", true);
     }
 
     private static String createJsonFromDto(Object item) {
         return gson.toJson(item);
-    }
-
-    public Link getRoot() {
-        return new Link("self", baseUrl, "GET");
     }
 
     private String method(Verb verb) {
@@ -273,6 +277,14 @@ public class API {
     }
 
     private enum Verb {GET, PUT, POST, DELETE}
+
+    public AuthenticationData getAuthenticationData() {
+        return this.authenticationData;
+    }
+
+    public void setAuthenticationData(AuthenticationData data) {
+        authenticationData = data;
+    }
 }
 
 
