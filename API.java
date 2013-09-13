@@ -5,7 +5,8 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -71,9 +72,11 @@ public class API {
             return (T) data;
         }
 
-        if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("start-new-optimization")) {
+        if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("create-new-optimization")) {
             result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
-        } else if (l.getRel().equals("start-new-optimization") || l.getRel().equals("start")) {
+        } else if (l.getMethod().equals("PUT")) {
+            result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), "");
+        } else if (l.getRel().equals("create-new-optimization") || l.getRel().equals("start")) {
             result = sendRequest(Verb.POST, this.baseUrl + l.getUri(), "");
         }  else {
             result = sendRequest(Verb.GET, l.getUri(), "");
@@ -131,6 +134,7 @@ public class API {
             boolean doOutput = (verb != Verb.GET);
             connection.setDoOutput(doOutput);
             connection.setRequestMethod( method(verb) );
+            connection.setInstanceFollowRedirects(false);
 
             if (authenticationData != null) {
                 connection.addRequestProperty("Authorization", authenticationData.getTokenType() + " " + authenticationData.getAccessToken());
@@ -138,7 +142,7 @@ public class API {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
 
-            if (json.length() > 0 || verb == Verb.POST) {
+            if (json.length() > 0 || (verb == Verb.POST || verb == Verb.PUT)) {
                 connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
                 OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
                 osw.write(json);

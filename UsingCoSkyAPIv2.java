@@ -9,9 +9,8 @@ import java.util.Date;
 public class UsingCoSkyAPIv2 {
 
     public static void main (String[] args) {
-        //TODO: Change before commit
-        API api = new API("http://testi-api-co-sky.cloudapp.net");
-        boolean success = api.authenticate("testi", "user");
+        API api = new API("url");
+        boolean success = api.authenticate("user", "pass");
 
         if (success) {
             ApiData data = api.navigate(ApiData.class, api.getRoot());
@@ -105,31 +104,22 @@ public class UsingCoSkyAPIv2 {
             problem1 = api.navigate(RoutingProblemData.class, problem1.getLink("self"));
             System.out.println(problem1);
 
-            result = api.navigate(ResultData.class, problem1.getLink("start-new-optimization"));
+            result = api.navigate(ResultData.class, problem1.getLink("create-new-optimization"));
             System.out.println(result);
 
-            //TODO: remember to remove before commit
-            Link l = result.getLocation();
-            String s = l.getUri().replace("82","81");
-            System.out.println(s);
-            l.setUri(s);
-
-            System.out.println(l);
-            OptimizationData optData = api.navigate(OptimizationData.class, l);
+            OptimizationData optData = api.navigate(OptimizationData.class, result.getLocation());
 
             for (Link f : optData.getLinks()) {
                 System.out.println(f);
             }
-            optData = api.navigate(OptimizationData.class, optData.getLink("start"));
 
-            System.out.println(optData);
+            result = api.navigate(ResultData.class, optData.getLink("start"));
+
             while (true) {
                 try {
-
                     Thread.sleep(1500);
                     optData = api.navigate(OptimizationData.class, optData.getLink("self"));
-                    //get the percentage of completion.
-                    System.out.println("Optimization is at : " + optData.getProgress());
+                    System.out.println("Optimization is at : " + optData.getProgress() + " " +optData.getState());
                     if (optData.getState().equals("Stopped")) break;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -149,11 +139,8 @@ public class UsingCoSkyAPIv2 {
                 TaskEventData previous = null;
                 for (TaskEventData current : td.getTaskEvents()) {
                     System.out.println("-TaskEvent " + " type " + current.getType() + " " + current.getPlannedArrivalTime() + " " + current.getPlannedDepartureTime() + " " + current.getServiceTime());
-
                 }
-
             }
-
         } else {
             System.out.println("Credentials were wrong, or the service is unavailable");
         }
