@@ -12,6 +12,15 @@ public class RoutingProblemUpdateRequest extends BaseData {
     private Date CreationDate;
     private Date ModifiedDate;
     private String Name;
+    private String State;
+
+    public String getState() {
+        return State;
+    }
+
+    public void setState(String state) {
+        State = state;
+    }
 
     public RoutingProblemUpdateRequest(String name) {
         this.Name = name;

@@ -1,3 +1,4 @@
+import java.lang.reflect.Field;
 import java.util.Date;
 
 /**
@@ -12,6 +13,24 @@ public class RoutingProblemData extends BaseData{
     private Date CreationDate;
     private Date ModifiedDate;
     private String Name;
+    private String State;
+    private int Progress;
+
+    public int getProgress() {
+        return Progress;
+    }
+
+    public void setProgress(int progress) {
+        Progress = progress;
+    }
+
+    public String getState() {
+        return State;
+    }
+
+    public void setState(String state) {
+        State = state;
+    }
 
     public RoutingProblemData(String name) {
         this.Name = name;
@@ -52,16 +71,19 @@ public class RoutingProblemData extends BaseData{
 
     @Override
     public String toString() {
-       /* return "RoutingProblemUpdateRequest{" +
-                "Id=" + Id +
-                ", CreationDate=" + CreationDate +
-                ", ModifiedDate=" + ModifiedDate +
-                ", Name='" + Name + '\'' +
-                '}';*/
-        return API.gson.toJson(this);
+         return API.gson.toJson(this);
     }
 
     public String getName() {
         return Name;
+    }
+
+    public RoutingProblemUpdateRequest toRequest() {
+        RoutingProblemUpdateRequest request = new RoutingProblemUpdateRequest(Name);
+        request.setCreationDate(this.getCreationDate());
+        request.setModifiedDate(this.getModifiedDate());
+        request.setId(this.getId());
+        request.setState(this.getState());
+        return request;
     }
 }

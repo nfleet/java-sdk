@@ -122,7 +122,16 @@ public class API {
         return new Link("self", baseUrl, "GET", true);
     }
 
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
     private String sendRequest(Verb verb, String url, String json) {
+
         URL serverAddress;
         BufferedReader br;
         String result = "";
@@ -153,7 +162,8 @@ public class API {
             connection.connect();
 
             if (connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
-                return connection.getHeaderField("Location");
+                String s = connection.getHeaderField("Location");
+                return s;
             }
 
             if (connection.getResponseCode() == 401) {
@@ -163,7 +173,8 @@ public class API {
                 return sendRequest(verb, url, json);
             }
 
-            if (connection.getResponseCode() != 200) {
+            if (connection.getResponseCode() > 401) {
+                System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
                 InputStream stream = connection.getErrorStream();
                 br = new BufferedReader(new InputStreamReader(stream));
                 StringBuilder sb = new StringBuilder();
@@ -171,8 +182,10 @@ public class API {
                 while ((s = br.readLine()) != null) {
                     sb.append(s);
                 }
-                System.out.println("Please check the request " + connection.getResponseMessage() + sb.toString()+ " " + url) ;
-                return sb.toString();
+                String body = sb.toString();
+                System.out.println(body);
+                System.out.println("Please check the request " + connection.getResponseMessage() + body + " " + url) ;
+                return body;
             }
 
             InputStream is = connection.getInputStream();
@@ -184,7 +197,8 @@ public class API {
                 sb.append(sa).append("\n");
             }
             result = sb.toString();
-        } catch (MalformedURLException e) {
+
+         } catch (MalformedURLException e) {
             System.out.println("Troubles with the url " + url);
             return "";
         } catch (ProtocolException e) {
