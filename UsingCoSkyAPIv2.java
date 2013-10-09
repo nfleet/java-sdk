@@ -10,7 +10,7 @@ public class UsingCoSkyAPIv2 {
 
     public static void main (String[] args) {
         API api = new API("http://test.api.co-sky.fi");
-        boolean success = api.authenticate("abba", "kissa13");
+        boolean success = api.authenticate("user", "pass");
 
 
         if (success) {
