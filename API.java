@@ -45,6 +45,11 @@ public class API {
     }
 
     public <T extends BaseData> T navigate(Class<T> tClass, Link l) {
+
+        return navigate(tClass, l, null);
+    }
+
+    public <T extends BaseData> T navigate(Class<T> tClass, Link l, HashMap<String, String> queryParameters) {
         String result;
 
         if (tClass.equals(AuthenticationData.class)) {
@@ -72,14 +77,25 @@ public class API {
             return (T) data;
         }
 
-        if (l.getMethod().equals("GET") && !l.getUri().contains(":") && !l.getRel().equals("create-new-optimization")) {
-            result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
+        String uri = l.getUri();
+        if (l.getMethod().equals("GET") && queryParameters != null && !queryParameters.isEmpty()) {
+            StringBuilder sb = new StringBuilder(uri + "?");
+
+            for(String key : queryParameters.keySet()) {
+                 sb.append(key + "="+ queryParameters.get(key)+"&");
+            }
+            sb.deleteCharAt(sb.length()-1);
+            uri = sb.toString();
+        }
+
+        if (l.getMethod().equals("GET") && !uri.contains(":") && !l.getRel().equals("create-new-optimization")) {
+            result = sendRequest(Verb.GET, this.baseUrl + uri, "");
         } else if (l.getMethod().equals("PUT")) {
-            result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), "");
+            result = sendRequest(Verb.PUT, this.baseUrl + uri, "");
         } else if (l.getRel().equals("create-new-optimization") || l.getRel().equals("start")) {
-            result = sendRequest(Verb.POST, this.baseUrl + l.getUri(), "");
+            result = sendRequest(Verb.POST, this.baseUrl + uri, "");
         }  else {
-            result = sendRequest(Verb.GET, l.getUri(), "");
+            result = sendRequest(Verb.GET, uri, "");
         }
 
         if (tClass.equals(ResultData.class)) {
