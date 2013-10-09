@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 
 /**
@@ -135,13 +136,22 @@ public class UsingCoSkyAPIv2 {
                 l.setUri(s);
                 result.setLocation(l);
 
-
+                ObjectiveValueDataSet objectiveValues = null;
+                HashMap<String,String> qp = new HashMap<String, String>();
+                qp.put("start","0");
+                qp.put("end","1");
                 while (true) {
                     try {
                         Thread.sleep(1500);
                         problem1 = api.navigate(RoutingProblemData.class, problem1.getLink("self"));
                         System.out.println("Optimization is " + problem1.getState() +" at percentage " + problem1.getProgress());
+                        objectiveValues = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"), qp);
 
+                        if (objectiveValues != null && !objectiveValues.getItems().isEmpty()) {
+                            for (ObjectiveValueData item : objectiveValues.getItems())    {
+                                System.out.println( "Objective values from "+qp.get("start")+" to "+qp.get("end")+": ["+item.getTimeStamp()+"] "+item.getValue());
+                            }
+                        }
                         //in the future one can ask the objective values using the following command.
                         //ObjectiveValueDataSet objectiveValueDataSet = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"));
 
