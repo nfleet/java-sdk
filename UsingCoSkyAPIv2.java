@@ -2,38 +2,50 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import fi.cosky.sdk.*;
+
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE.txt', which is part of this source code package.
+ */
 
 /**
  * Example program to demonstrate how to use the CO-SKY RESTful API
- * For reporting bugs in the SDK, please contact jarkko.p.laitinen (at) jyu.fi
+ * For reporting bugs in the SDK, please contact dev-support (at) co-sky.fi
  */
 public class UsingCoSkyAPIv2 {
 
     public static void main (String[] args) {
-        API api = new API("http://localhost:81");
+        API api = new API("");
         boolean success = api.authenticate("", "");
 
 
         if (success) {
             ApiData data = api.navigate(ApiData.class, api.getRoot());
-
-            UserDataSet users = api.navigate(UserDataSet.class, data.getLink("list-users"));
-            UserData user = null;
-            for (UserData u : users.getItems()) {
-                if (u.getId() == 1) {
-                    user = u;
-                    break;
-                }
+            System.out.println(data);
+            
+            ResultData datas = api.navigate(ResultData.class, data.getLink("create-user"), new UserData());
+            System.out.println(datas);
+            UserData user = api.navigate(UserData.class, datas.getLocation());
+            
+            UserDataSet asdfasdf= api.navigate(UserDataSet.class, data.getLink("list-users"));
+            
+            for (UserData u : asdfasdf.getItems()) {
+            	System.out.println(u);
             }
+                   
+            
             if (user != null) {
+            
                 ResultData result = api.navigate(ResultData.class, user.getLink("list-problems"));
 
                 RoutingProblemUpdateRequest newProblem = new RoutingProblemUpdateRequest("exampleProblem");
                 result = api.navigate(ResultData.class, user.getLink("create-problem"), newProblem );
-
+                System.out.println(result);
                 RoutingProblemDataSet problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
                 RoutingProblemData problem1 = problems.getItems().get(problems.getItems().size()-1);
-
+                
+                System.out.println(problem1);
                 CoordinateData coordinateData = new CoordinateData();
 
                 //coordinateData.setLatitude(62.244588);
@@ -92,7 +104,7 @@ public class UsingCoSkyAPIv2 {
                 }
 
                 ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
-                capacities.add(new CapacityData("Weight", 1));
+                taskCapacity.add(new CapacityData("Weight", 1));
 
                 for (int i = 0 ; i < 4; i++) {
                     ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
@@ -124,34 +136,29 @@ public class UsingCoSkyAPIv2 {
                 }
 
                 problem1 = api.navigate(RoutingProblemData.class, problem1.getLink("self"));
+                System.out.println(problem1);
                 //starting optimization
                 problem1.setState("Running");
                 result = api.navigate(ResultData.class, problem1.getLink("toggle-optimization"), problem1.toRequest());
                 System.out.println(result);
                 //stopping optimization would be the same but set state to "Stopped"
                 ObjectiveValueDataSet objectiveValues = null;
-
-                // this is how query parameters can be used
-                /*HashMap<String,String> qp = new HashMap<String, String>();
-                qp.put("start","0");
-                qp.put("end","1");*/
+                
+                HashMap<String, String> qp = new HashMap<String, String>();
+                qp.put("start", "0");
+                qp.put("end", "10");
                 while (true) {
                     try {
                         Thread.sleep(1500);
                         problem1 = api.navigate(RoutingProblemData.class, problem1.getLink("self"));
                         System.out.println("Optimization is " + problem1.getState() +" at percentage " + problem1.getProgress());
-                        objectiveValues = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"));
-
-                        // if you want to use query parameters
-                        //objectiveValues = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"),qp);
+                        objectiveValues = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"), qp);
 
                         if (objectiveValues != null && !objectiveValues.getItems().isEmpty()) {
                             for (ObjectiveValueData item : objectiveValues.getItems())    {
-                                System.out.println( "Objective values : ["+item.getTimeStamp()+"] "+item.getValue());
+                                System.out.println( "Objective values from " + qp.get("start") + " to " + qp.get("end") + ": [" + item.getTimeStamp() + "] " + item.getValue() );
                             }
                         }
-                        //in the future one can ask the objective values using the following command.
-                        //ObjectiveValueDataSet objectiveValueDataSet = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"));
 
                         if (problem1.getState().equals("Stopped")) break;
                     } catch (InterruptedException e) {
@@ -161,6 +168,7 @@ public class UsingCoSkyAPIv2 {
 
                 VehicleDataSet vehicleDataSet = api.navigate(VehicleDataSet.class, problem1.getLink("list-vehicles"));
 
+                //Gets the routeevent
                 for (VehicleData vd : vehicleDataSet.getItems()) {
                     System.out.println("Vehicles route " + vd.getRoute());
                     TaskEventDataSet route = api.navigate(TaskEventDataSet.class, vd.getLink("list-events"));
@@ -169,17 +177,7 @@ public class UsingCoSkyAPIv2 {
                     }
                 }
 
-
-
-                //Get list of tasks from the optimization, can view the plannedArrival and departure times.
-                TaskDataSet taskDataSet = api.navigate(TaskDataSet.class, problem1.getLink("list-tasks"));
-                for(TaskData td : taskDataSet.getItems()) {
-                    System.out.println("Task " + td);
-                    TaskEventData previous = null;
-                    for (TaskEventData current : td.getTaskEvents()) {
-                        System.out.println("-TaskEvent " + " type " + current.getType() + " " + current.getPlannedArrivalTime() + " " + current.getPlannedDepartureTime() + " " + current.getServiceTime());
-                    }
-                }
+                //Tasks do not contain the information about their task events anymore.
             }
         } else {
             System.out.println("Credentials were wrong, or the service is unavailable");
