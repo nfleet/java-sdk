@@ -7,11 +7,10 @@ import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 
 public class TestHelper {
 	
-	private static String url = "";
-	private static String clientKey = "";
-	private static String clientSecret = "";
-	
 	static API authenticate() {
+		String url = "http://localhost:81";
+		String clientKey = "testi";
+		String clientSecret = "user";
 		API api = new API(url);
 		api.authenticate(clientKey, clientSecret);
 		return api;
@@ -23,7 +22,7 @@ public class TestHelper {
 		UserData user = null;
 		if ( users.getItems() != null && users.getItems().size() < 1) {
 			user = new UserData();
-			ResultData createdUser = api.navigate(ResultData.class, apiData.getLink("create-user"), user);
+			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 			user = api.navigate(UserData.class, createdUser.getLocation());
 		} else {
 			for (UserData u : users.getItems()) {
@@ -35,7 +34,7 @@ public class TestHelper {
 	
 	static RoutingProblemData createProblem(API api, UserData user) {
 		RoutingProblemData problem = new RoutingProblemData("exampleProblem");
-		ResultData created = api.navigate(ResultData.class, user.getLink("create-problem"), problem);
+		ResponseData created = api.navigate(ResponseData.class, user.getLink("create-problem"), problem);
 		problem = api.navigate(RoutingProblemData.class, created.getLocation());
 		return problem;
 	}
@@ -57,8 +56,7 @@ public class TestHelper {
 	}
 	
 	static TaskData getTask(API api, RoutingProblemData problem) {
-		TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
-		
+				
 		CoordinateData pickup = new CoordinateData();
 		pickup.setLatitude(62.244958);
 		pickup.setLongitude(25.747143);
@@ -86,7 +84,7 @@ public class TestHelper {
 		both.add(task2);
 		TaskUpdateRequest task = new TaskUpdateRequest(both);
 		task.setName("testTask");
-		ResultData createdTask = api.navigate(ResultData.class, problem.getLink("create-task"), task);
+		ResponseData createdTask = api.navigate(ResponseData.class, problem.getLink("create-task"), task);
 		TaskData td = api.navigate(TaskData.class, createdTask.getLocation());
 		return td;
 	}

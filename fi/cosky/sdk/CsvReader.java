@@ -1,7 +1,7 @@
 package fi.cosky.sdk;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.text.DateFormat;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +20,10 @@ public class CsvReader {
 
     public ArrayList<VehicleData> readVehicles(String path) {
         ArrayList<VehicleData> vehicles = null;
+        BufferedReader br = null;
         try {
             vehicles = new ArrayList<VehicleData>();
-            BufferedReader br = new BufferedReader(new FileReader(path));
+            br = new BufferedReader(new FileReader(path));
             String line;
             VehicleData vehicle = null;
             while ((line = br.readLine()) != null) {
@@ -34,18 +35,22 @@ public class CsvReader {
                     vehicles.add(parseVehicle(line));
                 }
             }
+            br.close();
         } catch (Exception e) {
             return null;
+            
         }
+        
         return vehicles;
     }
 
     public ArrayList<TaskData> readTasks(String path) {
         ArrayList<TaskData> tasks = null;
+        BufferedReader br = null;
         try {
             System.out.println("Starting to read tasks");
             tasks = new ArrayList<TaskData>();
-            BufferedReader br = new BufferedReader(new FileReader(path));
+            br = new BufferedReader(new FileReader(path));
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.length() > 0) {
@@ -57,14 +62,21 @@ public class CsvReader {
                     tasks.add(data);
                 }
             }
+            br.close();
         } catch (Exception e) {
             return null;
+        } finally {
+        	try {
+				br.close();
+			} catch (IOException e){
+				e.printStackTrace();
+			}
         }
         return tasks;
     }
 
     private TaskData parseTask(String line) {
-        DateFormat df = DateFormat.getDateInstance();
+       // DateFormat df = DateFormat.getDateInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("dd.M.yyyy HH:mm");
         TaskData task = null;
         try {
@@ -126,7 +138,7 @@ public class CsvReader {
 
 
     private VehicleData parseVehicle(String line) {
-        DateFormat df = DateFormat.getDateInstance();
+        //DateFormat df = DateFormat.getDateInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("dd.M.yyyy HH:mm");
         StringTokenizer st = new StringTokenizer(line, ";");
         VehicleData vehicle = null;

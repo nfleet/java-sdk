@@ -7,6 +7,7 @@ import fi.cosky.sdk.*;
 
 public class TestData {
 	
+	@SuppressWarnings("deprecation")
 	public static void CreateDemoData(RoutingProblemData problem, API api) {
 		
 		CoordinateData coordinateData = new CoordinateData();
@@ -42,7 +43,7 @@ public class TestData {
         VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest("demoVehicle",capacities, locationData, locationData);
         vehicleRequest.setTimeWindows(timeWindows);
 
-        ResultData result = api.navigate(ResultData.class, problem.getLink("create-vehicle"), vehicleRequest);
+        api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
         
         ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
         taskCapacity.add(new CapacityData("Weight", 1));
@@ -57,6 +58,7 @@ public class TestData {
         taskEvents.get(0).setServiceTime(10);
         taskEvents.get(1).setServiceTime(10);
 
-        result = api.navigate(ResultData.class, problem.getLink("create-task"), task); 
+        api.navigate(ResponseData.class, problem.getLink("create-task"), task);
+        
 	}
 }

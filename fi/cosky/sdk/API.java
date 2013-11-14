@@ -11,7 +11,9 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import com.google.gson.*;
+
 import org.apache.commons.codec.binary.Base64;
 
 /*
@@ -37,7 +39,7 @@ public class API {
     public boolean authenticate(String username, String password) {
         this.ClientKey = username;
         this.ClientSecret = password;
-        ResultData result = navigate(ResultData.class, getAuthLink());
+        ResponseData result = navigate(ResponseData.class, getAuthLink());
 
         if (result == null || result.getItems() != null) {
             return false;
@@ -54,7 +56,8 @@ public class API {
         return navigate(tClass, l, null);
     }
 
-    public <T extends BaseData> T navigate(Class<T> tClass, Link l, HashMap<String, String> queryParameters) {
+    @SuppressWarnings("unchecked")
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l, HashMap<String, String> queryParameters) {
         String result;
 
         if (tClass.equals(TokenData.class)) {
@@ -70,13 +73,13 @@ public class API {
             if (result.length() < 1) {
                 ErrorData d = new ErrorData();
                 ArrayList<ErrorData> errors = new ArrayList<ErrorData>();
-                ResultData a = new ResultData();
+                ResponseData a = new ResponseData();
                 errors.add(d);
                 a.setItems(errors);
                 return (T) a;
             }
             result = result.substring(result.indexOf("/tokens"), result.length());
-            ResultData data = new ResultData();
+            ResponseData data = new ResponseData();
             data.setLocation(new Link("location", result, "GET"));
             return (T) data;
         }
@@ -102,8 +105,8 @@ public class API {
             result = sendRequest(Verb.GET, uri, "");
         }
 
-        if (tClass.equals(ResultData.class)) {
-            ResultData data = new ResultData();
+        if (tClass.equals(ResponseData.class)) {
+            ResponseData data = new ResponseData();
             data.setLocation(new Link("location", l.getUri() + result, "GET"));
             return (T) data;
         }
@@ -112,7 +115,8 @@ public class API {
         return gson.fromJson(result, tClass);
     }
 
-    public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object ) {
+    @SuppressWarnings("unchecked")
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object ) {
         String result = "";
 
         if (l.getMethod().equals("PUT")) {
@@ -124,16 +128,21 @@ public class API {
             result = sendRequest(Verb.POST, url, createJsonFromDto(object));
         }
 
-        if (tClass.equals(ResultData.class) && result.length() > 0) {
-            ResultData data = new ResultData();
+        if (tClass.equals(ResponseData.class) && result.length() > 0) {
+            ResponseData data = new ResponseData();
             if (result.contains("/problems")){
                 result = result.substring(result.indexOf("/problems"), result.length());
             } else if (result.contains("/api")) {
                 result = result.substring(result.indexOf("/api"), result.length());
             } else if (l.getRel().equals("create-user")){
             	
-            } else {
-                data = gson.fromJson(result, ResultData.class);
+            }else if (result.contains("http:") || result.contains("https:")) {
+            	result = result.replace("82", "81");
+            	data.setLocation(new Link("location", result, "GET", true));
+            	return (T) data;
+            }
+            else {
+                data = gson.fromJson(result, ResponseData.class);
             }
             
             //Azure emulator hack
@@ -167,8 +176,7 @@ public class API {
         try {
             serverAddress = new URL(url);
             connection = (HttpURLConnection) serverAddress.openConnection();
-
-            boolean doOutput = (verb != Verb.GET);
+	        boolean doOutput = (verb != Verb.GET);
             connection.setDoOutput(doOutput);
             connection.setRequestMethod( method(verb) );
             connection.setInstanceFollowRedirects(false);
@@ -350,6 +358,14 @@ public class API {
     public void setTokenData(TokenData data) {
         tokenData = data;
     }
+
+	public ApiData getApiData() {
+		return apiData;
+	}
+
+	public void setApiData(ApiData apiData) {
+		this.apiData = apiData;
+	}
 }
 
 

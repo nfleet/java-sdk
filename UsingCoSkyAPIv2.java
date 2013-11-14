@@ -15,7 +15,8 @@ import fi.cosky.sdk.*;
  */
 public class UsingCoSkyAPIv2 {
 
-    public static void main (String[] args) {
+    @SuppressWarnings("deprecation")
+	public static void main (String[] args) {
         API api = new API("");
         boolean success = api.authenticate("", "");
 
@@ -24,7 +25,7 @@ public class UsingCoSkyAPIv2 {
             ApiData data = api.navigate(ApiData.class, api.getRoot());
             System.out.println(data);
             
-            ResultData datas = api.navigate(ResultData.class, data.getLink("create-user"), new UserData());
+            ResponseData datas = api.navigate(ResponseData.class, data.getLink("create-user"), new UserData());
             System.out.println(datas);
             UserData user = api.navigate(UserData.class, datas.getLocation());
             
@@ -37,10 +38,10 @@ public class UsingCoSkyAPIv2 {
             
             if (user != null) {
             
-                ResultData result = api.navigate(ResultData.class, user.getLink("list-problems"));
+                ResponseData result = api.navigate(ResponseData.class, user.getLink("list-problems"));
 
                 RoutingProblemUpdateRequest newProblem = new RoutingProblemUpdateRequest("exampleProblem");
-                result = api.navigate(ResultData.class, user.getLink("create-problem"), newProblem );
+                result = api.navigate(ResponseData.class, user.getLink("create-problem"), newProblem );
                 System.out.println(result);
                 RoutingProblemDataSet problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
                 RoutingProblemData problem1 = problems.getItems().get(problems.getItems().size()-1);
@@ -95,7 +96,7 @@ public class UsingCoSkyAPIv2 {
                 VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest("demoVehicle",capacities, locationData, locationData);
                 vehicleRequest.setTimeWindows(timeWindows);
 
-                result = api.navigate(ResultData.class, problem1.getLink("create-vehicle"), vehicleRequest);
+                result = api.navigate(ResponseData.class, problem1.getLink("create-vehicle"), vehicleRequest);
 
                 VehicleDataSet d = api.navigate(VehicleDataSet.class, problem1.getLink("list-vehicles"));
 
@@ -117,7 +118,7 @@ public class UsingCoSkyAPIv2 {
                     taskEvents.get(0).setServiceTime(10);
                     taskEvents.get(1).setServiceTime(10);
 
-                    result = api.navigate(ResultData.class, problem1.getLink("create-task"), task);
+                    result = api.navigate(ResponseData.class, problem1.getLink("create-task"), task);
 
                 }
 
@@ -125,7 +126,6 @@ public class UsingCoSkyAPIv2 {
                 taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, taskCapacity));
                 taskEvents.add(new TaskEventData(Type.Delivery, deliveryLocation, taskCapacity));
 
-                ErrorData errorData;
                 if (result.getItems() != null) {
                     System.out.println(result.getItems());
                 }
@@ -139,7 +139,7 @@ public class UsingCoSkyAPIv2 {
                 System.out.println(problem1);
                 //starting optimization
                 problem1.setState("Running");
-                result = api.navigate(ResultData.class, problem1.getLink("toggle-optimization"), problem1.toRequest());
+                result = api.navigate(ResponseData.class, problem1.getLink("toggle-optimization"), problem1.toRequest());
                 System.out.println(result);
                 //stopping optimization would be the same but set state to "Stopped"
                 ObjectiveValueDataSet objectiveValues = null;
