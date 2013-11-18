@@ -8,9 +8,9 @@ import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 public class TestHelper {
 	
 	static API authenticate() {
-		String url = "";
-		String clientKey = "";
-		String clientSecret = "";
+		String url = "http://localhost:81";
+		String clientKey = "testi";
+		String clientSecret = "user";
 		API api = new API(url);
 		api.authenticate(clientKey, clientSecret);
 		return api;

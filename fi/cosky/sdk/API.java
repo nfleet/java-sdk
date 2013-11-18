@@ -5,12 +5,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gson.*;
 
@@ -52,36 +54,28 @@ public class API {
     }
 
     public <T extends BaseData> T navigate(Class<T> tClass, Link l) {
-
         return navigate(tClass, l, null);
     }
 
     @SuppressWarnings("unchecked")
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l, HashMap<String, String> queryParameters) {
-        String result;
+        Object result;
 
         if (tClass.equals(TokenData.class)) {
-            result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), "");
-            return gson.fromJson(result, tClass);
+            result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), tClass, null);
+            return (T) result;
         }
 
         if (l.getRel().equals("authenticate")) {
             HashMap<String, String> headers = new HashMap<String, String>();
             String authorization = "Basic " + Base64.encodeBase64String((ClientKey + ":" + ClientSecret).getBytes());
             headers.put("authorization", authorization);
-            result = sendRequestWithAddedHeaders(this.baseUrl + l.getUri(), headers);
-            if (result.length() < 1) {
-                ErrorData d = new ErrorData();
-                ArrayList<ErrorData> errors = new ArrayList<ErrorData>();
-                ResponseData a = new ResponseData();
-                errors.add(d);
-                a.setItems(errors);
-                return (T) a;
-            }
-            result = result.substring(result.indexOf("/tokens"), result.length());
-            ResponseData data = new ResponseData();
-            data.setLocation(new Link("location", result, "GET"));
-            return (T) data;
+            result = sendRequestWithAddedHeaders(Verb.POST, this.baseUrl + l.getUri(), tClass, null, headers);
+            ResponseData data = (ResponseData) result;
+            Link link = data.getLink("location");
+            link.setUri(link.getUri());
+            data.setLocation(link);
+            return (T) result;
         }
 
         String uri = l.getUri();
@@ -96,63 +90,31 @@ public class API {
         }
 
         if (l.getMethod().equals("GET") && !uri.contains(":") && !l.getRel().equals("create-new-optimization")) {
-            result = sendRequest(Verb.GET, this.baseUrl + uri, "");
+            result = sendRequest(Verb.GET, this.baseUrl + uri, tClass, null);
         } else if (l.getMethod().equals("PUT")) {
-            result = sendRequest(Verb.PUT, this.baseUrl + uri, "");
+            result = sendRequest(Verb.PUT, this.baseUrl + uri, tClass, null);
         } else if (l.getRel().equals("create-new-optimization") || l.getRel().equals("start") || l.getRel().equals("create-user")) {
-            result = sendRequest(Verb.POST, this.baseUrl + uri, "");
+            result = sendRequest(Verb.POST, this.baseUrl + uri, tClass, null);
         }  else {
-            result = sendRequest(Verb.GET, uri, "");
-        }
-
-        if (tClass.equals(ResponseData.class)) {
-            ResponseData data = new ResponseData();
-            data.setLocation(new Link("location", l.getUri() + result, "GET"));
-            return (T) data;
-        }
+            result = sendRequest(Verb.GET, uri, tClass, null);
+        }          
         
-        
-        return gson.fromJson(result, tClass);
+        return (T) result;
     }
 
     @SuppressWarnings("unchecked")
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object ) {
-        String result = "";
+        Object result = null;
 
         if (l.getMethod().equals("PUT")) {
-            result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), createJsonFromDto(object));
+            result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), tClass, object);
         }
 
         if (l.getMethod().equals("POST") ) {
             String url = this.baseUrl + l.getUri();
-            result = sendRequest(Verb.POST, url, createJsonFromDto(object));
+            result = sendRequest(Verb.POST, url, tClass, object);
         }
-
-        if (tClass.equals(ResponseData.class) && result.length() > 0) {
-            ResponseData data = new ResponseData();
-            if (result.contains("/problems")){
-                result = result.substring(result.indexOf("/problems"), result.length());
-            } else if (result.contains("/api")) {
-                result = result.substring(result.indexOf("/api"), result.length());
-            } else if (l.getRel().equals("create-user")){
-            	
-            }else if (result.contains("http:") || result.contains("https:")) {
-            	result = result.replace("82", "81");
-            	data.setLocation(new Link("location", result, "GET", true));
-            	return (T) data;
-            }
-            else {
-                data = gson.fromJson(result, ResponseData.class);
-            }
-            
-            //Azure emulator hack
-            if (result.contains("82")) result = result.replace("82", "81");
-            result = result.substring(result.lastIndexOf("/"));
-            data.setLocation(new Link("location", l.getUri() + result, "GET", true));
-
-            return (T) data;
-        }
-        return gson.fromJson(result, tClass);
+        return (T) result;
     }
 
     public Link getRoot() {
@@ -167,111 +129,120 @@ public class API {
         this.baseUrl = baseUrl;
     }
 
-    private String sendRequest(Verb verb, String url, String json) {
+    private <T extends BaseData> T sendRequest(Verb verb, String url, Class<T> tClass, Object object) {
+    	 URL serverAddress;
+         BufferedReader br;
+         String result = "";
+         HttpURLConnection connection = null;
+         try {
+             serverAddress = new URL(url);
+             connection = (HttpURLConnection) serverAddress.openConnection();
+ 	         boolean doOutput = (verb != Verb.GET);
+             connection.setDoOutput(doOutput);
+             connection.setRequestMethod( method(verb) );
+             connection.setInstanceFollowRedirects(false);
+             
+             if (tokenData != null) {
+                 connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
+             }
+             connection.setRequestProperty("Content-Type", "application/json");
+             connection.setRequestProperty("Accept", "application/json");
+             
+             Field f = null;                        
+             if (object != null) {
+            	 if ( (f = object.getClass().getDeclaredField("VersionNumber")) != null) {
+            		 f.setAccessible(true);
+                	 int versionNumber = f.getInt(object);
+                	 connection.setRequestProperty("If-None-Match", versionNumber + "");            	 
+                 }
+            	 if ((verb == Verb.POST || verb == Verb.PUT)) {
+            		 String json = gson.toJson(object);
+                     connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
+                     OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+                     osw.write(json);
+                     osw.flush();
+                     osw.close();
+                 }
+             }	 
+                            
+             connection.connect();
+             
+              if (connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
+            	 ResponseData data = new ResponseData();
+                 Link l  = parseLocationLinkFromString(connection.getHeaderField("Location"));
+                 data.setLocation(l);                
+                 connection.disconnect();
+                 return (T) data;
+             }
 
-        URL serverAddress;
-        BufferedReader br;
-        String result = "";
-        HttpURLConnection connection = null;
-        try {
-            serverAddress = new URL(url);
-            connection = (HttpURLConnection) serverAddress.openConnection();
-	        boolean doOutput = (verb != Verb.GET);
-            connection.setDoOutput(doOutput);
-            connection.setRequestMethod( method(verb) );
-            connection.setInstanceFollowRedirects(false);
-            
-            if (json.contains("VersionNumber")) {
-            	try {
-            		String s = json.substring(json.indexOf("VersionNumber\":"));
-            		String number = s.substring(s.indexOf(":")+1, s.indexOf('}'));
-            		int nasdf = Integer.parseInt(number);
-            		connection.setRequestProperty("If-None-Match", nasdf+"");
-            	} catch (Exception e) {
-            		//Very purkka
-            		String s = json.substring(json.indexOf("VersionNumber\":"));
-            		String number = s.substring(s.indexOf(':')+1, s.indexOf(","));
-            		connection.setRequestProperty("If-None-Match", number);
-            	}
-            	            	
-            }
-            if (tokenData != null) {
-                connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
-            }
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
+             if (connection.getResponseCode() == 401) {
+                 System.out.println("Authentication expired");
+                 this.authenticate(this.ClientKey, this.ClientSecret);
+                 System.out.println("Authenticated again");
+                 connection.disconnect();
+                 return sendRequest(verb, url, tClass, object);
+             }
 
-            if (json.length() > 0 || (verb == Verb.POST || verb == Verb.PUT)) {
-                connection.addRequestProperty("Content-Length", json.getBytes("UTF-8").length + "");
-                OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
-                osw.write(json);
-                osw.flush();
-                osw.close();
-            }
+             if (connection.getResponseCode() > 401) {
+                 System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
+                 InputStream stream = connection.getErrorStream();
+                 br = new BufferedReader(new InputStreamReader(stream));
+                 StringBuilder sb = new StringBuilder();
+                 String s;
+                 while ((s = br.readLine()) != null) {
+                     sb.append(s);
+                 }
+                 String body = sb.toString();
+                 System.out.println(body);
+                 System.out.println("Please check the request " + connection.getResponseMessage() + body + " " + url) ;
+                 connection.disconnect();
+                 return (T) gson.fromJson(body, ResponseData.class);
+             }
 
-            connection.connect();
-            
-             if (connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
-                String s = connection.getHeaderField("Location");
-                return s;
-            }
+             InputStream is = connection.getInputStream();
+             br = new BufferedReader(new InputStreamReader(is));
 
-            if (connection.getResponseCode() == 401) {
-                System.out.println("Authentication expired");
-                this.authenticate(this.ClientKey, this.ClientSecret);
-                System.out.println("Authenticated again");
-                return sendRequest(verb, url, json);
-            }
+             StringBuilder sb = new StringBuilder();
+             String sa;
+             while (( sa = br.readLine()) != null) {
+                 sb.append(sa).append("\n");
+             }
+             String abba = null;
+             if ((abba = connection.getHeaderField("ETag")) != null) {
+             	sb.insert(sb.lastIndexOf("}"),",\"VersionNumber\":" + abba + "" );
+             	
+             }
+             result = sb.toString();
 
-            if (connection.getResponseCode() > 401) {
-                System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
-                InputStream stream = connection.getErrorStream();
-                br = new BufferedReader(new InputStreamReader(stream));
-                StringBuilder sb = new StringBuilder();
-                String s;
-                while ((s = br.readLine()) != null) {
-                    sb.append(s);
-                }
-                String body = sb.toString();
-                System.out.println(body);
-                System.out.println("Please check the request " + connection.getResponseMessage() + body + " " + url) ;
-                return body;
-            }
-
-            InputStream is = connection.getInputStream();
-            br = new BufferedReader(new InputStreamReader(is));
-
-            StringBuilder sb = new StringBuilder();
-            String sa;
-            while (( sa = br.readLine()) != null) {
-                sb.append(sa).append("\n");
-            }
-            String abba = null;
-            if ((abba = connection.getHeaderField("ETag")) != null) {
-            	sb.insert(sb.lastIndexOf("}"),",\"VersionNumber\":" + abba+"" );
-            	
-            }
-            result = sb.toString();
-
-         } catch (MalformedURLException e) {
-            System.out.println("Troubles with the url " + url);
-            return "";
-        } catch (ProtocolException e) {
-            System.out.println("Troubles reaching the service, please check service status");
-            return "";
-        } catch (UnsupportedEncodingException e) {
-            return "";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        } finally {
-            assert connection != null;
-            connection.disconnect();
-        }
-            return result;
-        }
-
-    private String sendRequestWithAddedHeaders(String url, HashMap<String, String> headers) {
+          } catch (MalformedURLException e) {
+             System.out.println("Troubles with the url " + url);
+             return null;
+         } catch (ProtocolException e) {
+             System.out.println("Troubles reaching the service, please check service status");
+             return null;
+         } catch (UnsupportedEncodingException e) {
+             return null;
+         } catch (IOException e) {
+             e.printStackTrace();
+             return null;
+         } catch (NoSuchFieldException e) {
+			
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} finally {
+             assert connection != null;
+             connection.disconnect();
+         }
+         connection.disconnect();         
+         return (T) gson.fromJson(result, tClass);
+    }
+ 
+    
+    private <T extends BaseData> T sendRequestWithAddedHeaders(Verb verb, String url, Class<T> tClass, Object object, HashMap<String, String> headers) {
         URL serverAddress;
         HttpURLConnection connection;
         BufferedReader br;
@@ -281,7 +252,7 @@ public class API {
             connection =(HttpURLConnection) serverAddress.openConnection();
             connection.setInstanceFollowRedirects(false);
             connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod(method(verb));
             connection.setRequestProperty("Authorization", headers.get("authorization"));
             connection.addRequestProperty("Accept", "application/json");
             connection.addRequestProperty("Content-Length", "0");
@@ -293,7 +264,14 @@ public class API {
             connection.connect();
 
             if (connection.getResponseCode() == 303 || connection.getResponseCode() == 201) {
-                return connection.getHeaderField("Location");
+                Link location = parseLocationLinkFromString(connection.getHeaderField("Location"));
+                Link l = new Link("self", "/tokens", "GET", true);
+                ArrayList<Link> links = new ArrayList<Link>();
+                links.add(l);
+                links.add(location);
+                ResponseData data = new ResponseData();
+                data.setLinks(links);
+                return (T) data;
             }
 
             if (connection.getResponseCode() != 200) {
@@ -312,29 +290,25 @@ public class API {
         } catch (MalformedURLException e) {
             System.out.println("Url is not correct, please check");
             System.out.println(e.toString());
-            return "";
+            return null;
         } catch (ProtocolException e) {
             System.out.println("Please check if the service is up");
             System.out.println(e.toString());
-            return "";
+            return null;
         } catch (UnsupportedEncodingException e) {
             System.out.println(e.toString());
-            return "";
+            return null;
         } catch (IOException e) {
             System.out.println(e.toString());
-            return "";
+            return null;
         }
-        return result;
+        return (T) gson.fromJson(result, tClass);
     }
-
+  
     private Link getAuthLink() {
         return new Link("authenticate", "/tokens", "POST", true);
     }
-
-    private static String createJsonFromDto(Object item) {
-        return gson.toJson(item);
-    }
-
+   
     private String method(Verb verb) {
         switch (verb) {
             case GET:
@@ -349,6 +323,12 @@ public class API {
         return "";
     }
 
+    private Link parseLocationLinkFromString(String s) {
+   	 	if (s.contains("82")) s = s.replace("82", "81");
+        if (s.contains("/users")) s = s.substring(s.indexOf("/users"));
+        else s = s.substring(s.lastIndexOf("/"));
+        return new Link("location", s, "GET", true);
+    }
     private enum Verb {GET, PUT, POST, DELETE}
 
     public TokenData getTokenData() {

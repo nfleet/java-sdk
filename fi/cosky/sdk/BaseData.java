@@ -28,12 +28,7 @@ public class BaseData {
     private Link concatLink(Link self, Link rel) {
         return new Link(rel.getRel(), self.getUri()+rel.getUri(), rel.getMethod(), rel.isEnabled());
     }
-
-    public static Link concat(Link first, Link second) {
-    	return new Link(first.getRel(), first.getUri()+second.getUri(), first.getMethod(), first.isEnabled());
-    }
-    
-    
+        
     @Override
     public String toString() {
          return API.gson.toJson(this);
@@ -52,5 +47,8 @@ public class BaseData {
         return this.Meta;
     }
 
+    public void setLinks(List<Link> links) {
+    	this.Meta = links;
+    }
 
 }

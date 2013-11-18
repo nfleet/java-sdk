@@ -56,7 +56,7 @@ public class SdkTests {
 		
 		//##BEGIN EXAMPLE listingtasks##
 		TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
-		//##END EXAMPLEe##
+		//##END EXAMPLE##
 		
 		assertNotNull(tasks);
 	}
@@ -262,12 +262,12 @@ public class SdkTests {
 	@Test
 	public void T13CreatingUserTest() {
 		API api = TestHelper.authenticate();
-		System.out.println(api);
+		
 		ApiData data = api.navigate(ApiData.class, api.getRoot());
-		System.out.println(data);
+		
 		//##BEGIN EXAMPLE creatingauser##
 		UserDataSet users = api.navigate(UserDataSet.class, data.getLink("list-users"));
-		System.out.println(users);
+		
 		ResponseData result = api.navigate(ResponseData.class, users.getLink("create"), new UserUpdateRequest());
 		//##END EXAMPLE##
 		int before = users.getItems().size();
