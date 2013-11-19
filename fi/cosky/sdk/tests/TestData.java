@@ -44,7 +44,7 @@ public class TestData {
         vehicleRequest.setTimeWindows(timeWindows);
 
         api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
-        
+                
         ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
         taskCapacity.add(new CapacityData("Weight", 1));
         

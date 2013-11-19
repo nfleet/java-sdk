@@ -114,6 +114,11 @@ public class API {
             String url = this.baseUrl + l.getUri();
             result = sendRequest(Verb.POST, url, tClass, object);
         }
+        
+        if (l.getMethod().equals("PATCH")) {
+        	String url = this.baseUrl + l.getUri();
+        	result = sendRequest(Verb.PATCH, url, tClass, object);
+        }
         return (T) result;
     }
 
@@ -150,7 +155,12 @@ public class API {
              
              Field f = null;                        
              if (object != null) {
-            	 if ( (f = object.getClass().getDeclaredField("VersionNumber")) != null) {
+            	 try {
+            		 f = object.getClass().getDeclaredField("VersionNumber");
+            	 } catch (NoSuchFieldException e) {
+            		 //Object does not have versionnumber. 
+            	 }
+            	 if ( f != null) {
             		 f.setAccessible(true);
                 	 int versionNumber = f.getInt(object);
                 	 connection.setRequestProperty("If-None-Match", versionNumber + "");            	 
@@ -225,20 +235,17 @@ public class API {
          } catch (IOException e) {
              e.printStackTrace();
              return null;
-         } catch (NoSuchFieldException e) {
-			
-		} catch (SecurityException e) {
-			e.printStackTrace();
+        } catch (SecurityException e) {
+		     e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			 e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			 e.printStackTrace();
 		} finally {
              assert connection != null;
              connection.disconnect();
-         }
-         connection.disconnect();         
-         return (T) gson.fromJson(result, tClass);
+        }
+        return (T) gson.fromJson(result, tClass);
     }
  
     
@@ -319,6 +326,8 @@ public class API {
                 return "POST";
             case DELETE:
                 return "DELETE";
+            case PATCH:
+            	return "PATCH";
         }
         return "";
     }
@@ -329,7 +338,7 @@ public class API {
         else s = s.substring(s.lastIndexOf("/"));
         return new Link("location", s, "GET", true);
     }
-    private enum Verb {GET, PUT, POST, DELETE}
+    private enum Verb {GET, PUT, POST, DELETE, PATCH}
 
     public TokenData getTokenData() {
         return this.tokenData;

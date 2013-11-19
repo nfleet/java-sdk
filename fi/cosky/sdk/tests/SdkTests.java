@@ -216,7 +216,7 @@ public class SdkTests {
 		RouteUpdateRequest route = new RouteUpdateRequest();
 		int[] sequence = {11 , 12, 21, 22};		
 		route.setSequence(sequence);
-		api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
+		ResponseData asdf = api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 		//##END EXAMPLE##
 		
 		RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));

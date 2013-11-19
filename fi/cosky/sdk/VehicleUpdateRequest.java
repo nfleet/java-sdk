@@ -14,6 +14,7 @@ public class VehicleUpdateRequest extends BaseData {
     private LocationData EndLocation;
     private ArrayList<TimeWindowData> TimeWindows;
     private RouteData Route;
+    private int VersionNumber;
 
     public RouteData getRoute() {
         return Route;
@@ -59,7 +60,27 @@ public class VehicleUpdateRequest extends BaseData {
         EndLocation = endLocation;
     }
 
-    @Override
+    public int getVersionNumber() {
+		return VersionNumber;
+	}
+
+	public void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
+
+	public String getName() {
+		return Name;
+	}
+
+	public ArrayList<CapacityData> getCapacities() {
+		return Capacities;
+	}
+
+	public ArrayList<TimeWindowData> getTimeWindows() {
+		return TimeWindows;
+	}
+
+	@Override
     public String toString() {
         return "VehicleData{" +
                 "Id=" + Id +

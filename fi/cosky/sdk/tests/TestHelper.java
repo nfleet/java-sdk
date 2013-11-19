@@ -50,7 +50,7 @@ public class TestHelper {
 		VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 		VehicleData vehicle = null;
 		for (VehicleData v : vehicles.getItems()) {
-			if (v.getId() == 1) vehicle = v;
+			if (vehicle ==  null) vehicle = v;
 		}
 		return vehicle;
 	}
