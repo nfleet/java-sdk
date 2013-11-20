@@ -7,7 +7,6 @@ import java.util.List;
  */
 
 public class TaskUpdateRequest extends BaseData {
-	
     private String Name;
     private String Info;
     private List<TaskEventUpdateRequest> TaskEvents;
@@ -28,11 +27,11 @@ public class TaskUpdateRequest extends BaseData {
 		TaskId = taskId;
 	}
 
-	public int getVersionNumber() {
+	int getVersionNumber() {
 		return VersionNumber;
 	}
 
-	public void setVersionNumber(int versionNumber) {
+	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
 

@@ -86,4 +86,11 @@ public class TaskEventData extends BaseData {
     public void setCapacities(List<CapacityData> capacities) {
         Capacities = capacities;
     }
+
+	public TaskEventUpdateRequest toRequest() {
+		TaskEventUpdateRequest request = new TaskEventUpdateRequest(Type, Location, Capacities);
+		request.setServiceTime(ServiceTime);
+		request.setTaskEventId(Id);
+		return request;
+	}
 }

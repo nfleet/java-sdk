@@ -14,11 +14,11 @@ public class RoutingProblemUpdateRequest extends BaseData {
     private String State;
     private int VersionNumber;
     
-    public int getVersionNumber() {
+    int getVersionNumber() {
 		return VersionNumber;
 	}
 
-	public void setVersionNumber(int versionNumber) {
+	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
 

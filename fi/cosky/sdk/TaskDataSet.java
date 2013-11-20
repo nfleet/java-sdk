@@ -7,7 +7,13 @@ import java.util.List;
  */
 
 public class TaskDataSet extends BaseData {
-
+	private List<TaskData> Items;
+	private int VersionNumber;
+	
+    public TaskDataSet(List<TaskData> tasks) {
+        this.Items = tasks;
+    }
+	
     public List<TaskData> getItems() {
         return Items;
     }
@@ -16,10 +22,14 @@ public class TaskDataSet extends BaseData {
         Items = items;
     }
 
-    private List<TaskData> Items;
+	int getVersionNumber() {
+		return VersionNumber;
+	}
 
-    public TaskDataSet(List<TaskData> tasks) {
-        this.Items = tasks;
-    }
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
+
+    
 
 }

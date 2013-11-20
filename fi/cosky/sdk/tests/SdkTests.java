@@ -121,18 +121,10 @@ public class SdkTests {
 		TaskData oldTask = TestHelper.getTask(api, problem);
 		List<TaskEventUpdateRequest> events = new ArrayList<TaskEventUpdateRequest>();
 		
-		for (TaskEventData d : oldTask.getTaskEvents()) {
-			TaskEventUpdateRequest asdf = new TaskEventUpdateRequest(d.getType(), d.getLocation(), d.getCapacities());
-			asdf.setLocation(d.getLocation());
-			asdf.setServiceTime(d.getServiceTime());
-			asdf.setTaskEventId(d.getId());
-			events.add(asdf);
-		}
-		
+				
 		//##BEGIN EXAMPLE updatingtask##
-		TaskUpdateRequest task = new TaskUpdateRequest(events);
-		task.setName("newName");
-		task.setVersionNumber(oldTask.getVersionNumber());
+		TaskUpdateRequest task = oldTask.toRequest();
+		task.setName("abbaasdf");
 		ResponseData newTaskLocation = api.navigate(ResponseData.class, oldTask.getLink("update"), task);
 		//##END EXAMPLE##
 		
@@ -267,18 +259,36 @@ public class SdkTests {
 		
 		//##BEGIN EXAMPLE creatingauser##
 		UserDataSet users = api.navigate(UserDataSet.class, data.getLink("list-users"));
-		
+		ArrayList<UserData> before = users.getItems();
+		System.out.println(before);
 		ResponseData result = api.navigate(ResponseData.class, users.getLink("create"), new UserUpdateRequest());
+		System.out.println(result);
 		//##END EXAMPLE##
-		int before = users.getItems().size();
+		
 		users = api.navigate(UserDataSet.class, data.getLink("list-users"));
-		assertSame(before + 1, users.getItems().size());
+		System.out.println(users.getItems().size());
+		assertEquals(before.size()+1, users.getItems().size());
 	}
 	
 		
 	@Test
 	public void T14GetProgressTest() {
 		
+	}
+	
+	@Test 
+	public void T15UpdatingVehicleTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
+		
+		VehicleUpdateRequest updatedVehicle = vehicle.toRequest();
+		updatedVehicle.setName("asdfasdfasdf");
+		ResponseData result = api.navigate(ResponseData.class,  vehicle.getLink("update"), updatedVehicle);
+		
+		vehicle = api.navigate(VehicleData.class, vehicle.getLink("self"));
+		assertEquals(vehicle.getName(), updatedVehicle.getName());
 	}
 	
 }

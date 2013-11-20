@@ -8,8 +8,17 @@ import java.util.List;
 
 public class RoutingProblemDataSet extends BaseData {
     private List<RoutingProblemData> Items;
+    private int VersionNumber;
 
-    public List<RoutingProblemData> getItems() {
+    int getVersionNumber() {
+		return VersionNumber;
+	}
+
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
+
+	public List<RoutingProblemData> getItems() {
         return Items;
     }
 

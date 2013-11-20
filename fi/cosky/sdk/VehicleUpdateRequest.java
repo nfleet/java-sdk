@@ -60,11 +60,11 @@ public class VehicleUpdateRequest extends BaseData {
         EndLocation = endLocation;
     }
 
-    public int getVersionNumber() {
+    int getVersionNumber() {
 		return VersionNumber;
 	}
 
-	public void setVersionNumber(int versionNumber) {
+	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
 

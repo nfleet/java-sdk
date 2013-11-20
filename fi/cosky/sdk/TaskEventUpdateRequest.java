@@ -7,7 +7,6 @@ import java.util.List;
  */
 
 public class TaskEventUpdateRequest extends BaseData {
-   
 	private int TaskEventId;
     private Type Type;
     private List<TimeWindowData> TimeWindows;

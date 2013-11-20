@@ -1,4 +1,5 @@
 package fi.cosky.sdk;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -45,15 +46,30 @@ public class TaskData extends BaseData {
         Id = id;
     }
 
-    public int getVersionNumber() {
+    int getVersionNumber() {
 		return VersionNumber;
 	}
 
-	public void setVersionNumber(int versionNumber) {
+	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
 
 	public TaskData(List<TaskEventData> taskEvents) {
         this.TaskEvents = taskEvents;
     }
+	
+	public TaskUpdateRequest toRequest() {
+		List<TaskEventUpdateRequest> taskevents = new ArrayList<TaskEventUpdateRequest>();
+		
+		for( TaskEventData ted : this.getTaskEvents()) {
+			taskevents.add(ted.toRequest());
+		}
+		
+		TaskUpdateRequest update = new TaskUpdateRequest(taskevents);
+		update.setInfo(Info);
+		update.setName(Name);
+		update.setVersionNumber(VersionNumber);
+		update.setTaskId(Id);
+		return update;
+	}
 }

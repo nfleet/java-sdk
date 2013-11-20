@@ -4,16 +4,15 @@ package fi.cosky.sdk;
  * file 'LICENSE.txt', which is part of this source code package.
  */
 
-public class UserUpdateRequest extends BaseData{
-	
+public class UserUpdateRequest extends BaseData {
 	private int VersionNumber;
 	private int ClientId;
 	private int UserId;
 	
-	public int getVersionNumber() {
+	int getVersionNumber() {
 		return VersionNumber;
 	}
-	public void setVersionNumber(int versionNumber) {
+	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
 	public int getClientId() {

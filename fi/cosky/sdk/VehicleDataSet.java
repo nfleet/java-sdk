@@ -8,7 +8,8 @@ import java.util.ArrayList;
 
 public class VehicleDataSet extends BaseData {
     private ArrayList<VehicleData> Items;
-
+    private int VersionNumber;
+    
     public VehicleDataSet(ArrayList<VehicleData> vehicles) {
         this.Items = vehicles;
     }
@@ -41,5 +42,13 @@ public class VehicleDataSet extends BaseData {
         return this.Items.add(dto);
 
     }
+
+	int getVersionNumber() {
+		return VersionNumber;
+	}
+
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
 
 }

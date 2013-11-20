@@ -27,11 +27,11 @@ public class UserData extends BaseData {
 		ClientId = clientId;
 	}
 
-	public int getVersionNumber() {
+	int getVersionNumber() {
 		return VersionNumber;
 	}
 
-	public void setVersionNumber(int versionNumber) {
+	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
 

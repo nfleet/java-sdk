@@ -8,7 +8,9 @@ import java.util.ArrayList;
 
 public class UserDataSet extends BaseData {
     private ArrayList<UserData> Items;
-
+    private int VersionNumber;
+    private int ClientId;
+    
     public ArrayList<UserData> getItems() {
         return Items;
     }
@@ -16,4 +18,13 @@ public class UserDataSet extends BaseData {
     public void setItems(ArrayList<UserData> items) {
         Items = items;
     }
+
+	int getVersionNumber() {
+		return VersionNumber;
+	}
+
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
+    
 }

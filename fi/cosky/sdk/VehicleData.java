@@ -14,6 +14,7 @@ public class VehicleData extends BaseData {
     private LocationData EndLocation;
     private ArrayList<TimeWindowData> TimeWindows;
     private RouteData Route;
+    private int VersionNumber;
 
     public RouteData getRoute() {
         return Route;
@@ -59,19 +60,6 @@ public class VehicleData extends BaseData {
         EndLocation = endLocation;
     }
 
-    @Override
-    public String toString() {
-        return "VehicleData{" +
-                "Id=" + Id +
-                ", Name='" + Name + '\'' +
-                ", Capacities=" + Capacities +
-                ", StartLocation=" + StartLocation +
-                ", EndLocation=" + EndLocation +
-                ", TimeWindows=" + TimeWindows +
-                ", Route=" + Route +
-                '}' + super.toString();
-    }
-
     public LocationData getStartLocation() {
         return StartLocation;
     }
@@ -79,4 +67,34 @@ public class VehicleData extends BaseData {
     public void setStartLocation(LocationData startLocation) {
         StartLocation = startLocation;
     }
+
+	int getVersionNumber() {
+		return VersionNumber;
+	}
+
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
+	
+	public String getName() {
+		return Name;
+	}
+
+	public ArrayList<CapacityData> getCapacities() {
+		return Capacities;
+	}
+
+	public ArrayList<TimeWindowData> getTimeWindows() {
+		return TimeWindows;
+	}
+
+	public VehicleUpdateRequest toRequest() {
+		VehicleUpdateRequest request = new VehicleUpdateRequest(Name, Capacities, StartLocation, EndLocation);
+		request.setVersionNumber(VersionNumber);
+		request.setId(Id);
+		request.setName(Name);
+		request.setTimeWindows(TimeWindows);
+		request.setRoute(Route);
+		return request;
+	}
 }
