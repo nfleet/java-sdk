@@ -17,8 +17,8 @@ public class UsingCoSkyAPIv2 {
 
     @SuppressWarnings("deprecation")
 	public static void main (String[] args) {
-        API api = new API("");
-        boolean success = api.authenticate("", "");
+        API api = new API("http://localhost:81");
+        boolean success = api.authenticate("testi", "user");
 
 
         if (success) {
@@ -29,22 +29,22 @@ public class UsingCoSkyAPIv2 {
             System.out.println(datas);
             UserData user = api.navigate(UserData.class, datas.getLocation());
             
-            UserDataSet asdfasdf= api.navigate(UserDataSet.class, data.getLink("list-users"));
+            EntityLinkCollection users = api.navigate(EntityLinkCollection.class, data.getLink("list-users"));
             
-            for (UserData u : asdfasdf.getItems()) {
+            for (EntityLink u : users.getItems()) {
             	System.out.println(u);
             }
                    
             
             if (user != null) {
             
-                ResponseData result = api.navigate(ResponseData.class, user.getLink("list-problems"));
-
+                EntityLinkCollection problems = api.navigate(EntityLinkCollection.class, user.getLink("list-problems"));
+                	
                 RoutingProblemUpdateRequest newProblem = new RoutingProblemUpdateRequest("exampleProblem");
-                result = api.navigate(ResponseData.class, user.getLink("create-problem"), newProblem );
+                ResponseData result = api.navigate(ResponseData.class, user.getLink("create-problem"), newProblem );
                 System.out.println(result);
-                RoutingProblemDataSet problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
-                RoutingProblemData problem1 = problems.getItems().get(problems.getItems().size()-1);
+                problems = api.navigate(EntityLinkCollection.class, user.getLink("list-problems"));
+                RoutingProblemData problem1 = api.navigate(RoutingProblemData.class, problems.getItems().get(0).getLink("self"));
                 
                 System.out.println(problem1);
                 CoordinateData coordinateData = new CoordinateData();
@@ -98,9 +98,9 @@ public class UsingCoSkyAPIv2 {
 
                 result = api.navigate(ResponseData.class, problem1.getLink("create-vehicle"), vehicleRequest);
 
-                VehicleDataSet d = api.navigate(VehicleDataSet.class, problem1.getLink("list-vehicles"));
+                EntityLinkCollection vehicles = api.navigate(EntityLinkCollection.class, problem1.getLink("list-vehicles"));
 
-                for( VehicleData zdf : d.getItems()) {
+                for( EntityLink zdf : vehicles.getItems()) {
                     System.out.println(zdf);
                 }
 
@@ -166,17 +166,17 @@ public class UsingCoSkyAPIv2 {
                     }
                 }
 
-                VehicleDataSet vehicleDataSet = api.navigate(VehicleDataSet.class, problem1.getLink("list-vehicles"));
+                EntityLinkCollection v = api.navigate(EntityLinkCollection.class, problem1.getLink("list-vehicles"));
 
                 //Gets the routeevent
-                for (VehicleData vd : vehicleDataSet.getItems()) {
-                    System.out.println("Vehicles route " + vd.getRoute());
-                    TaskEventDataSet route = api.navigate(TaskEventDataSet.class, vd.getLink("list-events"));
-                    for ( TaskEventData ted : route.getItems()) {
-                        System.out.println(ted);
+                for (EntityLink el : v.getItems()) {
+                	VehicleData vd = api.navigate(VehicleData.class, el.getLink("self"));
+                    System.out.println("Vehicles route: ");
+                    RouteEventDataSet routeEvents = api.navigate(RouteEventDataSet.class, vd.getLink("list-events"));
+                    for (RouteEventData red : routeEvents.getItems()) {
+                    	System.out.println(red);
                     }
                 }
-
                 //Tasks do not contain the information about their task events anymore.
             }
         } else {
