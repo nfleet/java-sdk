@@ -55,7 +55,7 @@ public class SdkTests {
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		
 		//##BEGIN EXAMPLE listingtasks##
-		TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+		EntityLinkCollection tasks = api.navigate(EntityLinkCollection.class, problem.getLink("list-tasks"));
 		//##END EXAMPLE##
 		
 		assertNotNull(tasks);
@@ -144,7 +144,7 @@ public class SdkTests {
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		
 		//##BEGIN EXAMPLE listingvehicles##
-		VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+		EntityLinkCollection vehicles = api.navigate(EntityLinkCollection.class, problem.getLink("list-vehicles"));
 		//##END EXAMPLE##
 		assertNotNull(vehicles.getItems());
 	}
@@ -167,7 +167,7 @@ public class SdkTests {
 		api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 		
 		//##BEGIN EXAMPLE accessingtaskseq##
-		TaskEventDataSet events = api.navigate(TaskEventDataSet.class, vehicle.getLink("list-events"));
+		EntityLinkCollection events = api.navigate(EntityLinkCollection.class, vehicle.getLink("list-events"));
 		//##END EXAMPLE##
 		
 		assertNotNull(events);
@@ -258,14 +258,14 @@ public class SdkTests {
 		ApiData data = api.navigate(ApiData.class, api.getRoot());
 		
 		//##BEGIN EXAMPLE creatingauser##
-		UserDataSet users = api.navigate(UserDataSet.class, data.getLink("list-users"));
-		ArrayList<UserData> before = users.getItems();
+		EntityLinkCollection users = api.navigate(EntityLinkCollection.class, data.getLink("list-users"));
+		ArrayList<EntityLink> before = users.getItems();
 		System.out.println(before);
 		ResponseData result = api.navigate(ResponseData.class, users.getLink("create"), new UserUpdateRequest());
 		System.out.println(result);
 		//##END EXAMPLE##
 		
-		users = api.navigate(UserDataSet.class, data.getLink("list-users"));
+		users = api.navigate(EntityLinkCollection.class, data.getLink("list-users"));
 		System.out.println(users.getItems().size());
 		assertEquals(before.size()+1, users.getItems().size());
 	}

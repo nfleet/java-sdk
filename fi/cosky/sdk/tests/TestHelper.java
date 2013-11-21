@@ -18,16 +18,14 @@ public class TestHelper {
 	
 	static UserData getOrCreateUser( API api ) {
 		ApiData apiData = api.navigate(ApiData.class, api.getRoot());
-		UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+		EntityLinkCollection users = api.navigate(EntityLinkCollection.class, apiData.getLink("list-users"));
 		UserData user = null;
 		if ( users.getItems() != null && users.getItems().size() < 1) {
 			user = new UserData();
 			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 			user = api.navigate(UserData.class, createdUser.getLocation());
 		} else {
-			for (UserData u : users.getItems()) {
-				if (u.getId() == 1) user = u;
-			}
+		    user = api.navigate(UserData.class, users.getItems().get(0).getLink("self"));
 		}
 		return user;
 	}
@@ -47,11 +45,9 @@ public class TestHelper {
 	
 	static VehicleData getVehicle(API api, UserData user, RoutingProblemData problem) {
 		TestData.CreateDemoData(problem, api);
-		VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+		EntityLinkCollection vehicles = api.navigate(EntityLinkCollection.class, problem.getLink("list-vehicles"));
 		VehicleData vehicle = null;
-		for (VehicleData v : vehicles.getItems()) {
-			if (vehicle ==  null) vehicle = v;
-		}
+		vehicle = api.navigate(VehicleData.class, vehicles.getItems().get(0).getLink("self"));
 		return vehicle;
 	}
 	
