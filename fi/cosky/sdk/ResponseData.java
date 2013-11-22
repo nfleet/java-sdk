@@ -6,12 +6,13 @@ import java.util.ArrayList;
  * file 'LICENSE.txt', which is part of this source code package.
  */
 
-public class ResultData extends BaseData {
+public class ResponseData extends BaseData {
     private Link Location;
     private ArrayList<ErrorData> Items;
     private int Id;
     private String Message;
-
+    
+    
     public ArrayList<ErrorData> getItems() {
         return Items;
     }
