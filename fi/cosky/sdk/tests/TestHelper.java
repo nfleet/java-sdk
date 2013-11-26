@@ -8,9 +8,9 @@ import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 public class TestHelper {
 	
 	static API authenticate() {
-		String url = "http://localhost:81";
-		String clientKey = "testi";
-		String clientSecret = "user";
+		String url = "";
+		String clientKey = "";
+		String clientSecret = "";
 		API api = new API(url);
 		api.authenticate(clientKey, clientSecret);
 		return api;
@@ -32,6 +32,7 @@ public class TestHelper {
 	
 	static RoutingProblemData createProblem(API api, UserData user) {
 		RoutingProblemData problem = new RoutingProblemData("exampleProblem");
+		EntityLinkCollection problems = api.navigate(EntityLinkCollection.class, user.getLink("list-problems"));
 		ResponseData created = api.navigate(ResponseData.class, user.getLink("create-problem"), problem);
 		problem = api.navigate(RoutingProblemData.class, created.getLocation());
 		return problem;

@@ -24,7 +24,6 @@ public class SdkTests {
 	public void T01CreatingProblemTest() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
-		
 		//##BEGIN EXAMPLE creatingproblem##
 		RoutingProblemUpdateRequest update = new RoutingProblemUpdateRequest("TestProblem");
 		ResponseData createdProblem = api.navigate(ResponseData.class, user.getLink("create-problem"), update);
@@ -291,4 +290,15 @@ public class SdkTests {
 		assertEquals(vehicle.getName(), updatedVehicle.getName());
 	}
 	
+	@Test
+	public void T16BadRequestTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+				
+		//##BEGIN EXAMPLE badrequest##
+		RoutingProblemData problem = new RoutingProblemData("");
+		ResponseData result = api.navigate(ResponseData.class, user.getLink("create-problem"), problem);
+		//##END EXAMPLE##
+		System.out.println(result);
+	}
 }

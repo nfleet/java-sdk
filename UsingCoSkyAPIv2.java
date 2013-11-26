@@ -17,8 +17,8 @@ public class UsingCoSkyAPIv2 {
 
     @SuppressWarnings("deprecation")
 	public static void main (String[] args) {
-        API api = new API("http://localhost:81");
-        boolean success = api.authenticate("testi", "user");
+        API api = new API("");
+        boolean success = api.authenticate("user", "pass");
 
 
         if (success) {

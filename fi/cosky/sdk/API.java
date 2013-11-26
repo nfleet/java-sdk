@@ -66,7 +66,7 @@ public class API {
 		Object result;
 
 		if (tClass.equals(TokenData.class)) {
-			result = sendRequest(Verb.GET, this.baseUrl + l.getUri(), tClass, null);
+			result = sendRequest(Verb.GET, l.getUri(), tClass, null);
 			return (T) result;
 		}
 
@@ -75,10 +75,6 @@ public class API {
 			String authorization = "Basic " + Base64.encodeBase64String((ClientKey + ":" + ClientSecret).getBytes());
 			headers.put("authorization", authorization);
 			result = sendRequestWithAddedHeaders(Verb.POST,	this.baseUrl + l.getUri(), tClass, null, headers);
-			ResponseData data = (ResponseData) result;
-			Link link = data.getLink("location");
-			link.setUri(link.getUri());
-			data.setLocation(link);
 			return (T) result;
 		}
 
@@ -97,7 +93,7 @@ public class API {
 			result = sendRequest(Verb.GET, this.baseUrl + uri, tClass, null);
 		} else if (l.getMethod().equals("PUT")) {
 			result = sendRequest(Verb.PUT, this.baseUrl + uri, tClass, null);
-		} else if (l.getRel().equals("start") || l.getRel().equals("create-user")) {
+		} else if (l.getMethod().equals("POST")) {
 			result = sendRequest(Verb.POST, this.baseUrl + uri, tClass, null);
 		} else {
 			result = sendRequest(Verb.GET, uri, tClass, null);
@@ -203,7 +199,7 @@ public class API {
 
 			connection.connect();
 
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER || connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED || connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER ) {
 				ResponseData data = new ResponseData();
 				Link l = parseLocationLinkFromString(connection.getHeaderField("Location"));
 				data.setLocation(l);
@@ -213,9 +209,8 @@ public class API {
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 				System.out.println("Authentication expired");
-				this.authenticate(this.ClientKey, this.ClientSecret);
+				this.authenticate(ClientKey, ClientSecret);
 				System.out.println("Authenticated again");
-				connection.disconnect();
 				return sendRequest(verb, url, tClass, object);
 			}
 
@@ -223,7 +218,7 @@ public class API {
 				return (T) objectCache.getObject(url);
 			}
 
-			if (connection.getResponseCode() > HttpURLConnection.HTTP_FORBIDDEN) {
+			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
 				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
 				InputStream stream = connection.getErrorStream();
 				br = new BufferedReader(new InputStreamReader(stream));
@@ -238,7 +233,6 @@ public class API {
 				connection.disconnect();
 				return (T) gson.fromJson(body, ResponseData.class);
 			}
-
 			InputStream is = connection.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
 
@@ -252,14 +246,14 @@ public class API {
 				sb.insert(sb.lastIndexOf("}"), ",\"VersionNumber\":" + abba	+ "");
 
 			}
+			
 			result = sb.toString();
 
 		} catch (MalformedURLException e) {
 			System.out.println("Troubles with the url " + url);
 			return null;
 		} catch (ProtocolException e) {
-			System.out
-					.println("Troubles reaching the service, please check service status");
+			System.out.println("Troubles reaching the service, please check service status");
 			return null;
 		} catch (UnsupportedEncodingException e) {
 			return null;
@@ -309,6 +303,7 @@ public class API {
 				links.add(l);
 				links.add(location);
 				ResponseData data = new ResponseData();
+				data.setLocation(location);
 				data.setLinks(links);
 				return (T) data;
 			}
@@ -366,12 +361,13 @@ public class API {
 	}
 
 	private Link parseLocationLinkFromString(String s) {
+		//Azure emulator hack
 		if (s.contains("82"))
 			s = s.replace("82", "81");
-		if (s.contains("/users"))
-			s = s.substring(s.indexOf("/users"));
+		if (s.contains("/tokens"))
+			return new Link("location", s, "GET", true);
 		else
-			s = s.substring(s.lastIndexOf("/"));
+			s = s.substring(s.lastIndexOf("/users"));
 		return new Link("location", s, "GET", true);
 	}
 
