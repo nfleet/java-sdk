@@ -7,6 +7,7 @@ package fi.cosky.sdk;
 
 public class RouteData extends BaseData {
     private int[] Items;
+    private int VersionNumber;
 
     public int[] getItems() {
         return Items;
@@ -15,4 +16,12 @@ public class RouteData extends BaseData {
     public void setItems(int[] items) {
         Items = items;
     }
+
+	int getVersionNumber() {
+		return VersionNumber;
+	}
+
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
+	}
 }

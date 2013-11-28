@@ -10,7 +10,8 @@ public class RouteUpdateRequest extends BaseData {
 	private int UserId;
 	private int ProblemId;
 	private int VehicleId;
-	private int[] Sequence;
+	private int[] Items;
+	private int VersionNumber;
 	
 	public int getClientId() {
 		return ClientId;
@@ -37,10 +38,22 @@ public class RouteUpdateRequest extends BaseData {
 		VehicleId = vehicleId;
 	}
 	public int[] getSequence() {
-		return Sequence;
+		return Items;
 	}
 	public void setSequence(int[] sequence) {
-		Sequence = sequence;
+		Items = sequence;
+	}
+	public int[] getItems() {
+		return Items;
+	}
+	public void setItems(int[] items) {
+		Items = items;
+	}
+	int getVersionNumber() {
+		return VersionNumber;
+	}
+	void setVersionNumber(int versionNumber) {
+		VersionNumber = versionNumber;
 	}
 	
 }

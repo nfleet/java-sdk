@@ -152,7 +152,7 @@ public class API {
 			}
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept", "application/json");
-
+			/*
 			if (verb == Verb.GET) {
 				Field f = null;
 				Object fromCache = null;
@@ -172,21 +172,23 @@ public class API {
 				}
 				
 			}
-
+			*/
 			Field f = null;
 			if (object != null) {
-				try {
-					f = object.getClass().getDeclaredField("VersionNumber");
-				} catch (NoSuchFieldException e) {
+				Object fromCache = null;
+				if (objectCache.containsUri(url))  {
+					try {
+						fromCache = objectCache.getObject(url);
+						f = fromCache.getClass().getDeclaredField("VersionNumber");
+					} catch (NoSuchFieldException e) {
 					// Object does not have versionnumber.
+					}
+					if (f != null) {
+						f.setAccessible(true);
+						int versionNumber = f.getInt(fromCache);
+						connection.setRequestProperty("If-None-Match", versionNumber + "");
+					}
 				}
-				if (f != null) {
-					f.setAccessible(true);
-					int versionNumber = f.getInt(object);
-					connection.setRequestProperty("If-None-Match", versionNumber + "");
-
-				}
-
 				if ((verb == Verb.POST || verb == Verb.PUT)) {
 					String json = gson.toJson(object);
 					connection.addRequestProperty("Content-Length",	json.getBytes("UTF-8").length + "");
@@ -194,6 +196,7 @@ public class API {
 					osw.write(json);
 					osw.flush();
 					osw.close();
+					System.out.println(json);
 				}
 			}
 

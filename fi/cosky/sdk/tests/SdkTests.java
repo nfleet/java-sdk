@@ -1,5 +1,10 @@
 package fi.cosky.sdk.tests;
 
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE.txt', which is part of this source code package.
+ */
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -154,7 +159,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 				VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		
+				RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 		RouteUpdateRequest route = new RouteUpdateRequest();
 		int[] sd = {11,12};
 		route.setClientId(user.getClientId());
@@ -178,7 +183,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		
+		RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 		RouteUpdateRequest route = new RouteUpdateRequest();
 		int[] sequence = {11,12};
 		route.setClientId(user.getClientId());
@@ -204,6 +209,7 @@ public class SdkTests {
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
 		
 		//##BEGIN EXAMPLE updatingroute##
+		RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 		RouteUpdateRequest route = new RouteUpdateRequest();
 		int[] sequence = {11 , 12, 21, 22};		
 		route.setSequence(sequence);
@@ -211,6 +217,7 @@ public class SdkTests {
 		//##END EXAMPLE##
 		
 		RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));
+		System.out.println(routeData);
 		assertArrayEquals(routeData.getItems(), sequence);
 	}
 	
@@ -226,7 +233,7 @@ public class SdkTests {
 		update.setState("Running");
 		ResponseData result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 		//##END EXAMPLE##
-		
+		System.out.println(result);
 		assertNotNull(result);;
 	}
 	
