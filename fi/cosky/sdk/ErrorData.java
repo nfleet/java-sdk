@@ -22,4 +22,12 @@ public class ErrorData extends BaseData {
     public String toString() {
         return "Code: " + Code + " Message: " + Message;
     }
+
+	public int getCode() {
+		return Code;
+	}
+
+	public String getMessage() {
+		return Message;
+	}
 }

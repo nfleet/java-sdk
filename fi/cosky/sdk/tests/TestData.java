@@ -1,5 +1,6 @@
 package fi.cosky.sdk.tests;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -47,23 +48,27 @@ public class TestData {
         VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest("demoVehicle",capacities, locationData, locationData);
         vehicleRequest.setTimeWindows(timeWindows);
 
-        api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
-        
-        
-        ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
-        taskCapacity.add(new CapacityData("Weight", 1));
-        
-        ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
-        taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
-        taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
-        TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-        task.setName("testTask");
-        taskEvents.get(0).setTimeWindows(timeWindows);
-        taskEvents.get(1).setTimeWindows(timeWindows);
-        taskEvents.get(0).setServiceTime(10);
-        taskEvents.get(1).setServiceTime(10);
+        try {
+        	api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
+        	
+            ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
+            taskCapacity.add(new CapacityData("Weight", 1));
+            
+            ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
+            taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
+            taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
+            TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
+            task.setName("testTask");
+            taskEvents.get(0).setTimeWindows(timeWindows);
+            taskEvents.get(1).setTimeWindows(timeWindows);
+            taskEvents.get(0).setServiceTime(10);
+            taskEvents.get(1).setServiceTime(10);
 
-        api.navigate(ResponseData.class, problem.getLink("create-task"), task);
-        
+            api.navigate(ResponseData.class, problem.getLink("create-task"), task);
+        } catch (NFleetException e) {
+        	System.out.println("Something went wrong");
+        } catch (IOException e) {
+        	System.out.println();
+        }
 	}
 }

@@ -45,24 +45,36 @@ public class API {
 	public boolean authenticate(String username, String password) {
 		this.ClientKey = username;
 		this.ClientSecret = password;
-		ResponseData result = navigate(ResponseData.class, getAuthLink());
+		try {
+			ResponseData result = navigate(ResponseData.class, getAuthLink());
 
-		if (result == null || result.getItems() != null) {
+			if (result == null || result.getItems() != null) {
+				return false;
+			}
+
+			TokenData authenticationData = navigate(TokenData.class, result.getLocation());
+
+			this.tokenData = authenticationData;
+		} catch (IOException e) {
 			return false;
 		}
-
-		TokenData authenticationData = navigate(TokenData.class, result.getLocation());
-
-		this.tokenData = authenticationData;
 		return true;
 	}
 
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l) {
+	/**
+	 * 
+	 * @param tClass return type.
+	 * @param l navigation link
+	 * @return object of type tClass
+	 * @throws  NFleetException when there is data validation problems 
+	 * @throws	IOException when there is problems with infrastructure (connection etc..)
+	 */
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l) throws IOException {
 		return navigate(tClass, l, null);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) {
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
 		Object result;
 
 		if (tClass.equals(TokenData.class)) {
@@ -102,8 +114,17 @@ public class API {
 		return (T) result;
 	}
 
+	/**
+	 * Navigate method for sending data
+	 * @param tClass    return type.
+	 * @param l 		navigation link
+	 * @param object	object to send
+	 * @return 			object of type tClass
+	 * @throws 	NFleetException when there is problems with data validation, exception contains list of the errors.
+	 * @throws	IOException  when there is problems with infrastructure ( connection etc.. )
+	 */
 	@SuppressWarnings("unchecked")
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) {
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
 		Object result = null;
 
 		if (l.getMethod().equals("PUT")) {
@@ -134,7 +155,7 @@ public class API {
 		this.baseUrl = baseUrl;
 	}
 
-	private <T extends BaseData> T sendRequest(Verb verb, String url, Class<T> tClass, Object object) {
+	private <T extends BaseData> T sendRequest(Verb verb, String url, Class<T> tClass, Object object) throws IOException {
 		URL serverAddress;
 		BufferedReader br;
 		String result = "";
@@ -210,10 +231,8 @@ public class API {
 					sb.append(s);
 				}
 				String body = sb.toString();
-				System.out.println(body);
-				System.out.println("Please check the request " + connection.getResponseMessage() + body + " " + url);
 				connection.disconnect();
-				return (T) gson.fromJson(body, ResponseData.class);
+				throw (NFleetException) gson.fromJson(body, NFleetException.class);
 			}
 			InputStream is = connection.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
@@ -230,24 +249,20 @@ public class API {
 			}
 			
 			result = sb.toString();
-
 		} catch (MalformedURLException e) {
-			System.out.println("Troubles with the url " + url);
-			return null;
+			throw e;
 		} catch (ProtocolException e) {
-			System.out.println("Troubles reaching the service, please check service status");
-			return null;
+			throw e;
 		} catch (UnsupportedEncodingException e) {
-			return null;
+			throw e;
 		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+			throw e;
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			throw e;
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			throw e;
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			throw new IOException(e.toString());
 		} finally {
 			assert connection != null;
 			connection.disconnect();
@@ -257,7 +272,7 @@ public class API {
 		return (T) newEntity;
 	}
 
-	private <T extends BaseData> T sendRequestWithAddedHeaders(Verb verb, String url, Class<T> tClass, Object object, HashMap<String, String> headers) {
+	private <T extends BaseData> T sendRequestWithAddedHeaders(Verb verb, String url, Class<T> tClass, Object object, HashMap<String, String> headers) throws IOException {
 		URL serverAddress;
 		HttpURLConnection connection;
 		BufferedReader br;
@@ -291,7 +306,17 @@ public class API {
 			}
 
 			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				throw new IOException(connection.getResponseMessage() + connection.getContent());
+				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
+				InputStream stream = connection.getErrorStream();
+				br = new BufferedReader(new InputStreamReader(stream));
+				StringBuilder sb = new StringBuilder();
+				String s;
+				while ((s = br.readLine()) != null) {
+					sb.append(s);
+				}
+				String body = sb.toString();
+				connection.disconnect();
+				throw (NFleetException) gson.fromJson(body, NFleetException.class);
 			}
 
 			InputStream is = connection.getInputStream();
@@ -303,21 +328,14 @@ public class API {
 				sb.append(sa).append("\n");
 			}
 			result = sb.toString();
-			
 		} catch (MalformedURLException e) {
-			System.out.println("Url is not correct, please check");
-			System.out.println(e.toString());
-			return null;
+			throw e;
 		} catch (ProtocolException e) {
-			System.out.println("Please check if the service is up");
-			System.out.println(e.toString());
-			return null;
+			throw e;
 		} catch (UnsupportedEncodingException e) {
-			System.out.println(e.toString());
-			return null;
+			throw e;
 		} catch (IOException e) {
-			System.out.println(e.toString());
-			return null;
+			throw e;
 		}
 		return (T) gson.fromJson(result, tClass);
 	}
