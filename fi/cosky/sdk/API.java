@@ -35,6 +35,7 @@ public class API {
 	private ApiData apiData;
 	private TokenData tokenData;
 	private ObjectCache objectCache;
+	
 	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSX").create();
 
 	public API(String baseUrl) {
@@ -67,7 +68,7 @@ public class API {
 	 * @param l navigation link
 	 * @return object of type tClass
 	 * @throws  NFleetException when there is data validation problems 
-	 * @throws	IOException when there is problems with infrastructure (connection etc..)
+	 * 			IOException when there is problems with infrastructure (connection etc..)
 	 */
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l) throws IOException {
 		return navigate(tClass, l, null);
@@ -212,9 +213,13 @@ public class API {
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 				System.out.println("Authentication expired");
-				this.authenticate(ClientKey, ClientSecret);
-				System.out.println("Authenticated again");
-				return sendRequest(verb, url, tClass, object);
+				
+				if( this.authenticate(ClientKey, ClientSecret) ) {
+					System.out.println("Authenticated again");
+					return sendRequest(verb, url, tClass, object);
+				}
+				
+				else throw new IOException("Could not authenticate");	
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
@@ -305,6 +310,17 @@ public class API {
 				return (T) data;
 			}
 
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+				System.out.println("Authentication expired");
+				
+				if( this.authenticate(ClientKey, ClientSecret) ) {
+					System.out.println("Authenticated again");
+					return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
+				}
+				
+				else throw new IOException("Could not authenticate");	
+			}
+			
 			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
 				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
 				InputStream stream = connection.getErrorStream();
