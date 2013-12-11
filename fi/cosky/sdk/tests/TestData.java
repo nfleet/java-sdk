@@ -65,7 +65,7 @@ public class TestData {
             taskEvents.get(1).setServiceTime(10);
 
             api.navigate(ResponseData.class, problem.getLink("create-task"), task);
-        } catch (NFleetException e) {
+        } catch (NFleetRequestException e) {
         	System.out.println("Something went wrong");
         } catch (IOException e) {
         	System.out.println();

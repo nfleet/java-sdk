@@ -20,8 +20,7 @@ public class UsingCoSkyAPIv2 {
 	public static void main (String[] args) {
         API api = new API("");
         boolean success = api.authenticate("", "");
-
-
+        
         if (success) {
         	try {
         		ApiData data = api.navigate(ApiData.class, api.getRoot());
@@ -31,32 +30,31 @@ public class UsingCoSkyAPIv2 {
                 System.out.println(datas);
                 UserData user = api.navigate(UserData.class, datas.getLocation());
                 
-                EntityLinkCollection users = api.navigate(EntityLinkCollection.class, data.getLink("list-users"));
+                UserDataSet users = api.navigate(UserDataSet.class, data.getLink("list-users"));
                 
-                for (EntityLink u : users.getItems()) {
+                for (UserData u : users.getItems()) {
                 	System.out.println(u);
                 }
                        
-                
                 if (user != null) {
                 
-                    EntityLinkCollection problems = api.navigate(EntityLinkCollection.class, user.getLink("list-problems"));
+                    RoutingProblemDataSet problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
                     	
                     RoutingProblemUpdateRequest newProblem = new RoutingProblemUpdateRequest("exampleProblem");
                     ResponseData result = api.navigate(ResponseData.class, user.getLink("create-problem"), newProblem );
                     System.out.println(result);
-                    problems = api.navigate(EntityLinkCollection.class, user.getLink("list-problems"));
+                    problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
                     RoutingProblemData problem1 = api.navigate(RoutingProblemData.class, problems.getItems().get(0).getLink("self"));
                     
                     System.out.println(problem1);
                     CoordinateData coordinateData = new CoordinateData();
-
-                    //coordinateData.setLatitude(62.244588);
-                    //coordinateData.setLongitude(25.742683);
+                    
+                    coordinateData.setLatitude(62.244588);
+                    coordinateData.setLongitude(25.742683);
 
                     //Saksa
-                    coordinateData.setLatitude(54.130888);
-                    coordinateData.setLongitude(12.00938);
+                    //coordinateData.setLatitude(54.130888);
+                    //coordinateData.setLongitude(12.00938);
                     coordinateData.setSystem(CoordinateData.CoordinateSystem.WGS84);
                     LocationData locationData = new LocationData();
                     locationData.setCoordinatesData(coordinateData);
@@ -64,24 +62,24 @@ public class UsingCoSkyAPIv2 {
                     CoordinateData pickup = new CoordinateData();
 
 
-                    //pickup.setLatitude(62.247906);
-                    //pickup.setLongitude(25.867395);
+                    pickup.setLatitude(62.247906);
+                    pickup.setLongitude(25.867395);
 
                     //Saksa
-                    pickup.setLatitude(54.14454);
-                    pickup.setLongitude(12.108808);
+                    //pickup.setLatitude(54.14454);
+                    //pickup.setLongitude(12.108808);
                     pickup.setSystem(CoordinateData.CoordinateSystem.WGS84);
                     LocationData pickupLocation = new LocationData();
                     pickupLocation.setCoordinatesData(pickup);
 
                     CoordinateData delivery = new CoordinateData();
 
-                    //delivery.setLatitude(61.386909);
-                    //delivery.setLongitude(24.654106);
+                    delivery.setLatitude(61.386909);
+                    delivery.setLongitude(24.654106);
 
                     //Saksa
-                    delivery.setLatitude(53.545867);
-                    delivery.setLongitude(10.276409);
+                    //delivery.setLatitude(53.545867);
+                    //delivery.setLongitude(10.276409);
                     delivery.setSystem(CoordinateData.CoordinateSystem.WGS84);
                     LocationData deliveryLocation = new LocationData();
                     deliveryLocation.setCoordinatesData(delivery);
@@ -96,47 +94,44 @@ public class UsingCoSkyAPIv2 {
                     timeWindows.add(new TimeWindowData(morning, evening));
 
                     VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest("demoVehicle",capacities, locationData, locationData);
+                    VehicleUpdateRequest vehicle2 = new VehicleUpdateRequest("demoVehicle2",capacities, locationData, locationData);
                     vehicleRequest.setTimeWindows(timeWindows);
-
-                    result = api.navigate(ResponseData.class, problem1.getLink("create-vehicle"), vehicleRequest);
-
-                    EntityLinkCollection vehicles = api.navigate(EntityLinkCollection.class, problem1.getLink("list-vehicles"));
-
-                    for( EntityLink zdf : vehicles.getItems()) {
-                        System.out.println(zdf);
-                    }
-
+                    vehicle2.setTimeWindows(timeWindows);
+                    
+                    //New way to add many vehicles at the same time, is WAY faster than doing it one by one.
+                    VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+                    ArrayList<VehicleUpdateRequest> set = new ArrayList<VehicleUpdateRequest>();
+                    set.add(vehicle2);
+                    set.add(vehicleRequest);
+                    vehicles.setItems(set);
+                    result = api.navigate(ResponseData.class, problem1.getLink("import-vehicles"), vehicles);
+                     
+                                        
                     ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
                     taskCapacity.add(new CapacityData("Weight", 1));
-
+                    ArrayList<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
                     for (int i = 0 ; i < 4; i++) {
-                        ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
+                    	ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
                         taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
                         taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
                         TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-                        task.setName("testTask");
+                        task.setName("testTask" + i);
                         taskEvents.get(0).setTimeWindows(timeWindows);
                         taskEvents.get(1).setTimeWindows(timeWindows);
                         taskEvents.get(0).setServiceTime(10);
                         taskEvents.get(1).setServiceTime(10);
-
-                        result = api.navigate(ResponseData.class, problem1.getLink("create-task"), task);
-
+                        tasks.add(task);
                     }
-
+                    
+                    //New way to add many tasks in one request, is WAY faster than doing it one by one.
+                    TaskSetImportRequest taskeSetImport = new TaskSetImportRequest();
+                    taskeSetImport.setItems(tasks);
+                    result = api.navigate(ResponseData.class, problem1.getLink("import-tasks"), taskeSetImport);
+                                        
                     ArrayList<TaskEventData> taskEvents = new ArrayList<TaskEventData>();
                     taskEvents.add(new TaskEventData(Type.Pickup, pickupLocation, taskCapacity));
                     taskEvents.add(new TaskEventData(Type.Delivery, deliveryLocation, taskCapacity));
-
-                    if (result.getItems() != null) {
-                        System.out.println(result.getItems());
-                    }
-
-                    TaskDataSet taskData = api.navigate(TaskDataSet.class, problem1.getLink("list-tasks") );
-                    for (TaskData td : taskData.getItems()) {
-                        System.out.println(td);
-                    }
-
+                  
                     problem1 = api.navigate(RoutingProblemData.class, problem1.getLink("self"));
                     System.out.println(problem1);
                     //starting optimization
@@ -154,6 +149,7 @@ public class UsingCoSkyAPIv2 {
                             Thread.sleep(1500);
                             problem1 = api.navigate(RoutingProblemData.class, problem1.getLink("self"));
                             System.out.println("Optimization is " + problem1.getState() +" at percentage " + problem1.getProgress());
+                            /*
                             objectiveValues = api.navigate(ObjectiveValueDataSet.class, problem1.getLink("objective-values"), qp);
 
                             if (objectiveValues != null && !objectiveValues.getItems().isEmpty()) {
@@ -161,28 +157,22 @@ public class UsingCoSkyAPIv2 {
                                     System.out.println( "Objective values from " + qp.get("start") + " to " + qp.get("end") + ": [" + item.getTimeStamp() + "] " + item.getValue() );
                                 }
                             }
-
+							*/
                             if (problem1.getState().equals("Stopped")) break;
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
 
-                    EntityLinkCollection v = api.navigate(EntityLinkCollection.class, problem1.getLink("list-vehicles"));
+                    PlanData v = api.navigate(PlanData.class, problem1.getLink("plan"));
 
-                    //Gets the routeevent
-                    for (EntityLink el : v.getItems()) {
-                    	VehicleData vd = api.navigate(VehicleData.class, el.getLink("self"));
-                        System.out.println("Vehicles route: ");
-                        RouteEventDataSet routeEvents = api.navigate(RouteEventDataSet.class, vd.getLink("list-events"));
-                        for (RouteEventData red : routeEvents.getItems()) {
-                        	System.out.println(red);
-                        }
+                    //Go through the plan.
+                    for (FieldsItem el : v.getItems()) {
+                    	System.out.println(el);                      
                     }
-                    //Tasks do not contain the information about their task events anymore.
                 }
-
-        	} catch (NFleetException e) {
+			
+        	} catch (NFleetRequestException e) {
         		System.out.println("Something went wrong");
         	} catch (IOException e) {
         		System.out.println(e);

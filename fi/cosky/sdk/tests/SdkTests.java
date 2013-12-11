@@ -25,7 +25,7 @@ public class SdkTests {
 		ApiData data = null;
 		try {
 			data = api.navigate(ApiData.class, api.getRoot());
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -46,7 +46,7 @@ public class SdkTests {
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
 			//##END EXAMPLE##
 			asdf = problem;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -68,7 +68,7 @@ public class SdkTests {
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			//##END EXAMPLE##
 			check = problem;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -81,13 +81,13 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		EntityLinkCollection collection = null;
+		TaskDataSet collection = null;
 		try {
 			//##BEGIN EXAMPLE listingtasks##
-			EntityLinkCollection tasks = api.navigate(EntityLinkCollection.class, problem.getLink("list-tasks"));
+			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
 			//##END EXAMPLE##
 			collection = tasks;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -146,7 +146,7 @@ public class SdkTests {
     		//##END EXAMPLE##
     		update = task;
             asdf = api.navigate(TaskData.class, result.getLocation());
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -172,7 +172,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			oldTask = api.navigate(TaskData.class, oldTask.getLink("self"));
 			asdf = task;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -191,13 +191,13 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		EntityLinkCollection asdf = null;
+		VehicleDataSet asdf = null;
 		try { 
 			//##BEGIN EXAMPLE listingvehicles##
-			EntityLinkCollection vehicles = api.navigate(EntityLinkCollection.class, problem.getLink("list-vehicles"));
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 			//##END EXAMPLE##
 			asdf = vehicles;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -212,7 +212,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		EntityLinkCollection asdf = null;
+		RouteEventDataSet asdf = null;
 		try {
 			RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			RouteUpdateRequest route = new RouteUpdateRequest();
@@ -226,10 +226,10 @@ public class SdkTests {
 			api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 			
 			//##BEGIN EXAMPLE accessingtaskseq##
-			EntityLinkCollection events = api.navigate(EntityLinkCollection.class, vehicle.getLink("list-events"));
+			RouteEventDataSet events = api.navigate(RouteEventDataSet.class, vehicle.getLink("list-events"));
 			//##END EXAMPLE##
 			asdf = events;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -262,7 +262,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			routes = routeData;
 
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -291,7 +291,7 @@ public class SdkTests {
 			RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			a = sequence;
 			b = routeData.getItems();
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			
 		} catch (IOException e) {
 			
@@ -355,12 +355,12 @@ public class SdkTests {
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			
 			//##BEGIN EXAMPLE creatingauser##
-			EntityLinkCollection users = api.navigate(EntityLinkCollection.class, data.getLink("list-users"));
-			ArrayList<EntityLink> before = users.getItems();
+			UserDataSet users = api.navigate(UserDataSet.class, data.getLink("list-users"));
+			ArrayList<UserData> before = users.getItems();
 			b = before.size();
 			ResponseData result = api.navigate(ResponseData.class, users.getLink("create"), new UserUpdateRequest());
 			//##END EXAMPLE##
-			users = api.navigate(EntityLinkCollection.class, data.getLink("list-users"));
+			users = api.navigate(UserDataSet.class, data.getLink("list-users"));
 			a = users.getItems().size();
 		} catch (IOException e) {
 			
@@ -420,14 +420,14 @@ public class SdkTests {
 	public void T16BadRequestTest() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
-		NFleetException e = null;		
+		NFleetRequestException e = null;		
 
 		RoutingProblemData problem = new RoutingProblemData("");
 		try {
 			//##BEGIN EXAMPLE badrequest##
 			ResponseData result = api.navigate(ResponseData.class, user.getLink("create-problem"), problem);
 			//##END EXAMPLE##
-		} catch (NFleetException ex) {
+		} catch (NFleetRequestException ex) {
 			e = ex;
 		} catch (IOException ex) {
 			
@@ -435,4 +435,69 @@ public class SdkTests {
 		assertNotNull(e);
 		assertEquals(e.getItems().get(0).getCode(), 3401);
 	}
+	
+	@Test
+	public void T17StartingAFinishedOptimization() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		
+		RoutingProblemUpdateRequest requ = problem.toRequest();
+		requ.setState("Running");
+		try {
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), requ);
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			while (problem.getState().equals("Running")) {
+				Thread.sleep(1000);
+				System.out.println(problem.getProgress());
+				problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			}
+			
+			requ = problem.toRequest();
+			requ.setState("Running");
+			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), requ);
+			problem = api.navigate(RoutingProblemData.class, response.getLocation()); 
+			while (problem.getState().equals("Running")) {
+				Thread.sleep(1000);
+				problem = api.navigate(RoutingProblemData.class, response.getLocation());
+				System.out.println(problem.getProgress());
+			}		
+		} catch (Exception e) {
+			
+		}
+		assertEquals(problem.getState(), "Stopped");
+	}
+	
+	@Test
+	public void T18CheckingHowMuchFasterIsImport() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		int taskCount = 100;
+		RoutingProblemUpdateRequest request = new RoutingProblemUpdateRequest("testProblem");
+		try {
+			ResponseData result = api.navigate(ResponseData.class, user.getLink("create-problem"), request);
+			RoutingProblemData problem = api.navigate(RoutingProblemData.class, result.getLocation());
+			TaskSetImportRequest vehicles = new TaskSetImportRequest();
+			vehicles.setItems(TestHelper.createListOfTasks(taskCount));
+			long begin = System.currentTimeMillis();
+			
+			result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), vehicles);
+			long end = System.currentTimeMillis();
+			long total = end-begin;
+			System.out.println("Import of "+taskCount+" tasks took " + total + " ms");
+			
+			begin = System.currentTimeMillis();
+			for (TaskUpdateRequest tur : vehicles.getItems()) {
+				result = api.navigate(ResponseData.class, problem.getLink("create-task"), tur);
+			}
+			end = System.currentTimeMillis();
+			total = end - begin;
+			System.out.println("Individually adding "+taskCount+" tasks took " + total + " ms");
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(request);
+	}
+	
+	
 }

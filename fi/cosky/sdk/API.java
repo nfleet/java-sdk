@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
 
 import com.google.gson.*;
 
@@ -34,13 +35,17 @@ public class API {
 	private String ClientSecret;
 	private ApiData apiData;
 	private TokenData tokenData;
+	private boolean timed;
 	private ObjectCache objectCache;
+	private boolean retry;
 	
 	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSX").create();
 
 	public API(String baseUrl) {
 		this.baseUrl = baseUrl;
 		this.objectCache = new ObjectCache();
+		this.timed = false;
+		this.retry  = true;
 	}
 
 	public boolean authenticate(String username, String password) {
@@ -67,8 +72,8 @@ public class API {
 	 * @param tClass return type.
 	 * @param l navigation link
 	 * @return object of type tClass
-	 * @throws  NFleetException when there is data validation problems 
-	 * 			IOException when there is problems with infrastructure (connection etc..)
+	 * @throws  NFleetRequestException when there is data validation problems 
+	 * @throws IOException when there is problems with infrastructure (connection etc..)
 	 */
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l) throws IOException {
 		return navigate(tClass, l, null);
@@ -77,7 +82,12 @@ public class API {
 	@SuppressWarnings("unchecked")
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
 		Object result;
-
+		long start = 0; 
+		long end;
+		
+		if (isTimed()) {
+			start = System.currentTimeMillis();
+		}
 		if (tClass.equals(TokenData.class)) {
 			result = sendRequest(Verb.GET, l.getUri(), tClass, null);
 			return (T) result;
@@ -111,7 +121,11 @@ public class API {
 		} else {
 			result = sendRequest(Verb.GET, uri, tClass, null);
 		}
-
+		if (isTimed()) {
+			end = System.currentTimeMillis();
+			long time = end - start;
+			System.out.println("Method " + l.getMethod() + " on " + l.getUri() + " doing " + l.getRel() + " took " + time + " ms.");
+		}
 		return (T) result;
 	}
 
@@ -121,13 +135,17 @@ public class API {
 	 * @param l 		navigation link
 	 * @param object	object to send
 	 * @return 			object of type tClass
-	 * @throws 	NFleetException when there is problems with data validation, exception contains list of the errors.
+	 * @throws 	NFleetRequestException when there is problems with data validation, exception contains list of the errors.
 	 * @throws	IOException  when there is problems with infrastructure ( connection etc.. )
 	 */
 	@SuppressWarnings("unchecked")
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
+		long start = 0; 
+		long end;
+		if (isTimed()) {
+			start = System.currentTimeMillis();
+		}
 		Object result = null;
-
 		if (l.getMethod().equals("PUT")) {
 			result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), tClass, object);
 		}
@@ -140,6 +158,11 @@ public class API {
 		if (l.getMethod().equals("PATCH")) {
 			String url = this.baseUrl + l.getUri();
 			result = sendRequest(Verb.PATCH, url, tClass, object);
+		}
+		if (isTimed()) {
+			end = System.currentTimeMillis();
+			long time = end - start;
+			System.out.println("Method " + l.getMethod() + " on " + l.getUri() + " took " + time + " ms.");
 		}
 		return (T) result;
 	}
@@ -213,12 +236,13 @@ public class API {
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 				System.out.println("Authentication expired");
-				
-				if( this.authenticate(ClientKey, ClientSecret) ) {
-					System.out.println("Authenticated again");
-					return sendRequest(verb, url, tClass, object);
-				}
-				
+				if (retry) {
+					retry = false;
+					if( this.authenticate(ClientKey, ClientSecret) ) {
+						System.out.println("Authenticated again");
+						return sendRequest(verb, url, tClass, object);
+					}
+				}		
 				else throw new IOException("Could not authenticate");	
 			}
 
@@ -226,7 +250,7 @@ public class API {
 				return (T) objectCache.getObject(url);
 			}
 
-			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
+			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
 				InputStream stream = connection.getErrorStream();
 				br = new BufferedReader(new InputStreamReader(stream));
@@ -237,7 +261,19 @@ public class API {
 				}
 				String body = sb.toString();
 				connection.disconnect();
-				throw (NFleetException) gson.fromJson(body, NFleetException.class);
+				throw (NFleetRequestException) gson.fromJson(body, NFleetRequestException.class);
+			}
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
+				InputStream stream = connection.getErrorStream();
+				br = new BufferedReader(new InputStreamReader(stream));
+				StringBuilder sb = new StringBuilder();
+				String s;
+				while ((s = br.readLine()) != null) {
+					sb.append(s);
+				}
+				String body = sb.toString();
+				connection.disconnect();
+				throw new IOException(body);
 			}
 			InputStream is = connection.getInputStream();
 			br = new BufferedReader(new InputStreamReader(is));
@@ -312,16 +348,17 @@ public class API {
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 				System.out.println("Authentication expired");
-				
-				if( this.authenticate(ClientKey, ClientSecret) ) {
-					System.out.println("Authenticated again");
-					return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
+				if (retry) {
+					retry = false;
+					if( this.authenticate(ClientKey, ClientSecret) ) {
+						System.out.println("Authenticated again");
+						return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
+					}
 				}
-				
 				else throw new IOException("Could not authenticate");	
 			}
 			
-			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
 				InputStream stream = connection.getErrorStream();
 				br = new BufferedReader(new InputStreamReader(stream));
@@ -332,7 +369,19 @@ public class API {
 				}
 				String body = sb.toString();
 				connection.disconnect();
-				throw (NFleetException) gson.fromJson(body, NFleetException.class);
+				throw (NFleetRequestException) gson.fromJson(body, NFleetRequestException.class);
+			}
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
+				InputStream stream = connection.getErrorStream();
+				br = new BufferedReader(new InputStreamReader(stream));
+				StringBuilder sb = new StringBuilder();
+				String s;
+				while ((s = br.readLine()) != null) {
+					sb.append(s);
+				}
+				String body = sb.toString();
+				connection.disconnect();
+				throw new IOException(body);
 			}
 
 			InputStream is = connection.getInputStream();
@@ -405,5 +454,13 @@ public class API {
 
 	public void setApiData(ApiData apiData) {
 		this.apiData = apiData;
+	}
+
+	public boolean isTimed() {
+		return timed;
+	}
+
+	public void setTimed(boolean timed) {
+		this.timed = timed;
 	}
 }

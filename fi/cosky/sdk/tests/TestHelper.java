@@ -13,20 +13,25 @@ import fi.cosky.sdk.*;
 import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 
 public class TestHelper {
-	
+	private static API apis  = null;
 	static API authenticate() {
 		String url = "";
 		String clientKey = "";
 		String clientSecret = "";
-		API api = new API(url);
-		api.authenticate(clientKey, clientSecret);
-		return api;
+		if (apis == null) {
+			API api = new API(url);
+			api.setTimed(true);
+			if (api.authenticate(clientKey, clientSecret)) {
+				apis = api;
+			}
+		}
+		return apis;
 	}
 	
 	static UserData getOrCreateUser( API api ) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
-			EntityLinkCollection users = api.navigate(EntityLinkCollection.class, apiData.getLink("list-users"));
+			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
 			UserData user = null;
 			if ( users.getItems() != null && users.getItems().size() < 1) {
 				user = new UserData();
@@ -36,7 +41,7 @@ public class TestHelper {
 			    user = api.navigate(UserData.class, users.getItems().get(0).getLink("self"));
 			}
 			return user;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
 			return null;
 		} catch (IOException e) {
@@ -47,11 +52,11 @@ public class TestHelper {
 	static RoutingProblemData createProblem(API api, UserData user) {
 		try {
 			RoutingProblemData problem = new RoutingProblemData("exampleProblem");
-			EntityLinkCollection problems = api.navigate(EntityLinkCollection.class, user.getLink("list-problems"));
+			RoutingProblemDataSet problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
 			ResponseData created = api.navigate(ResponseData.class, user.getLink("create-problem"), problem);
 			problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			return problem;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
 			return null;
 		} catch (IOException e) {
@@ -68,11 +73,11 @@ public class TestHelper {
 	static VehicleData getVehicle(API api, UserData user, RoutingProblemData problem) {
 		try {
 			TestData.CreateDemoData(problem, api);
-			EntityLinkCollection vehicles = api.navigate(EntityLinkCollection.class, problem.getLink("list-vehicles"));
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 			VehicleData vehicle = null;
 			vehicle = api.navigate(VehicleData.class, vehicles.getItems().get(0).getLink("self"));
 			return vehicle;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
 			return null;
 		} catch (IOException e) {
@@ -112,12 +117,47 @@ public class TestHelper {
 			ResponseData createdTask = api.navigate(ResponseData.class, problem.getLink("create-task"), task);
 			TaskData td = api.navigate(TaskData.class, createdTask.getLocation());
 			return td;
-		} catch (NFleetException e) {
+		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
 			return null;
 		} catch (IOException e) {
 			return null;
 		}
+	}
+	
+	static List<TaskUpdateRequest> createListOfTasks(int howMany) {
+		List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
+		for (int i = 0; i < howMany; i++) {
+			CoordinateData pickup = new CoordinateData();
+			pickup.setLatitude(62.244958);
+			pickup.setLongitude(25.747143);
+			pickup.setSystem(CoordinateSystem.Euclidian);
+			LocationData pi = new LocationData();
+			pi.setCoordinatesData(pickup);
+			
+			
+			CoordinateData delivery = new CoordinateData();
+			delivery.setLatitude(62.244589);
+			delivery.setLongitude(25.74892);
+			delivery.setSystem(CoordinateSystem.Euclidian);
+			LocationData de = new LocationData();
+			de.setCoordinatesData(delivery);
+			
+			CapacityData capacity = new CapacityData("Weight", 20);
+			List<CapacityData> capacities = new ArrayList<CapacityData>();
+			capacities.add(capacity);
+			
+			TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
+			TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
+			
+			List<TaskEventUpdateRequest> both = new ArrayList<TaskEventUpdateRequest>();
+			both.add(task1);
+			both.add(task2);
+			TaskUpdateRequest task = new TaskUpdateRequest(both);
+			task.setName("testTask" + i);
+			tasks.add(task);
+		}
+		return tasks;
 	}
 	
 }
