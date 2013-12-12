@@ -26,7 +26,20 @@ public class BaseData {
     }
 
     private Link concatLink(Link self, Link rel) {
-        return new Link(rel.getRel(), self.getUri()+rel.getUri(), rel.getMethod(), rel.isEnabled());
+    	String newSelf = self.getUri();
+    	String newRel = rel.getUri();
+    	
+    	if (newRel.contains("../")) {
+      		while (newRel.contains("../")) {
+        		newSelf = newSelf.substring(0, newSelf.lastIndexOf('/'));
+        		newRel = newRel.substring(newRel.indexOf("/")+1);
+        	}
+    	}
+    	
+    	if (newRel.length() < 1) {
+    		return new Link(rel.getRel(), newSelf, rel.getMethod(), rel.isEnabled());
+    	}
+        return new Link(rel.getRel(), newSelf+"/"+newRel , rel.getMethod(), rel.isEnabled());
     }
         
     @Override

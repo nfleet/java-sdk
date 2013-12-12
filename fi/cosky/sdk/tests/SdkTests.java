@@ -467,7 +467,7 @@ public class SdkTests {
 		}
 		assertEquals(problem.getState(), "Stopped");
 	}
-	
+	/*
 	@Test
 	public void T18CheckingHowMuchFasterIsImport() {
 		API api = TestHelper.authenticate();
@@ -498,6 +498,29 @@ public class SdkTests {
 		}
 		assertNotNull(request);
 	}
+	*/
 	
+	@Test
+	public void T19TestingConcatLink() {
+		Link self = new Link("self", "/users/1/problems/3/vehicles/2/events/4", "GET");
+		Link parentVehicle = new Link("get-vehicle", "../../",  "GET");
+		Link parentTask = new Link("get-task", "../../../../tasks/3" ,"GET");
+		
+		List<Link> meta = new ArrayList<Link>();
+		List<Link> meta2 = new ArrayList<Link>();
+		
+		meta.add(self); meta.add(parentTask);
+		meta2.add(parentVehicle); meta2.add(self);
+		
+		PlanData d = new PlanData();
+		d.setLinks(meta);
+		Link vehicle = d.getLink("get-task");
+		String rel = vehicle.getUri();
+		assertEquals(rel, "/users/1/problems/3/tasks/3");
+		
+		d.setLinks(meta2);
+		Link task = d.getLink("get-vehicle");
+		assertEquals(task.getUri(), "/users/1/problems/3/vehicles/2");
+	}
 	
 }
