@@ -1,9 +1,14 @@
 package fi.cosky.sdk;
+
+/*
+ * This file is subject to the terms and conditions defined in
+ * file 'LICENSE.txt', which is part of this source code package.
+ */
+
 import java.util.Date;
 
-
 public class RouteEventData extends BaseData {
-
+	private int TaskEventId;
 	private int VersionNumber;
 	private String DataState;
 	private boolean IsFeasible;
@@ -62,6 +67,14 @@ public class RouteEventData extends BaseData {
 	}
 	public void setPlannedDepartureTime(Date plannedDepartureTime) {
 		PlannedDepartureTime = plannedDepartureTime;
+	}
+
+	public int getTaskEventId() {
+		return TaskEventId;
+	}
+
+	public void setTaskEventId(int taskEventId) {
+		TaskEventId = taskEventId;
 	}
 	
 }
