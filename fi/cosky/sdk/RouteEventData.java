@@ -15,9 +15,7 @@ public class RouteEventData extends BaseData {
 	private double WaitingTimeBefore;
 	private Date ActualArrivalTime;
 	private Date ActualDepartureTime;
-	private Date PlannedArrivalTime;
-	private Date PlannedDepartureTime;
-	
+		
 	int getVersionNumber() {
 		return VersionNumber;
 	}
@@ -55,18 +53,6 @@ public class RouteEventData extends BaseData {
 	}
 	public void setActualDepartureTime(Date actualDepartureTime) {
 		ActualDepartureTime = actualDepartureTime;
-	}
-	public Date getPlannedArrivalTime() {
-		return PlannedArrivalTime;
-	}
-	public void setPlannedArrivalTime(Date plannedArrivalTime) {
-		PlannedArrivalTime = plannedArrivalTime;
-	}
-	public Date getPlannedDepartureTime() {
-		return PlannedDepartureTime;
-	}
-	public void setPlannedDepartureTime(Date plannedDepartureTime) {
-		PlannedDepartureTime = plannedDepartureTime;
 	}
 
 	public int getTaskEventId() {
