@@ -11,10 +11,11 @@ public class RouteEventData extends BaseData {
 	private int TaskEventId;
 	private int VersionNumber;
 	private String DataState;
-	private boolean IsFeasible;
+	private String FeasibilityState;
 	private double WaitingTimeBefore;
 	private Date ActualArrivalTime;
 	private Date ActualDepartureTime;
+	private String State;
 		
 	int getVersionNumber() {
 		return VersionNumber;
@@ -30,11 +31,11 @@ public class RouteEventData extends BaseData {
 	public void setDataState(String dataState) {
 		DataState = dataState;
 	}
-	public boolean isIsFeasible() {
-		return IsFeasible;
+	public String isIsFeasible() {
+		return FeasibilityState;
 	}
-	public void setIsFeasible(boolean isFeasible) {
-		IsFeasible = isFeasible;
+	public void setIsFeasible(String isFeasible) {
+		FeasibilityState = isFeasible;
 	}
 	public double getWaitingTimeBefore() {
 		return WaitingTimeBefore;
@@ -61,6 +62,14 @@ public class RouteEventData extends BaseData {
 
 	public void setTaskEventId(int taskEventId) {
 		TaskEventId = taskEventId;
+	}
+
+	public String getState() {
+		return State;
+	}
+
+	public void setState(String state) {
+		State = state;
 	}
 	
 }
