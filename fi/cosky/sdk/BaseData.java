@@ -34,12 +34,14 @@ public class BaseData {
         		newSelf = newSelf.substring(0, newSelf.lastIndexOf('/'));
         		newRel = newRel.substring(newRel.indexOf("/")+1);
         	}
+      		if (newRel.length() < 1) {
+        		return new Link(rel.getRel(), newSelf, rel.getMethod(), rel.isEnabled());
+        	} else {
+        		return new Link(rel.getRel(), newSelf+"/"+newRel , rel.getMethod(), rel.isEnabled());
+        	}
     	}
-    	
-    	if (newRel.length() < 1) {
-    		return new Link(rel.getRel(), newSelf, rel.getMethod(), rel.isEnabled());
-    	}
-        return new Link(rel.getRel(), newSelf+"/"+newRel , rel.getMethod(), rel.isEnabled());
+    	return new Link(rel.getRel(), self.getUri() + rel.getUri(), rel.getMethod(), rel.isEnabled());
+        
     }
         
     @Override
