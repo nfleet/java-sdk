@@ -11,7 +11,7 @@ public class ObjectCache {
 	private HashMap<String, Object> relationVersion;
 		
 	public ObjectCache() {
-		relationVersion = new HashMap<>();
+		relationVersion = new HashMap<String, Object>();
 	}
 	
 	/**
