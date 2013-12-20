@@ -39,7 +39,7 @@ public class API {
 	private ObjectCache objectCache;
 	private boolean retry;
 	
-	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSX").create();
+	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
 
 	public API(String baseUrl) {
 		this.baseUrl = baseUrl;
