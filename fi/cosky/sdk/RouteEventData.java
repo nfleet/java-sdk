@@ -31,7 +31,7 @@ public class RouteEventData extends BaseData {
 	public void setDataState(String dataState) {
 		DataState = dataState;
 	}
-	public String isIsFeasible() {
+	public String isFeasible() {
 		return FeasibilityState;
 	}
 	public void setIsFeasible(String isFeasible) {
