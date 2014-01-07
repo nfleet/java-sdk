@@ -13,8 +13,8 @@ public class RouteEventData extends BaseData {
 	private String DataState;
 	private String FeasibilityState;
 	private double WaitingTimeBefore;
-	private Date ActualArrivalTime;
-	private Date ActualDepartureTime;
+	private Date ArrivalTime;
+	private Date DepartureTime;
 	private String State;
 		
 	int getVersionNumber() {
@@ -43,17 +43,17 @@ public class RouteEventData extends BaseData {
 	public void setWaitingTimeBefore(double waitingTimeBefore) {
 		WaitingTimeBefore = waitingTimeBefore;
 	}
-	public Date getActualArrivalTime() {
-		return ActualArrivalTime;
+	public Date getArrivalTime() {
+		return ArrivalTime;
 	}
-	public void setActualArrivalTime(Date actualArrivalTime) {
-		ActualArrivalTime = actualArrivalTime;
+	public void setArrivalTime(Date arrivalTime) {
+		ArrivalTime = arrivalTime;
 	}
-	public Date getActualDepartureTime() {
-		return ActualDepartureTime;
+	public Date getDepartureTime() {
+		return DepartureTime;
 	}
-	public void setActualDepartureTime(Date actualDepartureTime) {
-		ActualDepartureTime = actualDepartureTime;
+	public void setDepartureTime(Date departureTime) {
+		DepartureTime = departureTime;
 	}
 
 	public int getTaskEventId() {
