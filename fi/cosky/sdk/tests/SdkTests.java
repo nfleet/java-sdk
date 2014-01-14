@@ -562,7 +562,7 @@ public class SdkTests {
 		RoutingProblemData problem = TestHelper.createProblem(api, user);
 		
 		CapacityData capa = new CapacityData("Weight", 10);
-		ArrayList<CapacityData> list = new ArrayList<>();
+		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
 		list.add(capa);
 		CoordinateData startc = new CoordinateData();
 		CoordinateData endc = new CoordinateData();
@@ -575,7 +575,7 @@ public class SdkTests {
 		try {
 			//##BEGIN EXAMPLE importvehicleset##
 			VehicleSetImportRequest set = new VehicleSetImportRequest();
-			List<VehicleUpdateRequest> vehicles = new ArrayList<>();
+			List<VehicleUpdateRequest> vehicles = new ArrayList<VehicleUpdateRequest>();
 			for (int i = 0; i < 10; i++) {
 				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle", list, start, end);
 				vehicles.add(vehicle);
@@ -597,7 +597,7 @@ public class SdkTests {
 		RoutingProblemData problem = TestHelper.createProblem(api, user);
 		
 		CapacityData capa = new CapacityData("Weight", 10);
-		ArrayList<CapacityData> list = new ArrayList<>();
+		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
 		list.add(capa);
 		CoordinateData startc = new CoordinateData();
 		CoordinateData endc = new CoordinateData();
@@ -610,10 +610,10 @@ public class SdkTests {
 		LocationData deliveryLocation = new LocationData();
 		try {
 			//##BEGIN EXAMPLE importtaskset##
-			List<TaskUpdateRequest> tasks = new ArrayList<>();
+			List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
 			
 			for (int i = 0; i < 10; i++) {
-				List<TaskEventUpdateRequest> taskEvents = new ArrayList<>();
+				List<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
 				TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pickupLocation, list);
 				TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, list);
 				TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
