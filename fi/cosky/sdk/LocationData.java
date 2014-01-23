@@ -12,10 +12,23 @@ package fi.cosky.sdk;
  */
 public class LocationData extends BaseData {
 
-    private CoordinateData Coordinate;
+	private CoordinateData Coordinate;
+    private AddressData Address;
     private int Id;
 
-    public int getId() {
+    public CoordinateData getCoordinate() {
+		return Coordinate;
+	}
+
+	public AddressData getAddress() {
+		return Address;
+	}
+
+	public void setAddress(AddressData address) {
+		Address = address;
+	}
+
+	public int getId() {
         return Id;
     }
 
