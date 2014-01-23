@@ -14,15 +14,19 @@ import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 
 public class TestHelper {
 	private static API apis  = null;
+	static String clientKey = "";
+	static String clientSecret = "";
+	
 	static API authenticate() {
-		String url = "";
-		String clientKey = "";
-		String clientSecret = "";
+		String url = "https://api.co-sky.fi";
 		if (apis == null) {
 			API api = new API(url);
 			api.setTimed(true);
 			if (api.authenticate(clientKey, clientSecret)) {
 				apis = api;
+			} else {
+				System.out.println("Could not authenticate, please check service and credentials");
+				return null;
 			}
 		}
 		return apis;
@@ -159,5 +163,33 @@ public class TestHelper {
 		}
 		return tasks;
 	}
+	
+	static LocationData createLocation(Location name) {
+		CoordinateData coordinates = new CoordinateData();
+		switch (name){
+			case TASK_PICKUP: {
+				coordinates.setLatitude(62.244958);
+				coordinates.setLongitude(25.747143);
+				break;
+			}
+			case TASK_DELIVERY: {
+				coordinates.setLatitude(62.244589);
+				coordinates.setLongitude(25.74892);
+				break;
+			}
+			case VEHICLE_START:
+			default: {
+	            coordinates.setLatitude(62.247906);
+	            coordinates.setLongitude(25.867395);
+	            break;
+			}
+		}
+		coordinates.setSystem(CoordinateSystem.Euclidian);
+		LocationData data = new LocationData();
+		data.setCoordinatesData(coordinates);
+		return data;
+	}
+	
+	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY};
 	
 }

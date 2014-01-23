@@ -7,14 +7,12 @@ package fi.cosky.sdk.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import fi.cosky.sdk.*;
 import fi.cosky.sdk.CoordinateData.CoordinateSystem;
+import fi.cosky.sdk.tests.TestHelper.Location;
 
 import org.junit.*;
 
@@ -24,11 +22,11 @@ public class SdkTests {
 	
 	@Test
 	public void T00RootLinkTest() {
-		String clientKey = null, clientSecret = null;
+		String clientKey = TestHelper.clientKey, clientSecret = TestHelper.clientSecret;
 		ApiData data2 = null;
 		try {
 			//##BEGIN EXAMPLE accessingapi##
-			API api = new API("http://test.api.co-sky.fi");
+			API api = new API("https://api.co-sky.fi");
 			api.authenticate(clientKey, clientSecret);
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
@@ -386,18 +384,17 @@ public class SdkTests {
 		
 		RoutingProblemUpdateRequest update = problem.toRequest();
 		update.setState("Running");
+	
 		try {
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			Thread.sleep(5000);
+			
 			//##BEGIN EXAMPLE getprogress 
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
-			while(problem.getProgress() < 100) {
-				Thread.sleep(100);
+			
+			while ( problem.getProgress() < 100 ) {
+				Thread.sleep(1000);
 				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			}
 			//##END EXAMPLE 
@@ -414,6 +411,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
+		ArrayList<TimeWindowData> akkuna = vehicle.getTimeWindows();
 		String updatedName = null;
 		try {
 			VehicleUpdateRequest updatedVehicle = vehicle.toRequest();
@@ -425,7 +423,7 @@ public class SdkTests {
 		} catch (IOException e) {
 			
 		}
-
+		assertEquals(vehicle.getTimeWindows().get(0).getStart(), akkuna.get(0).getStart());
 		assertEquals(vehicle.getName(), updatedName);
 	}
 	
@@ -482,12 +480,12 @@ public class SdkTests {
 		}
 		assertEquals(problem.getState(), "Stopped");
 	}
-	/*
+	
 	@Test
 	public void T18CheckingHowMuchFasterIsImport() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
-		int taskCount = 1000;
+		int taskCount = 10;
 		RoutingProblemUpdateRequest request = new RoutingProblemUpdateRequest("testProblem");
 		try {
 			ResponseData result = api.navigate(ResponseData.class, user.getLink("create-problem"), request);
@@ -513,7 +511,7 @@ public class SdkTests {
 		}
 		assertNotNull(request);
 	}
-	*/
+	
 	
 	@Test
 	public void T19TestingConcatLink() {
@@ -564,20 +562,17 @@ public class SdkTests {
 		CapacityData capa = new CapacityData("Weight", 10);
 		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
 		list.add(capa);
-		CoordinateData startc = new CoordinateData();
-		CoordinateData endc = new CoordinateData();
-		LocationData start = new LocationData();
-		LocationData end = new LocationData();
 		
-		start.setCoordinatesData(startc);
-		end.setCoordinatesData(endc);
+		LocationData start = TestHelper.createLocation(Location.VEHICLE_START);
+		LocationData end = TestHelper.createLocation(Location.VEHICLE_START);
+				
 		ResponseData a = null;
 		try {
 			//##BEGIN EXAMPLE importvehicleset##
 			VehicleSetImportRequest set = new VehicleSetImportRequest();
 			List<VehicleUpdateRequest> vehicles = new ArrayList<VehicleUpdateRequest>();
 			for (int i = 0; i < 10; i++) {
-				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle", list, start, end);
+				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle" + i, list, start, end);
 				vehicles.add(vehicle);
 			}
 			set.setItems(vehicles);
@@ -599,15 +594,10 @@ public class SdkTests {
 		CapacityData capa = new CapacityData("Weight", 10);
 		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
 		list.add(capa);
-		CoordinateData startc = new CoordinateData();
-		CoordinateData endc = new CoordinateData();
-		LocationData start = new LocationData();
-		LocationData end = new LocationData();
-		
-		start.setCoordinatesData(startc);
-		end.setCoordinatesData(endc);
-		LocationData pickupLocation = new LocationData();
-		LocationData deliveryLocation = new LocationData();
+	
+		LocationData pickupLocation = TestHelper.createLocation(Location.TASK_PICKUP);
+		LocationData deliveryLocation = TestHelper.createLocation(Location.TASK_DELIVERY);
+		ResponseData r = null;
 		try {
 			//##BEGIN EXAMPLE importtaskset##
 			List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
@@ -616,16 +606,21 @@ public class SdkTests {
 				List<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
 				TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pickupLocation, list);
 				TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, list);
+				taskEvents.add(pickup); taskEvents.add(delivery);
 				TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
+				task.setName("kivikasat" + i);
 				tasks.add(task);
 			}
 			TaskSetImportRequest set = new TaskSetImportRequest();
 			set.setItems(tasks);
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
+			System.out.println(result.toString());
 			//##END EXAMPLE##
+			r = result;
 		} catch (Exception e) {
 			
 		}
-		
+		assertNotNull(r.getLocation());
 	}
+	
 }
