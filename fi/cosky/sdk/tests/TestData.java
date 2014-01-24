@@ -9,33 +9,17 @@ import fi.cosky.sdk.*;
  * This file is subject to the terms and conditions defined in
  * file 'LICENSE.txt', which is part of this source code package.
  */
+import fi.cosky.sdk.tests.TestHelper.Location;
 
 public class TestData {
 	
 	@SuppressWarnings("deprecation")
 	public static void CreateDemoData(RoutingProblemData problem, API api) {
 		
-		CoordinateData coordinateData = new CoordinateData();
-		coordinateData.setLatitude(54.130888);
-        coordinateData.setLongitude(12.00938);
-        coordinateData.setSystem(CoordinateData.CoordinateSystem.WGS84);
-        LocationData locationData = new LocationData();
-        locationData.setCoordinatesData(coordinateData);
+		LocationData locationData = TestHelper.createLocation(Location.VEHICLE_START);
+        LocationData pickupLocation = TestHelper.createLocation(Location.TASK_PICKUP);      
+        LocationData deliveryLocation = TestHelper.createLocation(Location.TASK_DELIVERY);
         
-        CoordinateData pickup = new CoordinateData();
-        pickup.setLatitude(54.14454);
-        pickup.setLongitude(12.108808);
-        pickup.setSystem(CoordinateData.CoordinateSystem.WGS84);
-        LocationData pickupLocation = new LocationData();
-        pickupLocation.setCoordinatesData(pickup);
-
-        CoordinateData delivery = new CoordinateData();
-        delivery.setLatitude(53.545867);
-        delivery.setLongitude(10.276409);
-        delivery.setSystem(CoordinateData.CoordinateSystem.WGS84);
-        LocationData deliveryLocation = new LocationData();
-        deliveryLocation.setCoordinatesData(delivery);
-
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 100000));
         ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();

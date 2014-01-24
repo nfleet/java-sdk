@@ -7,6 +7,7 @@ package fi.cosky.sdk.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import fi.cosky.sdk.*;
@@ -90,21 +91,9 @@ public class TestHelper {
 	} 
 	
 	static TaskData getTask(API api, RoutingProblemData problem) {		
-		CoordinateData pickup = new CoordinateData();
-		pickup.setLatitude(62.244958);
-		pickup.setLongitude(25.747143);
-		pickup.setSystem(CoordinateSystem.Euclidian);
-		LocationData pi = new LocationData();
-		pi.setCoordinatesData(pickup);
-		
-		
-		CoordinateData delivery = new CoordinateData();
-		delivery.setLatitude(62.244589);
-		delivery.setLongitude(25.74892);
-		delivery.setSystem(CoordinateSystem.Euclidian);
-		LocationData de = new LocationData();
-		de.setCoordinatesData(delivery);
-		
+		LocationData pi = createLocation(Location.TASK_PICKUP);
+		LocationData de = createLocation(Location.TASK_DELIVERY);
+				
 		CapacityData capacity = new CapacityData("Weight", 20);
 		List<CapacityData> capacities = new ArrayList<CapacityData>();
 		capacities.add(capacity);
@@ -132,25 +121,12 @@ public class TestHelper {
 	static List<TaskUpdateRequest> createListOfTasks(int howMany) {
 		List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
 		for (int i = 0; i < howMany; i++) {
-			CoordinateData pickup = new CoordinateData();
-			pickup.setLatitude(62.244958);
-			pickup.setLongitude(25.747143);
-			pickup.setSystem(CoordinateSystem.Euclidian);
-			LocationData pi = new LocationData();
-			pi.setCoordinatesData(pickup);
-			
-			
-			CoordinateData delivery = new CoordinateData();
-			delivery.setLatitude(62.244589);
-			delivery.setLongitude(25.74892);
-			delivery.setSystem(CoordinateSystem.Euclidian);
-			LocationData de = new LocationData();
-			de.setCoordinatesData(delivery);
-			
+			LocationData pi = createLocation(Location.TASK_PICKUP);
+			LocationData de = createLocation(Location.TASK_DELIVERY);
+						
 			CapacityData capacity = new CapacityData("Weight", 20);
 			List<CapacityData> capacities = new ArrayList<CapacityData>();
 			capacities.add(capacity);
-			
 			TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 			TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
 			
@@ -162,6 +138,22 @@ public class TestHelper {
 			tasks.add(task);
 		}
 		return tasks;
+	}
+	
+	static VehicleUpdateRequest createVehicleUpdateRequest(String name) {
+		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+        capacities.add(new CapacityData("Weight", 100000));
+        ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+        Date morning = new Date();
+        morning.setHours(7);
+        Date evening = new Date();
+        evening.setHours(16);
+        timeWindows.add(new TimeWindowData(morning, evening));
+        
+        LocationData startLocation = createLocation(Location.VEHICLE_START);
+		VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
+        vehicleRequest.setTimeWindows(timeWindows);
+        return vehicleRequest;
 	}
 	
 	static LocationData createLocation(Location name) {
@@ -187,6 +179,18 @@ public class TestHelper {
 		coordinates.setSystem(CoordinateSystem.Euclidian);
 		LocationData data = new LocationData();
 		data.setCoordinatesData(coordinates);
+		return data;
+	}
+	
+	static LocationData createLocationWithAddress() {
+		AddressData address = new AddressData();
+		address.setCity("Jyväskylä");
+		address.setCountry("Finland");
+		address.setPostalCode("40100");
+		address.setStreet("Mattilanniemi 2");
+		
+		LocationData data = new LocationData();
+		data.setAddress(address);
 		return data;
 	}
 	

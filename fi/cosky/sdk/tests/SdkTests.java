@@ -623,4 +623,40 @@ public class SdkTests {
 		assertNotNull(r.getLocation());
 	}
 	
+	@Test
+	public void T23ImportVehiclesAndTasks() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
+		
+		for (int i = 0; i < 3; i++) {
+			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
+		}
+		vehicles.setItems(vehicleList);
+		
+		TaskSetImportRequest tasks = new TaskSetImportRequest();
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
+		tasks.setItems(taskList);
+		ImportData r = null;
+		try {
+			//##BEGIN EXAMPLE importtasksandvehicles##
+			ImportRequest importRequest = new ImportRequest();
+			importRequest.setVehicles(vehicles);
+			importRequest.setTasks(tasks);
+			
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import"), importRequest);
+			ImportData result = api.navigate(ImportData.class, response.getLocation());
+			//##END EXAMPLE##
+			r = result;
+			
+		} catch (Exception e){
+			System.out.println(e.getMessage());
+		}
+		assertNotNull(r.getVehicles());
+	}
+	
+	
 }
