@@ -15,6 +15,7 @@ public class VehicleData extends BaseData {
     private ArrayList<TimeWindowData> TimeWindows;
     private RouteData Route;
     private int VersionNumber;
+    private String VehicleType;
 
     public RouteData getRoute() {
         return Route;
@@ -82,6 +83,14 @@ public class VehicleData extends BaseData {
 
 	public ArrayList<CapacityData> getCapacities() {
 		return Capacities;
+	}
+
+	public String getVehicleType() {
+		return VehicleType;
+	}
+
+	public void setVehicleType(String vehicleType) {
+		VehicleType = vehicleType;
 	}
 
 	public ArrayList<TimeWindowData> getTimeWindows() {

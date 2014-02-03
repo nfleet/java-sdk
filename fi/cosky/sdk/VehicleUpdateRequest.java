@@ -15,6 +15,7 @@ public class VehicleUpdateRequest extends BaseData {
     private ArrayList<TimeWindowData> TimeWindows;
     private RouteData Route;
     private int VersionNumber;
+    private String VehicleType;
 
     public RouteData getRoute() {
         return Route;
@@ -100,4 +101,12 @@ public class VehicleUpdateRequest extends BaseData {
     public void setStartLocation(LocationData startLocation) {
         StartLocation = startLocation;
     }
+
+	public String getVehicleType() {
+		return VehicleType;
+	}
+
+	public void setVehicleType(String vehicleType) {
+		VehicleType = vehicleType;
+	}
 }
