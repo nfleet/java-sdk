@@ -13,6 +13,7 @@ public class TaskData extends BaseData {
     private List<TaskEventData> TaskEvents;
     private int Id;
     private int VersionNumber;
+    private List<String> IncompatibleVehicleTypes;
     
     public String getInfo() {
         return Info;
@@ -58,6 +59,14 @@ public class TaskData extends BaseData {
         this.TaskEvents = taskEvents;
     }
 	
+	public List<String> getIncompatibleVehicleTypes() {
+		return IncompatibleVehicleTypes;
+	}
+
+	public void setIncompatibleVehicleTypes(List<String> incompatibleVehicleTypes) {
+		IncompatibleVehicleTypes = incompatibleVehicleTypes;
+	}
+
 	public TaskUpdateRequest toRequest() {
 		List<TaskEventUpdateRequest> taskevents = new ArrayList<TaskEventUpdateRequest>();
 		
