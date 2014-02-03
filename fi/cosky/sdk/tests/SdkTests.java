@@ -647,7 +647,8 @@ public class SdkTests {
 			importRequest.setVehicles(vehicles);
 			importRequest.setTasks(tasks);
 			
-			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import"), importRequest);
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
+			System.out.println(response.getLocation());
 			ImportData result = api.navigate(ImportData.class, response.getLocation());
 			//##END EXAMPLE##
 			r = result;
@@ -655,8 +656,69 @@ public class SdkTests {
 		} catch (Exception e){
 			System.out.println(e.getMessage());
 		}
-		assertNotNull(r.getVehicles());
+		assertEquals(0, r.getErrorCount());
 	}
 	
+	@Test
+	public void T24DifferentCompatibilityTypesTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		LocationData pi = TestHelper.createLocation(Location.TASK_PICKUP);
+		LocationData de = TestHelper.createLocation(Location.TASK_DELIVERY);
+				
+		CapacityData capacity = new CapacityData("Weight", 20);
+		List<CapacityData> capacities = new ArrayList<CapacityData>();
+		capacities.add(capacity);
+		
+		TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
+		TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
+		
+		List<TaskEventUpdateRequest> task1 = new ArrayList<TaskEventUpdateRequest>();
+		task1.add(pickup);
+		task1.add(delivery);
+		TaskUpdateRequest task = new TaskUpdateRequest(task1);
+		task.setName("testTask");
+		List<String> types = new ArrayList<String>();
+		types.add("rekka");
+		task.setIncompatibleVehicleTypes(types);
+		
+		TaskUpdateRequest task2 = new TaskUpdateRequest(task1);
+		List<String> other = new ArrayList<String>();
+		other.add("henkiloauto");		
+		task2.setIncompatibleVehicleTypes(other);
+		
+		
+		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("Auto");
+		vehicle.setVehicleType("rekka");
+		List<FieldsItem> items = null;
+		try {
+			ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicle);
+			result = api.navigate(ResponseData.class, problem.getLink("create-task"), task1);
+			result = api.navigate(ResponseData.class, problem.getLink("create-task"), task2);
+			
+			problem.setState("Running");
+			result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem);
+			problem = api.navigate(RoutingProblemData.class, result.getLocation());
+			while (problem.getState().equals("Running")) {
+				Thread.sleep(1000);
+				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+			}
+			
+			 PlanData v = api.navigate(PlanData.class, problem.getLink("plan"));
+             
+             //Go through the plan.
+			 items = v.getItems();
+             for (FieldsItem el : v.getItems()) {
+             	System.out.println(el);                      
+             }
+			
+			
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(items);
+	}
 	
 }
