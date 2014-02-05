@@ -6,9 +6,8 @@ package fi.cosky.sdk;
 
 /**
  *
- * LocationData only accepts coordinates at the moment, will update SDK when this will be changed.
- * 
- * - this will be changed when address correction is implemented in service.
+ *	LocationData contains support for addresses and coordinates.
+ *  
  */
 public class LocationData extends BaseData {
 

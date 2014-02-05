@@ -687,15 +687,17 @@ public class SdkTests {
 		TaskUpdateRequest task2 = new TaskUpdateRequest(task1);
 		List<String> other = new ArrayList<String>();
 		other.add("henkiloauto");		
+		task2.setName("testTask2");
 		task2.setIncompatibleVehicleTypes(other);
 		
 		
 		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("Auto");
 		vehicle.setVehicleType("rekka");
 		List<FieldsItem> items = null;
+		
 		try {
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicle);
-			result = api.navigate(ResponseData.class, problem.getLink("create-task"), task1);
+			result = api.navigate(ResponseData.class, problem.getLink("create-task"), task);
 			result = api.navigate(ResponseData.class, problem.getLink("create-task"), task2);
 			
 			problem.setState("Running");
