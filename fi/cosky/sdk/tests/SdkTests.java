@@ -26,7 +26,7 @@ public class SdkTests {
 		ApiData data2 = null;
 		try {
 			//##BEGIN EXAMPLE accessingapi##
-			API api = new API("https://api.co-sky.fi");
+			API api = new API("https://api.nfleet.fi");
 			api.authenticate(clientKey, clientSecret);
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
@@ -563,8 +563,8 @@ public class SdkTests {
 		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
 		list.add(capa);
 		
-		LocationData start = TestHelper.createLocation(Location.VEHICLE_START);
-		LocationData end = TestHelper.createLocation(Location.VEHICLE_START);
+		LocationData start = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
+		LocationData end = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
 				
 		ResponseData a = null;
 		try {
@@ -595,8 +595,8 @@ public class SdkTests {
 		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
 		list.add(capa);
 	
-		LocationData pickupLocation = TestHelper.createLocation(Location.TASK_PICKUP);
-		LocationData deliveryLocation = TestHelper.createLocation(Location.TASK_DELIVERY);
+		LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);
+		LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
 		ResponseData r = null;
 		try {
 			//##BEGIN EXAMPLE importtaskset##
@@ -665,8 +665,8 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblem(api, user);
 		
-		LocationData pi = TestHelper.createLocation(Location.TASK_PICKUP);
-		LocationData de = TestHelper.createLocation(Location.TASK_DELIVERY);
+		LocationData pi = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);
+		LocationData de = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
 				
 		CapacityData capacity = new CapacityData("Weight", 20);
 		List<CapacityData> capacities = new ArrayList<CapacityData>();
@@ -721,6 +721,46 @@ public class SdkTests {
 			
 		}
 		assertNotNull(items);
+	}
+	
+	@Test
+	public void T25ApplyImportTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
+		
+		ResponseData data = new ResponseData();
+		try {
+			//##BEGIN EXAMPLE applyimport##
+			ResponseData response = api.navigate(ResponseData.class, data.getLink("apply-import"));
+			//##END EXAMPLE##
+		} catch (Exception e) {
+			
+		}
+	}
+	
+	@Test
+	public void T26TestGeocodingThruAPI() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
+		
+		LocationData location = TestHelper.createLocationWithAddress();
+		CapacityData capacity = new CapacityData("Weight", 20);
+		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+		capacities.add(capacity);
+		
+		VehicleUpdateRequest vehicle = new VehicleUpdateRequest("Rekka", capacities, location, location);
+		VehicleData response = null;
+		try {
+			ResponseData res = api.navigate(ResponseData.class, routingProblemData.getLink("create-vehicle"), vehicle);
+			System.out.println(res);
+			response = api.navigate(VehicleData.class, res.getLocation());
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		System.out.println(response);
+		assertNotEquals(0, response.getEndLocation().getCoordinate().getLatitude());
 	}
 	
 }

@@ -91,8 +91,8 @@ public class TestHelper {
 	} 
 	
 	static TaskData getTask(API api, RoutingProblemData problem) {		
-		LocationData pi = createLocation(Location.TASK_PICKUP);
-		LocationData de = createLocation(Location.TASK_DELIVERY);
+		LocationData pi = createLocationWithCoordinates(Location.TASK_PICKUP);
+		LocationData de = createLocationWithCoordinates(Location.TASK_DELIVERY);
 				
 		CapacityData capacity = new CapacityData("Weight", 20);
 		List<CapacityData> capacities = new ArrayList<CapacityData>();
@@ -121,8 +121,8 @@ public class TestHelper {
 	static List<TaskUpdateRequest> createListOfTasks(int howMany) {
 		List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
 		for (int i = 0; i < howMany; i++) {
-			LocationData pi = createLocation(Location.TASK_PICKUP);
-			LocationData de = createLocation(Location.TASK_DELIVERY);
+			LocationData pi = createLocationWithCoordinates(Location.TASK_PICKUP);
+			LocationData de = createLocationWithCoordinates(Location.TASK_DELIVERY);
 						
 			CapacityData capacity = new CapacityData("Weight", 20);
 			List<CapacityData> capacities = new ArrayList<CapacityData>();
@@ -150,13 +150,13 @@ public class TestHelper {
         evening.setHours(16);
         timeWindows.add(new TimeWindowData(morning, evening));
         
-        LocationData startLocation = createLocation(Location.VEHICLE_START);
+        LocationData startLocation = createLocationWithCoordinates(Location.VEHICLE_START);
 		VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
         vehicleRequest.setTimeWindows(timeWindows);
         return vehicleRequest;
 	}
 	
-	static LocationData createLocation(Location name) {
+	static LocationData createLocationWithCoordinates(Location name) {
 		CoordinateData coordinates = new CoordinateData();
 		switch (name){
 			case TASK_PICKUP: {

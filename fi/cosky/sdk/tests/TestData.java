@@ -16,9 +16,9 @@ public class TestData {
 	@SuppressWarnings("deprecation")
 	public static void CreateDemoData(RoutingProblemData problem, API api) {
 		
-		LocationData locationData = TestHelper.createLocation(Location.VEHICLE_START);
-        LocationData pickupLocation = TestHelper.createLocation(Location.TASK_PICKUP);      
-        LocationData deliveryLocation = TestHelper.createLocation(Location.TASK_DELIVERY);
+		LocationData locationData = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
+        LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);      
+        LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
         
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 100000));
