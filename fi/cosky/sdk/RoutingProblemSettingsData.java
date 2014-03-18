@@ -8,7 +8,7 @@ package fi.cosky.sdk;
 public class RoutingProblemSettingsData extends BaseData {
 	private int VersionNumber;
 	private double DefaultVehicleSpeedFactor;
-	private double DefaultVehicleSpeedProfile;
+	private String DefaultVehicleSpeedProfile;
 	
 	public int getVersionNumber() {
 		return VersionNumber;
@@ -22,10 +22,10 @@ public class RoutingProblemSettingsData extends BaseData {
 	public void setDefaultVehicleSpeedFactor(double defaultVehicleSpeedFactor) {
 		DefaultVehicleSpeedFactor = defaultVehicleSpeedFactor;
 	}
-	public double getDefaultVehicleSpeedProfile() {
+	public String getDefaultVehicleSpeedProfile() {
 		return DefaultVehicleSpeedProfile;
 	}
-	public void setDefaultVehicleSpeedProfile(double defaultVehicleSpeedProfile) {
+	public void setDefaultVehicleSpeedProfile(String defaultVehicleSpeedProfile) {
 		DefaultVehicleSpeedProfile = defaultVehicleSpeedProfile;
 	}
 }

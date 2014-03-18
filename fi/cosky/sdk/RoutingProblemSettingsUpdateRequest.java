@@ -8,7 +8,7 @@ package fi.cosky.sdk;
 public class RoutingProblemSettingsUpdateRequest {
 	
 	private double DefaultVehicleSpeedFactor;
-	private double DefaultVehicleSpeedProfile;
+	private SpeedProfile DefaultVehicleSpeedProfile;
 	
 	public double getDefaultVehicleSpeedFactor() {
 		return DefaultVehicleSpeedFactor;
@@ -16,10 +16,12 @@ public class RoutingProblemSettingsUpdateRequest {
 	public void setDefaultVehicleSpeedFactor(double defaultVehicleSpeedFactor) {
 		DefaultVehicleSpeedFactor = defaultVehicleSpeedFactor;
 	}
-	public double getDefaultVehicleSpeedProfile() {
+	public SpeedProfile getDefaultVehicleSpeedProfile() {
 		return DefaultVehicleSpeedProfile;
 	}
-	public void setDefaultVehicleSpeedProfile(double defaultVehicleSpeedProfile) {
+	public void setDefaultVehicleSpeedProfile(SpeedProfile defaultVehicleSpeedProfile) {
 		DefaultVehicleSpeedProfile = defaultVehicleSpeedProfile;
 	}
+	
 }
+
