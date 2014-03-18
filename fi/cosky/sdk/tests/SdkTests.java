@@ -762,5 +762,31 @@ public class SdkTests {
 		System.out.println(response);
 		assertNotEquals(0, response.getEndLocation().getCoordinate().getLatitude());
 	}
-	
-}
+
+	@Test
+	public void T27TestUpdatingRoutingProblemSettings() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
+		
+		RoutingProblemSettingsData before = null;
+		RoutingProblemSettingsData after = null;
+		try {
+			RoutingProblemSettingsData settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
+			
+			before = settings;
+			RoutingProblemSettingsUpdateRequest updatedSettings = new RoutingProblemSettingsUpdateRequest();
+			updatedSettings.setDefaultVehicleSpeedFactor(0.8);
+			updatedSettings.setDefaultVehicleSpeedProfile(SpeedProfile.Max120Kmh);
+			
+			ResponseData response = api.navigate(ResponseData.class, settings.getLink("update-settings"), updatedSettings);
+			
+			settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
+			after = settings;
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		assertNotEquals(before.getDefaultVehicleSpeedProfile(), after.getDefaultVehicleSpeedProfile());
+	}
+} 
