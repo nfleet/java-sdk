@@ -777,7 +777,7 @@ public class SdkTests {
 			RoutingProblemSettingsUpdateRequest updatedSettings = new RoutingProblemSettingsUpdateRequest();
 			updatedSettings.setDefaultVehicleSpeedFactor(0.8);
 			updatedSettings.setDefaultVehicleSpeedProfile(SpeedProfile.Max120Kmh);
-			//##END EXAMPLE changeproblemsettings##
+			//##END EXAMPLE##
 			ResponseData response = api.navigate(ResponseData.class, settings.getLink("update-settings"), updatedSettings);
 			before = settings;
 			settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
