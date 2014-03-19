@@ -772,18 +772,16 @@ public class SdkTests {
 		RoutingProblemSettingsData before = null;
 		RoutingProblemSettingsData after = null;
 		try {
+			//##BEGIN EXAMPLE changeproblemsettings##
 			RoutingProblemSettingsData settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
-			
-			before = settings;
 			RoutingProblemSettingsUpdateRequest updatedSettings = new RoutingProblemSettingsUpdateRequest();
 			updatedSettings.setDefaultVehicleSpeedFactor(0.8);
 			updatedSettings.setDefaultVehicleSpeedProfile(SpeedProfile.Max120Kmh);
-			
+			//##END EXAMPLE changeproblemsettings##
 			ResponseData response = api.navigate(ResponseData.class, settings.getLink("update-settings"), updatedSettings);
-			
+			before = settings;
 			settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
 			after = settings;
-			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
