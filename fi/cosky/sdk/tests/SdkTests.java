@@ -787,4 +787,43 @@ public class SdkTests {
 		}
 		assertNotEquals(before.getDefaultVehicleSpeedProfile(), after.getDefaultVehicleSpeedProfile());
 	}
+	
+	@Test
+	public void T28TestRequestingVehicleTypesFromProblem() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
+		ArrayList<String> vehicleTypes = new ArrayList<String>();
+		vehicleTypes.add("Rekka");
+		vehicleTypes.add("Auto");
+		
+		ArrayList<String> vehicleTypesFromServer = null;
+		try {
+			LocationData start = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
+			LocationData end = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
+			
+			ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+			CapacityData capa = new CapacityData("asdf", 100);
+			capacities.add(capa);
+			VehicleUpdateRequest vehicle1 = new VehicleUpdateRequest("auto1", capacities, start, end);
+			vehicle1.setVehicleType(vehicleTypes.get(0));
+						
+			VehicleUpdateRequest vehicle2 = new VehicleUpdateRequest("auto2", capacities, start, end);
+			vehicle2.setVehicleType(vehicleTypes.get(1));
+			ArrayList<VehicleUpdateRequest> both = new ArrayList<VehicleUpdateRequest>();
+			both.add(vehicle1); both.add(vehicle2);
+			VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+			vehicles.setItems(both);
+			
+			ResponseData response = api.navigate(ResponseData.class, routingProblemData.getLink("import-vehicles"), vehicles);
+			
+			VehicleTypeData vehicleType = api.navigate(VehicleTypeData.class, routingProblemData.getLink("get-types"));
+			vehicleTypesFromServer = vehicleType.getVehicleTypes();
+		} catch (Exception e) {
+			
+		}
+		assertEquals(vehicleTypesFromServer.size(), vehicleTypes.size());
+		assertEquals(vehicleTypesFromServer.get(0), vehicleTypes.get(0));
+		assertEquals(vehicleTypesFromServer.get(1), vehicleTypes.get(1));
+	}
 } 
