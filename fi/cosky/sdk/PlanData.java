@@ -9,6 +9,8 @@ import java.util.List;
 public class PlanData extends BaseData {
 	private int VersionNumber;
 	private List<FieldsItem> Items;
+	private KPIData KPIs;
+	private List<TaskData> Unassigned;
 	
 	public int getVersionNumber() {
 		return VersionNumber;
@@ -23,5 +25,16 @@ public class PlanData extends BaseData {
 		Items = items;
 	}
 	
-	
+	public KPIData getKPIs() {
+		return KPIs;
+	}
+	public void setKPIs(KPIData kPIs) {
+		KPIs = kPIs;
+	}
+	public List<TaskData> getUnassigned() {
+		return Unassigned;
+	}
+	public void setUnassigned(List<TaskData> unassigned) {
+		Unassigned = unassigned;
+	}
 }

@@ -826,4 +826,107 @@ public class SdkTests {
 		assertEquals(vehicleTypesFromServer.get(0), vehicleTypes.get(0));
 		assertEquals(vehicleTypesFromServer.get(1), vehicleTypes.get(1));
 	}
+	
+	@Test
+	public void T29TestRequestingTasksAndVehiclesWhileOptimizing() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
+		
+		for (int i = 0; i < 3; i++) {
+			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
+		}
+		vehicles.setItems(vehicleList);
+		
+		TaskSetImportRequest tasks = new TaskSetImportRequest();
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
+		tasks.setItems(taskList);
+		VehicleDataSet veh = null;
+		TaskDataSet tas = null;
+		try {
+		
+			ImportRequest importRequest = new ImportRequest();
+			importRequest.setVehicles(vehicles);
+			importRequest.setTasks(tasks);
+			
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
+			System.out.println(response.getLocation());
+			ImportData result = api.navigate(ImportData.class, response.getLocation());
+		
+			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
+			System.out.println(response);
+			problem.setState("Running");
+			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem.toRequest());
+			
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			
+			while (problem.getProgress() < 10 ) {
+				Thread.sleep(100);
+				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+			}
+			
+			veh = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			tas = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			
+		} catch (Exception e){
+			System.out.println(e.getMessage());
+		}
+		
+		assertNotNull(veh.getItems());
+		assertNotNull(tas.getItems());
+	}
+	
+	@Test
+	public void T30TestGettingKPIsThroughtTheAPI() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		RoutingProblemUpdateRequest requ = problem.toRequest();
+		requ.setState("Running");
+		PlanData plan = null;
+		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
+		
+		for (int i = 0; i < 3; i++) {
+			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
+		}
+		vehicles.setItems(vehicleList);
+		
+		TaskSetImportRequest tasks = new TaskSetImportRequest();
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
+		tasks.setItems(taskList);
+				
+		try {
+			ImportRequest importRequest = new ImportRequest();
+			importRequest.setVehicles(vehicles);
+			importRequest.setTasks(tasks);
+			
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
+			System.out.println(response.getLocation());
+			ImportData result = api.navigate(ImportData.class, response.getLocation());
+		
+			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
+			System.out.println(response);
+			problem.setState("Running");
+			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem.toRequest());
+			
+						
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			while (problem.getState().equals("Running")) {
+				Thread.sleep(1000);
+				System.out.println(problem.getProgress());
+				problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			}
+			
+			plan = api.navigate(PlanData.class, problem.getLink("plan"));
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(plan.getKPIs());
+	}
+	
 } 
