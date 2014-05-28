@@ -864,7 +864,7 @@ public class SdkTests {
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
 			
 			while (problem.getProgress() < 10 ) {
-				Thread.sleep(100);
+				Thread.sleep(1500);
 				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			}
 			
@@ -878,6 +878,7 @@ public class SdkTests {
 		assertNotNull(veh.getItems());
 		assertNotNull(tas.getItems());
 	}
+	
 	
 	@Test
 	public void T30TestGettingKPIsThroughtTheAPI() {
