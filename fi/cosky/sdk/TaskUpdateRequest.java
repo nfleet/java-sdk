@@ -15,6 +15,7 @@ public class TaskUpdateRequest extends BaseData {
     private int ClientId;
     private int UserId;
     private List<String> IncompatibleVehicleTypes;
+    private double Profit;
     
     public String getInfo() {
         return Info;
@@ -81,7 +82,15 @@ public class TaskUpdateRequest extends BaseData {
     }
 
 
-    public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
+    public double getProfit() {
+		return Profit;
+	}
+
+	public void setProfit(double profit) {
+		Profit = profit;
+	}
+
+	public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
         this.TaskEvents = taskEvents;
     }
 }
