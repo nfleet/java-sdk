@@ -16,6 +16,7 @@ public class RouteEventData extends BaseData {
 	private Date ArrivalTime;
 	private Date DepartureTime;
 	private String State;
+	private KPIData KPIs;
 		
 	int getVersionNumber() {
 		return VersionNumber;
@@ -70,6 +71,22 @@ public class RouteEventData extends BaseData {
 
 	public void setState(String state) {
 		State = state;
+	}
+
+	public String getFeasibilityState() {
+		return FeasibilityState;
+	}
+
+	public void setFeasibilityState(String feasibilityState) {
+		FeasibilityState = feasibilityState;
+	}
+
+	public KPIData getKPIs() {
+		return KPIs;
+	}
+
+	public void setKPIs(KPIData kPIs) {
+		KPIs = kPIs;
 	}
 	
 }

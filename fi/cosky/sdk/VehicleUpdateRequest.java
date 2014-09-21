@@ -16,6 +16,10 @@ public class VehicleUpdateRequest extends BaseData {
     private RouteData Route;
     private int VersionNumber;
     private String VehicleType;
+    
+    private double FixedCost;
+    private double KilometerCost;
+    private double HourCost;
 
     public RouteData getRoute() {
         return Route;
@@ -108,5 +112,29 @@ public class VehicleUpdateRequest extends BaseData {
 
 	public void setVehicleType(String vehicleType) {
 		VehicleType = vehicleType;
+	}
+
+	public double getFixedCost() {
+		return FixedCost;
+	}
+
+	public void setFixedCost(double fixedCost) {
+		FixedCost = fixedCost;
+	}
+
+	public double getKilometerCost() {
+		return KilometerCost;
+	}
+
+	public void setKilometerCost(double kilometerCost) {
+		KilometerCost = kilometerCost;
+	}
+
+	public double getHourCost() {
+		return HourCost;
+	}
+
+	public void setHourCost(double hourCost) {
+		HourCost = hourCost;
 	}
 }

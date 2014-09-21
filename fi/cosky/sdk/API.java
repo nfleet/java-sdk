@@ -194,6 +194,7 @@ public class API {
 			connection.setRequestMethod(method(verb));
 			connection.setInstanceFollowRedirects(false);
 
+		
 			if (tokenData != null) {
 				connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
 			}
@@ -224,6 +225,13 @@ public class API {
 					osw.flush();
 					osw.close();
 				}
+			}
+			else if (verb == verb.POST && object == null) {
+				connection.addRequestProperty("Content-Length",	"0");
+				OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+				osw.write("");
+				osw.flush();
+				osw.close();
 			}
 
 			connection.connect();

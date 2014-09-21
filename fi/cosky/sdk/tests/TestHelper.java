@@ -126,6 +126,30 @@ public class TestHelper {
 		}
 	}
 	
+	static TaskUpdateRequest createTaskUpdateRequest(String name) {
+		LocationData pi = createLocationWithCoordinates(Location.TASK_PICKUP);
+		LocationData de = createLocationWithCoordinates(Location.TASK_DELIVERY);
+		CapacityData capacity = new CapacityData("Weight", 20);
+		List<CapacityData> capacities = new ArrayList<CapacityData>();
+		capacities.add(capacity);
+		TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
+		
+		List<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+		TimeWindowData tw = new TimeWindowData(new Date(2013, 5, 14, 8, 0), new Date(2013, 5, 14, 12, 0));
+		timeWindows.add(tw);
+		
+		task1.setTimeWindows(timeWindows);
+		TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
+		task2.setTimeWindows(timeWindows);
+		List<TaskEventUpdateRequest> both = new ArrayList<TaskEventUpdateRequest>();
+		both.add(task1);
+		both.add(task2);
+		TaskUpdateRequest task = new TaskUpdateRequest(both);
+		task.setName(name);
+		
+		return task;
+	}
+	
 	static List<TaskUpdateRequest> createListOfTasks(int howMany) {
 		List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
 		for (int i = 0; i < howMany; i++) {
@@ -164,12 +188,13 @@ public class TestHelper {
         morning.setHours(7);
         Date evening = new Date();
         evening.setHours(16);
-        timeWindows.add(new TimeWindowData(morning, evening));
+        timeWindows.add(new TimeWindowData(new Date(2013,5,14,8,0), new Date(2013,5,14,12,0)));
         
         LocationData startLocation = createLocationWithCoordinates(Location.VEHICLE_START);
 		VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
         vehicleRequest.setTimeWindows(timeWindows);
         return vehicleRequest;
+        
 	}
 	
 	static LocationData createLocationWithCoordinates(Location name) {
@@ -208,6 +233,30 @@ public class TestHelper {
 		LocationData data = new LocationData();
 		data.setAddress(address);
 		return data;
+	}
+	
+	static VehicleData createAndGetVehicle(API api, RoutingProblemData problem, VehicleUpdateRequest request) {
+		try {
+			ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-vehicle"), request);
+			VehicleData vehicle = api.navigate(VehicleData.class, result.getLocation());
+			return vehicle;
+		}
+		catch (Exception e) {
+			System.out.println("Something went wrong. Unable to create a vehicle.");
+		}
+		return null;
+	}
+	
+	static TaskData createAndGetTask(API api, RoutingProblemData problem, TaskUpdateRequest request) {
+		try {
+			ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), request);
+			TaskData task = api.navigate(TaskData.class, result.getLocation());
+			return task;
+		}
+		catch (Exception e) {
+			System.out.println("Something went wrong. Unable to create a task.");
+		}
+		return null;
 	}
 	
 	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY};

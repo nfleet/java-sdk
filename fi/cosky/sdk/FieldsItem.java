@@ -11,7 +11,8 @@ public class FieldsItem {
 	private String Name;
 	private String Uri;
 	private List<RouteEventData> Events;
-	
+	private KPIData KPIs;
+		
 	public String getName() {
 		return Name;
 	}
@@ -24,6 +25,12 @@ public class FieldsItem {
 	public void setUri(String uri) {
 		Uri = uri;
 	}
+	public KPIData getKPIs() {
+		return KPIs;
+	}
+	public void setKPIs(KPIData kPIs) {
+		KPIs = kPIs;
+	}
 	public List<RouteEventData> getEvents() {
 		return Events;
 	}
@@ -35,4 +42,6 @@ public class FieldsItem {
 	public String toString() {
 		return this.Name + " " + this.Uri + " " + Events;
 	}
+	
+	
 }
