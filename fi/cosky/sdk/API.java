@@ -51,10 +51,12 @@ public class API {
 	public boolean authenticate(String username, String password) {
 		this.ClientKey = username;
 		this.ClientSecret = password;
+		System.out.println("Authenticating API with username: " +username + " and pass: " + password);
 		try {
 			ResponseData result = navigate(ResponseData.class, getAuthLink());
 
 			if (result == null || result.getItems() != null) {
+				System.out.println("Could not authenticate, please check credentials");
 				return false;
 			}
 
@@ -235,10 +237,10 @@ public class API {
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-				System.out.println("Authentication expired");
-				if (retry) {
+				System.out.println("Authentication expired " + connection.getResponseMessage());
+				if (retry && this.tokenData != null) {
 					retry = false;
-					if( this.authenticate(ClientKey, ClientSecret) ) {
+					if( authenticate(this.ClientKey, this.ClientSecret) ) {
 						System.out.println("Authenticated again");
 						return sendRequest(verb, url, tClass, object);
 					}
@@ -251,7 +253,8 @@ public class API {
 			}
 
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
+				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
+									" " + url + ", verb: " + verb);
 				InputStream stream = connection.getErrorStream();
 				br = new BufferedReader(new InputStreamReader(stream));
 				StringBuilder sb = new StringBuilder();
@@ -347,19 +350,21 @@ public class API {
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-				System.out.println("Authentication expired");
-				if (retry) {
+				System.out.println("Authentication expired: " + connection.getResponseMessage());
+				if ( retry && this.tokenData != null ) {
 					retry = false;
-					if( this.authenticate(ClientKey, ClientSecret) ) {
+					if( authenticate(this.ClientKey, this.ClientSecret) ) {
 						System.out.println("Authenticated again");
 						return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
 					}
+					System.out.println("Could not authenticate");
 				}
 				else throw new IOException("Could not authenticate");	
 			}
 			
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-				System.out.println("code: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url);
+				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
+									" " + url + ", verb: " + verb);
 				InputStream stream = connection.getErrorStream();
 				br = new BufferedReader(new InputStreamReader(stream));
 				StringBuilder sb = new StringBuilder();
