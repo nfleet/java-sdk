@@ -3,6 +3,7 @@ package fi.cosky.sdk.tests;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import fi.cosky.sdk.*;
 /*
@@ -28,8 +29,7 @@ public class TestData {
         Date evening = new Date();
         evening.setHours(16);
         timeWindows.add(new TimeWindowData(morning, evening));
-
-        VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest("demoVehicle",capacities, locationData, locationData);
+        VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(UUID.randomUUID().toString(),capacities, locationData, locationData);
         vehicleRequest.setTimeWindows(timeWindows);
 
         try {

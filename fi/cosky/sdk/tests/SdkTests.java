@@ -179,7 +179,7 @@ public class SdkTests {
 			oldTask = api.navigate(TaskData.class, oldTask.getLink("self"));
 			asdf = task;
 		} catch (NFleetRequestException e) {
-			
+			System.out.println(e.toString());
 		} catch (IOException e) {
 			
 		}
@@ -567,12 +567,20 @@ public class SdkTests {
 		LocationData end = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
 				
 		ResponseData a = null;
-		try {
+		
+		Date startTime = new Date();
+		Date endTime = new Date();
+		endTime.setHours(20);
+		
+		ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+		timeWindows.add(new TimeWindowData(startTime, endTime));
+ 		try {
 			//##BEGIN EXAMPLE importvehicleset##
 			VehicleSetImportRequest set = new VehicleSetImportRequest();
 			List<VehicleUpdateRequest> vehicles = new ArrayList<VehicleUpdateRequest>();
 			for (int i = 0; i < 10; i++) {
 				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle" + i, list, start, end);
+				vehicle.setTimeWindows(timeWindows);
 				vehicles.add(vehicle);
 			}
 			set.setItems(vehicles);
@@ -602,10 +610,18 @@ public class SdkTests {
 			//##BEGIN EXAMPLE importtaskset##
 			List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
 			
+			Date start = new Date();
+			Date end = new Date();
+			end.setHours(20);
+			
+			ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+			timeWindows.add(new TimeWindowData(start, end));
 			for (int i = 0; i < 10; i++) {
 				List<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
 				TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pickupLocation, list);
+				pickup.setTimeWindows(timeWindows);
 				TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, list);
+				delivery.setTimeWindows(timeWindows);
 				taskEvents.add(pickup); taskEvents.add(delivery);
 				TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
 				task.setName("kivikasat" + i);
@@ -750,7 +766,7 @@ public class SdkTests {
 		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
 		capacities.add(capacity);
 		
-		VehicleUpdateRequest vehicle = new VehicleUpdateRequest("Rekka", capacities, location, location);
+		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("TestiAuto");
 		VehicleData response = null;
 		try {
 			ResponseData res = api.navigate(ResponseData.class, routingProblemData.getLink("create-vehicle"), vehicle);

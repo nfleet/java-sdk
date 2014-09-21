@@ -15,11 +15,11 @@ import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 
 public class TestHelper {
 	private static API apis  = null;
-	static String clientKey = "";
+	static String clientKey    = "";
 	static String clientSecret = "";
 	
 	static API authenticate() {
-		String url = "https://api.co-sky.fi";
+		String url = "https://api.nfleet.fi";
 		if (apis == null) {
 			API api = new API(url);
 			api.setTimed(true);
@@ -43,7 +43,7 @@ public class TestHelper {
 				ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 				user = api.navigate(UserData.class, createdUser.getLocation());
 			} else {
-			    user = api.navigate(UserData.class, users.getItems().get(0).getLink("self"));
+			    user = api.navigate(UserData.class, users.getItems().get(users.getItems().size()-1).getLink("self"));
 			}
 			return user;
 		} catch (NFleetRequestException e) {
@@ -83,7 +83,7 @@ public class TestHelper {
 			vehicle = api.navigate(VehicleData.class, vehicles.getItems().get(0).getLink("self"));
 			return vehicle;
 		} catch (NFleetRequestException e) {
-			System.out.println("Something went wrong");
+			System.out.println("Something went wrong: " + e.toString());
 			return null;
 		} catch (IOException e) {
 			return null;
@@ -101,6 +101,14 @@ public class TestHelper {
 		TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 		TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
 		
+		Date start = new Date();
+		Date end = new Date();
+		end.setHours(20);
+		TimeWindowData twstart = new TimeWindowData(start, end);
+		ArrayList<TimeWindowData> timewindows = new ArrayList<TimeWindowData>();
+		timewindows.add(twstart);
+		task1.setTimeWindows(timewindows);
+		task2.setTimeWindows(timewindows);
 		List<TaskEventUpdateRequest> both = new ArrayList<TaskEventUpdateRequest>();
 		both.add(task1);
 		both.add(task2);
@@ -111,7 +119,7 @@ public class TestHelper {
 			TaskData td = api.navigate(TaskData.class, createdTask.getLocation());
 			return td;
 		} catch (NFleetRequestException e) {
-			System.out.println("Something went wrong");
+			System.out.println("Something went wrong " + e.toString());
 			return null;
 		} catch (IOException e) {
 			return null;
@@ -129,7 +137,15 @@ public class TestHelper {
 			capacities.add(capacity);
 			TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 			TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
-			
+			Date start = new Date();
+			Date end = new Date();
+			end.setHours(20);
+			TimeWindowData twstart = new TimeWindowData(start, end);
+			ArrayList<TimeWindowData> timewindows = new ArrayList<TimeWindowData>();
+			timewindows.add(twstart);
+			timewindows.add(twstart);
+			task1.setTimeWindows(timewindows);
+			task2.setTimeWindows(timewindows);
 			List<TaskEventUpdateRequest> both = new ArrayList<TaskEventUpdateRequest>();
 			both.add(task1);
 			both.add(task2);
