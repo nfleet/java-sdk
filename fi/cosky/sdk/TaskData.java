@@ -14,6 +14,7 @@ public class TaskData extends BaseData {
     private int Id;
     private int VersionNumber;
     private List<String> IncompatibleVehicleTypes;
+    private double Profit;
     
     public String getInfo() {
         return Info;
@@ -65,6 +66,14 @@ public class TaskData extends BaseData {
 
 	public void setIncompatibleVehicleTypes(List<String> incompatibleVehicleTypes) {
 		IncompatibleVehicleTypes = incompatibleVehicleTypes;
+	}
+
+	public double getProfit() {
+		return Profit;
+	}
+
+	public void setProfit(double profit) {
+		Profit = profit;
 	}
 
 	public TaskUpdateRequest toRequest() {

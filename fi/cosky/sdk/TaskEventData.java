@@ -91,6 +91,7 @@ public class TaskEventData extends BaseData {
 		TaskEventUpdateRequest request = new TaskEventUpdateRequest(Type, Location, Capacities);
 		request.setServiceTime(ServiceTime);
 		request.setTaskEventId(Id);
+		request.setTimeWindows(TimeWindows);
 		return request;
 	}
 }

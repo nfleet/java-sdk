@@ -28,4 +28,13 @@ public class NFleetRequestException extends IOException {
 		Items = items;
 	}	
 	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		for( ErrorData e : Items) {
+			sb.append(" ErrorCode: "+e.getCode() + " ErrorMessage: " + e.getMessage());
+		}
+		return sb.toString();
+	}
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import fi.cosky.sdk.*;
 import fi.cosky.sdk.CoordinateData.CoordinateSystem;
@@ -26,15 +27,13 @@ public class SdkTests {
 		ApiData data2 = null;
 		try {
 			//##BEGIN EXAMPLE accessingapi##
-			API api = new API("https://api.nfleet.fi");
+            API api = new API("https://api.nfleet.fi");
 			api.authenticate(clientKey, clientSecret);
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
 			data2 = data;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertNotNull(data2);
 		assertNotNull(data2.getLinks());	
@@ -52,10 +51,8 @@ public class SdkTests {
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
 			//##END EXAMPLE##
 			asdf = problem;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertNotNull(asdf);
 	}
@@ -74,10 +71,8 @@ public class SdkTests {
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			//##END EXAMPLE##
 			check = problem;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertEquals(requ.getName(), check.getName());
 	}
@@ -93,10 +88,8 @@ public class SdkTests {
 			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
 			//##END EXAMPLE##
 			collection = tasks;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(collection);
@@ -152,10 +145,8 @@ public class SdkTests {
     		//##END EXAMPLE##
     		update = task;
             asdf = api.navigate(TaskData.class, result.getLocation());
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 
         assertEquals(asdf.getName(), update.getName());
@@ -178,10 +169,8 @@ public class SdkTests {
 			//##END EXAMPLE##
 			oldTask = api.navigate(TaskData.class, oldTask.getLink("self"));
 			asdf = task;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 			
 		assertEquals(oldTask.getName(), asdf.getName());
@@ -203,10 +192,8 @@ public class SdkTests {
 			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 			//##END EXAMPLE##
 			asdf = vehicles;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(asdf.getItems());
@@ -235,10 +222,8 @@ public class SdkTests {
 			RouteEventDataSet events = api.navigate(RouteEventDataSet.class, vehicle.getLink("list-events"));
 			//##END EXAMPLE##
 			asdf = events;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(asdf);
@@ -268,10 +253,8 @@ public class SdkTests {
 			//##END EXAMPLE##
 			routes = routeData;
 
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 				
 		assertNotNull(routes);
@@ -297,10 +280,9 @@ public class SdkTests {
 			RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			a = sequence;
 			b = routeData.getItems();
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertArrayEquals(a, b);
 	}
@@ -320,8 +302,8 @@ public class SdkTests {
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			//##END EXAMPLE##
 			asdf = result;
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertNotNull(asdf);
 	}
@@ -344,12 +326,10 @@ public class SdkTests {
 			updateRequest.setState("Stopped");
 			result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updateRequest);
 			//##END EXAMPLE##
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
-		
-		
-		
+				
 		assertNotNull(result);
 	}
 	
@@ -369,8 +349,8 @@ public class SdkTests {
 			b = before.size();
 			users = api.navigate(UserDataSet.class, data.getLink("list-users"));
 			a = users.getItems().size();
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertEquals(b+1, a);
 	}
@@ -399,9 +379,8 @@ public class SdkTests {
 			}
 			//##END EXAMPLE 
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
-		assertEquals(problem.getState(), "Stopped");
 		assertTrue(problem.getProgress() >= 0);
 	}
 	
@@ -420,8 +399,8 @@ public class SdkTests {
 			ResponseData result = api.navigate(ResponseData.class,  vehicle.getLink("update"), updatedVehicle);
 			
 			vehicle = api.navigate(VehicleData.class, vehicle.getLink("self"));
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertEquals(vehicle.getTimeWindows().get(0).getStart(), akkuna.get(0).getStart());
 		assertEquals(vehicle.getName(), updatedName);
@@ -476,7 +455,7 @@ public class SdkTests {
 				System.out.println(problem.getProgress());
 			}		
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertEquals(problem.getState(), "Stopped");
 	}
@@ -507,7 +486,7 @@ public class SdkTests {
 			total = end - begin;
 			System.out.println("Individually adding "+taskCount+" tasks took " + total + " ms");
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(request);
 	}
@@ -548,7 +527,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			s = plan;
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(s);
 	}
@@ -567,12 +546,20 @@ public class SdkTests {
 		LocationData end = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
 				
 		ResponseData a = null;
-		try {
+		
+		Date startTime = new Date();
+		Date endTime = new Date();
+		endTime.setHours(20);
+		
+		ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+		timeWindows.add(new TimeWindowData(startTime, endTime));
+ 		try {
 			//##BEGIN EXAMPLE importvehicleset##
 			VehicleSetImportRequest set = new VehicleSetImportRequest();
 			List<VehicleUpdateRequest> vehicles = new ArrayList<VehicleUpdateRequest>();
 			for (int i = 0; i < 10; i++) {
 				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle" + i, list, start, end);
+				vehicle.setTimeWindows(timeWindows);
 				vehicles.add(vehicle);
 			}
 			set.setItems(vehicles);
@@ -580,7 +567,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			a = result;
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(a.getLocation());
 	}
@@ -602,10 +589,18 @@ public class SdkTests {
 			//##BEGIN EXAMPLE importtaskset##
 			List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
 			
+			Date start = new Date();
+			Date end = new Date();
+			end.setHours(20);
+			
+			ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+			timeWindows.add(new TimeWindowData(start, end));
 			for (int i = 0; i < 10; i++) {
 				List<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
 				TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pickupLocation, list);
+				pickup.setTimeWindows(timeWindows);
 				TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, list);
+				delivery.setTimeWindows(timeWindows);
 				taskEvents.add(pickup); taskEvents.add(delivery);
 				TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
 				task.setName("kivikasat" + i);
@@ -618,7 +613,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			r = result;
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(r.getLocation());
 	}
@@ -654,7 +649,7 @@ public class SdkTests {
 			r = result;
 			
 		} catch (Exception e){
-			System.out.println(e.getMessage());
+			System.out.println(e.toString());
 		}
 		assertEquals(0, r.getErrorCount());
 	}
@@ -718,7 +713,7 @@ public class SdkTests {
 			
 			
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(items);
 	}
@@ -735,7 +730,7 @@ public class SdkTests {
 			ResponseData response = api.navigate(ResponseData.class, data.getLink("apply-import"));
 			//##END EXAMPLE##
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 	}
 	
@@ -750,14 +745,14 @@ public class SdkTests {
 		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
 		capacities.add(capacity);
 		
-		VehicleUpdateRequest vehicle = new VehicleUpdateRequest("Rekka", capacities, location, location);
+		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("TestiAuto");
 		VehicleData response = null;
 		try {
 			ResponseData res = api.navigate(ResponseData.class, routingProblemData.getLink("create-vehicle"), vehicle);
 			System.out.println(res);
 			response = api.navigate(VehicleData.class, res.getLocation());
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.toString());
 		}
 		System.out.println(response);
 		assertNotEquals(0, response.getEndLocation().getCoordinate().getLatitude());
@@ -783,7 +778,7 @@ public class SdkTests {
 			settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
 			after = settings;
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.toString());
 		}
 		assertNotEquals(before.getDefaultVehicleSpeedProfile(), after.getDefaultVehicleSpeedProfile());
 	}
@@ -801,14 +796,11 @@ public class SdkTests {
 		try {
 			LocationData start = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
 			LocationData end = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
-			
-			ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-			CapacityData capa = new CapacityData("asdf", 100);
-			capacities.add(capa);
-			VehicleUpdateRequest vehicle1 = new VehicleUpdateRequest("auto1", capacities, start, end);
+						
+			VehicleUpdateRequest vehicle1 = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
 			vehicle1.setVehicleType(vehicleTypes.get(0));
 						
-			VehicleUpdateRequest vehicle2 = new VehicleUpdateRequest("auto2", capacities, start, end);
+			VehicleUpdateRequest vehicle2 = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
 			vehicle2.setVehicleType(vehicleTypes.get(1));
 			ArrayList<VehicleUpdateRequest> both = new ArrayList<VehicleUpdateRequest>();
 			both.add(vehicle1); both.add(vehicle2);
@@ -820,7 +812,7 @@ public class SdkTests {
 			VehicleTypeData vehicleType = api.navigate(VehicleTypeData.class, routingProblemData.getLink("get-types"));
 			vehicleTypesFromServer = vehicleType.getVehicleTypes();
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertEquals(vehicleTypesFromServer.size(), vehicleTypes.size());
 		assertEquals(vehicleTypesFromServer.get(0), vehicleTypes.get(0));
@@ -872,7 +864,7 @@ public class SdkTests {
 			tas = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
 			
 		} catch (Exception e){
-			System.out.println(e.getMessage());
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(veh.getItems());
@@ -886,8 +878,6 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);				
 		RoutingProblemData problem = TestHelper.createProblem(api, user);
 		
-		RoutingProblemUpdateRequest requ = problem.toRequest();
-		requ.setState("Running");
 		PlanData plan = null;
 		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
 		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
@@ -902,21 +892,15 @@ public class SdkTests {
 		tasks.setItems(taskList);
 				
 		try {
-			ImportRequest importRequest = new ImportRequest();
-			importRequest.setVehicles(vehicles);
-			importRequest.setTasks(tasks);
+			ResponseData response;
+			response = api.navigate(ResponseData.class, problem.getLink("import-vehicles"), vehicles);
+			response = api.navigate(ResponseData.class, problem.getLink("import-tasks"), tasks);
 			
-			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
-			System.out.println(response.getLocation());
-			ImportData result = api.navigate(ImportData.class, response.getLocation());
-		
-			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
-			System.out.println(response);
 			problem.setState("Running");
 			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem.toRequest());
-			
-						
+									
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			System.out.println(problem.getState() + " " + problem.getProgress());
 			while (problem.getState().equals("Running")) {
 				Thread.sleep(1000);
 				System.out.println(problem.getProgress());
@@ -925,9 +909,254 @@ public class SdkTests {
 			
 			plan = api.navigate(PlanData.class, problem.getLink("plan"));
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(plan.getKPIs());
 	}
+	
+	/*
+	@Test
+	public void T30LockingTaskEventToVehicle() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);				
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		CoordinateData pickupCoord = new CoordinateData();
+		CoordinateData deliveryCoord = new CoordinateData();
+		pickupCoord.setLatitude(62.244958);
+		pickupCoord.setLongitude(25.747143);
+		pickupCoord.setSystem(CoordinateSystem.Euclidian);
+		
+		LocationData pickupLoc = new LocationData();
+		pickupLoc.setCoordinatesData(pickupCoord);
+		
+		deliveryCoord.setLatitude(62.244589);
+		deliveryCoord.setLongitude(25.74892);
+		deliveryCoord.setSystem(CoordinateSystem.Euclidian);
+		
+		LocationData deliveryLoc = new LocationData();
+		deliveryLoc.setCoordinatesData(deliveryCoord);
+		
+		TaskUpdateRequest task1 = TestHelper.createTaskUpdateRequest("task1");
+		task1.getTaskEvents().get(0).setLocation(pickupLoc);
+		task1.getTaskEvents().get(1).setLocation(deliveryLoc);
+		
+		TaskUpdateRequest task2 = TestHelper.createTaskUpdateRequest("task2");
+		task2.getTaskEvents().get(0).setLocation(pickupLoc);
+		task2.getTaskEvents().get(1).setLocation(deliveryLoc);
+		
+		
+		VehicleUpdateRequest veh1 = TestHelper.createVehicleUpdateRequest("vehicle1");
+		VehicleUpdateRequest veh2 = TestHelper.createVehicleUpdateRequest("vehicle2");
+		
+		LocationData vehicleLoc = new LocationData();
+		vehicleLoc.setCoordinatesData(pickupCoord);
+		veh1.setStartLocation(vehicleLoc);
+		veh1.setEndLocation(vehicleLoc);
+		
+		veh2.setStartLocation(vehicleLoc);
+		veh2.setEndLocation(vehicleLoc);
+		
+		VehicleData veh1res = TestHelper.createAndGetVehicle(api, problem, veh1);
+		VehicleData veh2res = TestHelper.createAndGetVehicle(api, problem, veh2);
+		
+		TaskData task1res = TestHelper.createAndGetTask(api, problem, task1);
+		TaskData task2res = TestHelper.createAndGetTask(api, problem, task2);
+		try {
+			api.navigate(RouteData.class, veh1res.getLink("get-route"));
+			api.navigate(RouteData.class, veh2res.getLink("get-route"));
+			
+			RouteUpdateRequest routeReq1 = new RouteUpdateRequest();
+			int[] seq1 = { task1res.getTaskEvents().get(0).getId(), task1res.getTaskEvents().get(1).getId() };
+			routeReq1.setSequence(seq1);
+			RouteUpdateRequest routeReq2 = new RouteUpdateRequest();
+			int[] seq2 = { task2res.getTaskEvents().get(0).getId(), task2res.getTaskEvents().get(1).getId() };
+			routeReq2.setSequence(seq2);
+			
+			api.navigate(ResponseData.class, veh1res.getLink("set-route"), routeReq1);
+			api.navigate(ResponseData.class, veh2res.getLink("set-route"), routeReq2);
+			
+		   
+		   RouteEventDataSet res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
+		   RouteEventDataSet res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
+		   
+		   for (RouteEventData re : res1.getItems() ) {
+			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   if (re.getTaskEventId() < 20000 ) {
+				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   req.setState("LockedToVehicle");
+				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
+			   }
+		   }
+		   
+		   for (RouteEventData re : res2.getItems() ) {
+			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   if (re.getTaskEventId() < 20000 ) {
+				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   req.setState("LockedToVehicle");
+				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
+			   }
+		   }
+		   
+		   RoutingProblemUpdateRequest update = problem.toRequest();
+			update.setState("Running");
+		
+			
+		   ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
+				
+		   Thread.sleep(5000);
+				
+		   problem = api.navigate(RoutingProblemData.class, response.getLocation());
+				
+		   while ( problem.getProgress() < 100 ) {
+		       Thread.sleep(1000);
+			   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   }
+		   
+		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
+		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
+		   
+		   assertEquals(4, res1.getItems().size());
+		   assertEquals(4, res2.getItems().size());
+		   
+			// unlocking task events
+		   
+		   veh1res = api.navigate(VehicleData.class, veh1res.getLink("self"));
+		   veh2res = api.navigate(VehicleData.class, veh2res.getLink("self"));
+		   
+		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
+		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
+
+		   for (RouteEventData re : res1.getItems() ) {
+			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   if (re.getTaskEventId() < 50 ) {
+				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   req.setState("UnlockedFromVehicle");
+				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
+			   }
+		   }
+
+		   for (RouteEventData re : res2.getItems() ) {
+			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   if (re.getTaskEventId() < 50) {
+				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   req.setState("UnlockedFromVehicle");
+				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
+			   }
+		   }
+		   
+		   update = problem.toRequest();
+		   update.setState("Running");
+		
+			
+		   response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
+				
+		   Thread.sleep(5000);
+				
+		   problem = api.navigate(RoutingProblemData.class, response.getLocation());
+				
+		   while ( problem.getProgress() < 100 ) {
+		       Thread.sleep(1000);
+			   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   }
+		   
+		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
+		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
+		   
+		   assertEquals(2, res1.getItems().size());
+		   assertEquals(6, res2.getItems().size());
+		} catch (Exception e) {
+			System.out.println("Something went wrong.");
+		}
+		
+		/*
+        api.Navigate<ResponseData>(vehicleResult1.GetLink("set-route"), new RouteUpdateRequest { Items = route1 });
+        api.Navigate<ResponseData>(vehicleResult2.GetLink("set-route"), new RouteUpdateRequest { Items = route2 });
+
+        var events1 = api.Navigate<RouteEventDataSet>(vehicleResult1.GetLink("list-events"));
+        var events2 = api.Navigate<RouteEventDataSet>(vehicleResult2.GetLink("list-events"));
+
+        foreach (var item in events1.Items)
+        {
+            var @event = api.Navigate<RouteEventData>(item.GetLink("self"));
+            if (@event.TaskEventId < 20000) api.Navigate<ResponseData>(@event.GetLink("lock-to-vehicle"), new RouteEventUpdateRequest
+            {
+                State = "LockedToVehicle"
+            });
+        }
+        foreach (var item in events2.Items)
+        {
+            var @event = api.Navigate<RouteEventData>(item.GetLink("self"));
+            if (@event.TaskEventId < 20000) api.Navigate<ResponseData>(@event.GetLink("lock-to-vehicle"), new RouteEventUpdateRequest
+            {
+                State = "LockedToVehicle"
+            } );
+        }
+
+        problem = api.Navigate<RoutingProblemData>(problem.GetLink("self"));
+
+        var result = api.Navigate<ResponseData>(problem.GetLink("toggle-optimization"), new RoutingProblemUpdateRequest
+        {
+            Name = problem.Name,
+            State = "Running"
+        });
+
+        problem = api.Navigate<RoutingProblemData>(problem.GetLink("self"));
+        Thread.Sleep(1000);
+        while (problem.State.Equals("Running"))
+        {
+            Thread.Sleep(1000);
+            problem = api.Navigate<RoutingProblemData>(problem.GetLink("self"));
+        }
+
+        var plan = api.Navigate<PlanData>(problem.GetLink("plan"));
+        Assert.AreEqual(4, plan.Items[0].Events.Count);
+        Assert.AreEqual(4, plan.Items[1].Events.Count);
+
+        // unlocking
+
+        vehicleResult1 = api.Navigate<VehicleData>(v1.GetLink("self"));
+        vehicleResult2 = api.Navigate<VehicleData>(v2.GetLink("self"));
+
+        events1 = api.Navigate<RouteEventDataSet>(vehicleResult1.GetLink("list-events"));
+        events2 = api.Navigate<RouteEventDataSet>(vehicleResult2.GetLink("list-events"));
+
+        foreach (var item in events1.Items)
+        {
+            var @event = api.Navigate<RouteEventData>(item.GetLink("self"));
+            if (@event.TaskEventId < 20000) api.Navigate<ResponseData>(@event.GetLink("lock-to-vehicle"), new RouteEventUpdateRequest
+            {
+                State = "UnlockedFromVehicle"
+            });
+        }
+        foreach (var item in events2.Items)
+        {
+            var @event = api.Navigate<RouteEventData>(item.GetLink("self"));
+            if (@event.TaskEventId < 20000) api.Navigate<ResponseData>(@event.GetLink("lock-to-vehicle"), new RouteEventUpdateRequest
+            {
+                State = "UnlockedFromVehicle"
+            });
+        }
+
+        problem = api.Navigate<RoutingProblemData>(problem.GetLink("self"));
+
+        result = api.Navigate<ResponseData>(problem.GetLink("toggle-optimization"), new RoutingProblemUpdateRequest
+        {
+            Name = problem.Name,
+            State = "Running"
+        });
+
+        problem = api.Navigate<RoutingProblemData>(problem.GetLink("self"));
+        Thread.Sleep(1000);
+        while (problem.State.Equals("Running"))
+        {
+            Thread.Sleep(1000);
+            problem = api.Navigate<RoutingProblemData>(problem.GetLink("self"));
+        }
+
+        plan = api.Navigate<PlanData>(problem.GetLink("plan"));
+        Assert.AreEqual(2, plan.Items[0].Events.Count);
+        Assert.AreEqual(6, plan.Items[1].Events.Count);
+	}*/
 	
 } 
