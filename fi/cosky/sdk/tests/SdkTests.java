@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import fi.cosky.sdk.*;
 import fi.cosky.sdk.CoordinateData.CoordinateSystem;
@@ -31,10 +32,8 @@ public class SdkTests {
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
 			data2 = data;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertNotNull(data2);
 		assertNotNull(data2.getLinks());	
@@ -52,10 +51,8 @@ public class SdkTests {
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
 			//##END EXAMPLE##
 			asdf = problem;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertNotNull(asdf);
 	}
@@ -74,10 +71,8 @@ public class SdkTests {
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			//##END EXAMPLE##
 			check = problem;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertEquals(requ.getName(), check.getName());
 	}
@@ -93,10 +88,8 @@ public class SdkTests {
 			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
 			//##END EXAMPLE##
 			collection = tasks;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(collection);
@@ -152,10 +145,8 @@ public class SdkTests {
     		//##END EXAMPLE##
     		update = task;
             asdf = api.navigate(TaskData.class, result.getLocation());
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 
         assertEquals(asdf.getName(), update.getName());
@@ -178,10 +169,8 @@ public class SdkTests {
 			//##END EXAMPLE##
 			oldTask = api.navigate(TaskData.class, oldTask.getLink("self"));
 			asdf = task;
-		} catch (NFleetRequestException e) {
+		} catch (Exception e) {
 			System.out.println(e.toString());
-		} catch (IOException e) {
-			
 		}
 			
 		assertEquals(oldTask.getName(), asdf.getName());
@@ -203,10 +192,8 @@ public class SdkTests {
 			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 			//##END EXAMPLE##
 			asdf = vehicles;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(asdf.getItems());
@@ -235,10 +222,8 @@ public class SdkTests {
 			RouteEventDataSet events = api.navigate(RouteEventDataSet.class, vehicle.getLink("list-events"));
 			//##END EXAMPLE##
 			asdf = events;
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(asdf);
@@ -268,10 +253,8 @@ public class SdkTests {
 			//##END EXAMPLE##
 			routes = routeData;
 
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 				
 		assertNotNull(routes);
@@ -297,10 +280,9 @@ public class SdkTests {
 			RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			a = sequence;
 			b = routeData.getItems();
-		} catch (NFleetRequestException e) {
-			
-		} catch (IOException e) {
-			
+		}
+		catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertArrayEquals(a, b);
 	}
@@ -320,8 +302,8 @@ public class SdkTests {
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			//##END EXAMPLE##
 			asdf = result;
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertNotNull(asdf);
 	}
@@ -344,12 +326,10 @@ public class SdkTests {
 			updateRequest.setState("Stopped");
 			result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updateRequest);
 			//##END EXAMPLE##
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
-		
-		
-		
+				
 		assertNotNull(result);
 	}
 	
@@ -369,8 +349,8 @@ public class SdkTests {
 			b = before.size();
 			users = api.navigate(UserDataSet.class, data.getLink("list-users"));
 			a = users.getItems().size();
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertEquals(b+1, a);
 	}
@@ -399,9 +379,8 @@ public class SdkTests {
 			}
 			//##END EXAMPLE 
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
-		assertEquals(problem.getState(), "Stopped");
 		assertTrue(problem.getProgress() >= 0);
 	}
 	
@@ -420,8 +399,8 @@ public class SdkTests {
 			ResponseData result = api.navigate(ResponseData.class,  vehicle.getLink("update"), updatedVehicle);
 			
 			vehicle = api.navigate(VehicleData.class, vehicle.getLink("self"));
-		} catch (IOException e) {
-			
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		}
 		assertEquals(vehicle.getTimeWindows().get(0).getStart(), akkuna.get(0).getStart());
 		assertEquals(vehicle.getName(), updatedName);
@@ -476,7 +455,7 @@ public class SdkTests {
 				System.out.println(problem.getProgress());
 			}		
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertEquals(problem.getState(), "Stopped");
 	}
@@ -507,7 +486,7 @@ public class SdkTests {
 			total = end - begin;
 			System.out.println("Individually adding "+taskCount+" tasks took " + total + " ms");
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(request);
 	}
@@ -548,7 +527,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			s = plan;
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(s);
 	}
@@ -588,7 +567,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			a = result;
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(a.getLocation());
 	}
@@ -634,7 +613,7 @@ public class SdkTests {
 			//##END EXAMPLE##
 			r = result;
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(r.getLocation());
 	}
@@ -670,7 +649,7 @@ public class SdkTests {
 			r = result;
 			
 		} catch (Exception e){
-			System.out.println(e.getMessage());
+			System.out.println(e.toString());
 		}
 		assertEquals(0, r.getErrorCount());
 	}
@@ -734,7 +713,7 @@ public class SdkTests {
 			
 			
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(items);
 	}
@@ -751,7 +730,7 @@ public class SdkTests {
 			ResponseData response = api.navigate(ResponseData.class, data.getLink("apply-import"));
 			//##END EXAMPLE##
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 	}
 	
@@ -773,7 +752,7 @@ public class SdkTests {
 			System.out.println(res);
 			response = api.navigate(VehicleData.class, res.getLocation());
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.toString());
 		}
 		System.out.println(response);
 		assertNotEquals(0, response.getEndLocation().getCoordinate().getLatitude());
@@ -799,7 +778,7 @@ public class SdkTests {
 			settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
 			after = settings;
 		} catch (Exception e) {
-			System.out.println(e);
+			System.out.println(e.toString());
 		}
 		assertNotEquals(before.getDefaultVehicleSpeedProfile(), after.getDefaultVehicleSpeedProfile());
 	}
@@ -817,14 +796,11 @@ public class SdkTests {
 		try {
 			LocationData start = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
 			LocationData end = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
-			
-			ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-			CapacityData capa = new CapacityData("asdf", 100);
-			capacities.add(capa);
-			VehicleUpdateRequest vehicle1 = new VehicleUpdateRequest("auto1", capacities, start, end);
+						
+			VehicleUpdateRequest vehicle1 = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
 			vehicle1.setVehicleType(vehicleTypes.get(0));
 						
-			VehicleUpdateRequest vehicle2 = new VehicleUpdateRequest("auto2", capacities, start, end);
+			VehicleUpdateRequest vehicle2 = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
 			vehicle2.setVehicleType(vehicleTypes.get(1));
 			ArrayList<VehicleUpdateRequest> both = new ArrayList<VehicleUpdateRequest>();
 			both.add(vehicle1); both.add(vehicle2);
@@ -836,7 +812,7 @@ public class SdkTests {
 			VehicleTypeData vehicleType = api.navigate(VehicleTypeData.class, routingProblemData.getLink("get-types"));
 			vehicleTypesFromServer = vehicleType.getVehicleTypes();
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertEquals(vehicleTypesFromServer.size(), vehicleTypes.size());
 		assertEquals(vehicleTypesFromServer.get(0), vehicleTypes.get(0));
@@ -888,7 +864,7 @@ public class SdkTests {
 			tas = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
 			
 		} catch (Exception e){
-			System.out.println(e.getMessage());
+			System.out.println(e.toString());
 		}
 		
 		assertNotNull(veh.getItems());
@@ -902,8 +878,6 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);				
 		RoutingProblemData problem = TestHelper.createProblem(api, user);
 		
-		RoutingProblemUpdateRequest requ = problem.toRequest();
-		requ.setState("Running");
 		PlanData plan = null;
 		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
 		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
@@ -918,21 +892,15 @@ public class SdkTests {
 		tasks.setItems(taskList);
 				
 		try {
-			ImportRequest importRequest = new ImportRequest();
-			importRequest.setVehicles(vehicles);
-			importRequest.setTasks(tasks);
+			ResponseData response;
+			response = api.navigate(ResponseData.class, problem.getLink("import-vehicles"), vehicles);
+			response = api.navigate(ResponseData.class, problem.getLink("import-tasks"), tasks);
 			
-			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
-			System.out.println(response.getLocation());
-			ImportData result = api.navigate(ImportData.class, response.getLocation());
-		
-			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
-			System.out.println(response);
 			problem.setState("Running");
 			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem.toRequest());
-			
-						
+									
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			System.out.println(problem.getState() + " " + problem.getProgress());
 			while (problem.getState().equals("Running")) {
 				Thread.sleep(1000);
 				System.out.println(problem.getProgress());
@@ -941,11 +909,12 @@ public class SdkTests {
 			
 			plan = api.navigate(PlanData.class, problem.getLink("plan"));
 		} catch (Exception e) {
-			
+			System.out.println(e.toString());
 		}
 		assertNotNull(plan.getKPIs());
 	}
 	
+	/*
 	@Test
 	public void T30LockingTaskEventToVehicle() {
 		API api = TestHelper.authenticate();
@@ -1187,7 +1156,7 @@ public class SdkTests {
 
         plan = api.Navigate<PlanData>(problem.GetLink("plan"));
         Assert.AreEqual(2, plan.Items[0].Events.Count);
-        Assert.AreEqual(6, plan.Items[1].Events.Count);*/
-	}
+        Assert.AreEqual(6, plan.Items[1].Events.Count);
+	}*/
 	
 } 

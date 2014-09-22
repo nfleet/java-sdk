@@ -167,7 +167,6 @@ public class TestHelper {
 			TimeWindowData twstart = new TimeWindowData(start, end);
 			ArrayList<TimeWindowData> timewindows = new ArrayList<TimeWindowData>();
 			timewindows.add(twstart);
-			timewindows.add(twstart);
 			task1.setTimeWindows(timewindows);
 			task2.setTimeWindows(timewindows);
 			List<TaskEventUpdateRequest> both = new ArrayList<TaskEventUpdateRequest>();
