@@ -724,14 +724,38 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);				
 		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
 		
-		ResponseData data = new ResponseData();
+		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
+		
+		for (int i = 0; i < 3; i++) {
+			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
+		}
+		vehicles.setItems(vehicleList);
+		
+		TaskSetImportRequest tasks = new TaskSetImportRequest();
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
+		tasks.setItems(taskList);
+		VehicleDataSet veh = null;
+		TaskDataSet tas = null;
+		ResponseData response = null;
 		try {
+		
+			ImportRequest importRequest = new ImportRequest();
+			importRequest.setVehicles(vehicles);
+			importRequest.setTasks(tasks);
+			
+			response = api.navigate(ResponseData.class, routingProblemData.getLink("import-data"), importRequest);
+			System.out.println(response.getLocation());
+			ImportData result = api.navigate(ImportData.class, response.getLocation());
+	
 			//##BEGIN EXAMPLE applyimport##
-			ResponseData response = api.navigate(ResponseData.class, data.getLink("apply-import"));
+			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
 			//##END EXAMPLE##
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
+		assertNotEquals(response, null);
+		assertNotEquals(response.getLocation(), null);
 	}
 	
 	@Test
