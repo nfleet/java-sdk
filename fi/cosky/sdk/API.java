@@ -48,6 +48,11 @@ public class API {
 		this.retry  = true;
 	}
 
+	private boolean authenticate() {
+		return authenticate(this.ClientKey, this.ClientSecret);
+	}
+	
+	
 	public boolean authenticate(String username, String password) {
 		this.ClientKey = username;
 		this.ClientSecret = password;
@@ -97,7 +102,7 @@ public class API {
 
 		if (l.getRel().equals("authenticate")) {
 			HashMap<String, String> headers = new HashMap<String, String>();
-			String authorization = "Basic " + Base64.encodeBase64String((ClientKey + ":" + ClientSecret).getBytes());
+			String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
 			headers.put("authorization", authorization);
 			result = sendRequestWithAddedHeaders(Verb.POST,	this.baseUrl + l.getUri(), tClass, null, headers);
 			return (T) result;
@@ -226,7 +231,7 @@ public class API {
 					osw.close();
 				}
 			}
-			else if (verb == verb.POST && object == null) {
+			else if (verb == Verb.POST && object == null) {
 				connection.addRequestProperty("Content-Length",	"0");
 				OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
 				osw.write("");
@@ -247,8 +252,9 @@ public class API {
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 				System.out.println("Authentication expired " + connection.getResponseMessage());
 				if (retry && this.tokenData != null) {
+					this.tokenData = null;
 					retry = false;
-					if( authenticate(this.ClientKey, this.ClientSecret) ) {
+					if( authenticate() ) {
 						System.out.println("Authenticated again");
 						return sendRequest(verb, url, tClass, object);
 					}
@@ -297,7 +303,6 @@ public class API {
 			String abba = null;
 			if ((abba = connection.getHeaderField("ETag")) != null) {
 				sb.insert(sb.lastIndexOf("}"), ",\"VersionNumber\":" + abba	+ "");
-
 			}
 			
 			result = sb.toString();
@@ -361,7 +366,8 @@ public class API {
 				System.out.println("Authentication expired: " + connection.getResponseMessage());
 				if ( retry && this.tokenData != null ) {
 					retry = false;
-					if( authenticate(this.ClientKey, this.ClientSecret) ) {
+					this.tokenData = null;
+					if( authenticate() ) {
 						System.out.println("Authenticated again");
 						return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
 					}

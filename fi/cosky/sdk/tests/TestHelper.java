@@ -101,10 +101,7 @@ public class TestHelper {
 		TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 		TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
 		
-		Date start = new Date();
-		Date end = new Date();
-		end.setHours(20);
-		TimeWindowData twstart = new TimeWindowData(start, end);
+		TimeWindowData twstart = createTimeWindow(7, 20);
 		ArrayList<TimeWindowData> timewindows = new ArrayList<TimeWindowData>();
 		timewindows.add(twstart);
 		task1.setTimeWindows(timewindows);
@@ -135,7 +132,7 @@ public class TestHelper {
 		TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 		
 		List<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-		TimeWindowData tw = new TimeWindowData(new Date(2013, 5, 14, 8, 0), new Date(2013, 5, 14, 12, 0));
+		TimeWindowData tw = createTimeWindow(7, 20);
 		timeWindows.add(tw);
 		
 		task1.setTimeWindows(timeWindows);
@@ -161,10 +158,8 @@ public class TestHelper {
 			capacities.add(capacity);
 			TaskEventUpdateRequest task1 = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 			TaskEventUpdateRequest task2 = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
-			Date start = new Date();
-			Date end = new Date();
-			end.setHours(20);
-			TimeWindowData twstart = new TimeWindowData(start, end);
+			
+			TimeWindowData twstart = createTimeWindow(7, 20);
 			ArrayList<TimeWindowData> timewindows = new ArrayList<TimeWindowData>();
 			timewindows.add(twstart);
 			task1.setTimeWindows(timewindows);
@@ -183,11 +178,8 @@ public class TestHelper {
 		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 100000));
         ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-        Date morning = new Date();
-        morning.setHours(7);
-        Date evening = new Date();
-        evening.setHours(16);
-        timeWindows.add(new TimeWindowData(new Date(2013,5,14,8,0), new Date(2013,5,14,12,0)));
+        
+        timeWindows.add(createTimeWindow(7, 20));
         
         LocationData startLocation = createLocationWithCoordinates(Location.VEHICLE_START);
 		VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
@@ -260,4 +252,14 @@ public class TestHelper {
 	
 	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY};
 	
+	static TimeWindowData createTimeWindow(int start, int end) {
+		Date startD = new Date();
+		startD.setHours(start);
+		
+		Date endD = new Date();
+		endD.setHours(end);
+		
+		TimeWindowData twd = new TimeWindowData(startD, endD);
+		return twd;
+	}
 }
