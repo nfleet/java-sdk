@@ -36,15 +36,9 @@ public class TestHelper {
 	static UserData getOrCreateUser( API api ) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
-			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
-			UserData user = null;
-			if ( users.getItems() != null && users.getItems().size() < 1) {
-				user = new UserData();
-				ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
-				user = api.navigate(UserData.class, createdUser.getLocation());
-			} else {
-			    user = api.navigate(UserData.class, users.getItems().get(users.getItems().size()-1).getLink("self"));
-			}
+			UserData user = new UserData();
+			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
+			user = api.navigate(UserData.class, createdUser.getLocation());
 			return user;
 		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
@@ -57,7 +51,6 @@ public class TestHelper {
 	static RoutingProblemData createProblem(API api, UserData user) {
 		try {
 			RoutingProblemData problem = new RoutingProblemData("exampleProblem");
-			RoutingProblemDataSet problems = api.navigate(RoutingProblemDataSet.class, user.getLink("list-problems"));
 			ResponseData created = api.navigate(ResponseData.class, user.getLink("create-problem"), problem);
 			problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			return problem;
