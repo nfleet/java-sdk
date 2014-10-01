@@ -16,6 +16,8 @@ public class VehicleUpdateRequest extends BaseData {
     private RouteData Route;
     private int VersionNumber;
     private String VehicleType;
+    private SpeedProfile SpeedProfile;
+    private double SpeedFactor;
     
     private double FixedCost;
     private double KilometerCost;
@@ -112,6 +114,22 @@ public class VehicleUpdateRequest extends BaseData {
 
 	public void setVehicleType(String vehicleType) {
 		VehicleType = vehicleType;
+	}
+
+	public SpeedProfile getVehicleSpeedProfile() {
+		return SpeedProfile;
+	}
+
+	public void setVehicleSpeedProfile(SpeedProfile vehicleSpeedProfile) {
+		SpeedProfile = vehicleSpeedProfile;
+	}
+
+	public double getVehicleSpeedFactor() {
+		return SpeedFactor;
+	}
+
+	public void setVehicleSpeedFactor(double vehicleSpeedFactor) {
+		SpeedFactor = vehicleSpeedFactor;
 	}
 
 	public double getFixedCost() {

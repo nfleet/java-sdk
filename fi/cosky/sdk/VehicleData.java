@@ -16,6 +16,8 @@ public class VehicleData extends BaseData {
     private RouteData Route;
     private int VersionNumber;
     private String VehicleType;
+    private SpeedProfile SpeedProfile;
+    private double SpeedFactor;
     
     private double FixedCost;
     private double KilometerCost;
@@ -97,6 +99,22 @@ public class VehicleData extends BaseData {
 		VehicleType = vehicleType;
 	}
 
+	public SpeedProfile getSpeedProfile() {
+		return SpeedProfile;
+	}
+
+	public void setSpeedProfile(SpeedProfile vehicleSpeedProfile) {
+		SpeedProfile = vehicleSpeedProfile;
+	}
+
+	public double getSpeedFactor() {
+		return SpeedFactor;
+	}
+
+	public void setSpeedFactor(double vehicleSpeedFactor) {
+		SpeedFactor = vehicleSpeedFactor;
+	}
+
 	public ArrayList<TimeWindowData> getTimeWindows() {
 		return TimeWindows;
 	}
@@ -132,6 +150,8 @@ public class VehicleData extends BaseData {
 		request.setName(Name);
 		request.setTimeWindows(TimeWindows);
 		request.setRoute(Route);
+		request.setVehicleSpeedFactor(SpeedFactor);
+		request.setVehicleSpeedProfile(SpeedProfile);
 		return request;
 	}
 }

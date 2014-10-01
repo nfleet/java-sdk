@@ -180,9 +180,11 @@ public class TestHelper {
         ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
         
         timeWindows.add(createTimeWindow(7, 20));
-        
+                
         LocationData startLocation = createLocationWithCoordinates(Location.VEHICLE_START);
 		VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
+		vehicleRequest.setVehicleSpeedProfile(SpeedProfile.Max80Kmh);
+		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
         return vehicleRequest;
         
