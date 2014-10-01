@@ -24,14 +24,8 @@ public class TestData {
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 100000));
         ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-        Date morning = new Date();
-        morning.setHours(7);
-        Date evening = new Date();
-        evening.setHours(16);
-        timeWindows.add(new TimeWindowData(morning, evening));
-        VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(UUID.randomUUID().toString(),capacities, locationData, locationData);
-        vehicleRequest.setTimeWindows(timeWindows);
-
+        VehicleUpdateRequest vehicleRequest = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
+        
         try {
         	api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
         	
