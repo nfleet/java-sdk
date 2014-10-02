@@ -16,7 +16,7 @@ public class VehicleData extends BaseData {
     private RouteData Route;
     private int VersionNumber;
     private String VehicleType;
-    private SpeedProfile SpeedProfile;
+    private String SpeedProfile;
     private double SpeedFactor;
     
     private double FixedCost;
@@ -99,11 +99,11 @@ public class VehicleData extends BaseData {
 		VehicleType = vehicleType;
 	}
 
-	public SpeedProfile getSpeedProfile() {
+	public String getSpeedProfile() {
 		return SpeedProfile;
 	}
 
-	public void setSpeedProfile(SpeedProfile vehicleSpeedProfile) {
+	public void setSpeedProfile(String vehicleSpeedProfile) {
 		SpeedProfile = vehicleSpeedProfile;
 	}
 

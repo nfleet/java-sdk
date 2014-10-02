@@ -176,7 +176,7 @@ public class TestHelper {
                 
         LocationData startLocation = createLocationWithCoordinates(Location.VEHICLE_START);
 		VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
-		vehicleRequest.setVehicleSpeedProfile(SpeedProfile.Max80Kmh);
+		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
         return vehicleRequest;
