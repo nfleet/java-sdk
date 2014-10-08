@@ -46,6 +46,10 @@ public class API {
 		this.objectCache = new ObjectCache();
 		this.timed = false;
 		this.retry  = true;
+		
+		//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
+		//this hopefully helps with that.
+		System.setProperty("http.keepAlive", "false");
 	}
 
 	private boolean authenticate() {
