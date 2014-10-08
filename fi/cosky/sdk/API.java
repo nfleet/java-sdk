@@ -129,6 +129,8 @@ public class API {
 			result = sendRequest(Verb.PUT, this.baseUrl + uri, tClass, null);
 		} else if (l.getMethod().equals("POST")) {
 			result = sendRequest(Verb.POST, this.baseUrl + uri, tClass, null);
+		} else if (l.getMethod().equals("DELETE")) {
+			result = sendRequest(Verb.DELETE, this.baseUrl + uri, tClass, new Object());
 		} else {
 			result = sendRequest(Verb.GET, uri, tClass, null);
 		}
@@ -170,6 +172,11 @@ public class API {
 			String url = this.baseUrl + l.getUri();
 			result = sendRequest(Verb.PATCH, url, tClass, object);
 		}
+		
+		if (l.getMethod().equals("DELETE")) {
+			String url = this.baseUrl + l.getUri();
+			result = sendRequest(Verb.DELETE, url, tClass, object);
+		}
 		if (isTimed()) {
 			end = System.currentTimeMillis();
 			long time = end - start;
@@ -198,7 +205,7 @@ public class API {
 		try {
 			serverAddress = new URL(url);
 			connection = (HttpURLConnection) serverAddress.openConnection();
-			boolean doOutput = (verb != Verb.GET);
+			boolean doOutput = doOutput(verb);
 			connection.setDoOutput(doOutput);
 			connection.setRequestMethod(method(verb));
 			connection.setInstanceFollowRedirects(false);
@@ -270,6 +277,10 @@ public class API {
 				return (T) objectCache.getObject(url);
 			}
 
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
+				return (T) new ResponseData();
+			}
+			
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
 									" " + url + ", verb: " + verb);
@@ -342,16 +353,18 @@ public class API {
 			serverAddress = new URL(url);
 			connection = (HttpURLConnection) serverAddress.openConnection();
 			connection.setInstanceFollowRedirects(false);
-			connection.setDoOutput(true);
+			boolean doOutput = doOutput(verb);
+			connection.setDoOutput(doOutput);
 			connection.setRequestMethod(method(verb));
 			connection.setRequestProperty("Authorization", headers.get("authorization"));
 			connection.addRequestProperty("Accept", "application/json");
-			connection.addRequestProperty("Content-Length", "0");
-
-			OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
-			os.write("");
-			os.flush();
-			os.close();
+			if (doOutput){ 
+				connection.addRequestProperty("Content-Length", "0");
+				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
+				os.write("");
+				os.flush();
+				os.close();
+			}
 			connection.connect();
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER	|| connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
@@ -459,6 +472,15 @@ public class API {
 		return new Link("location", s, "GET", true);
 	}
 
+	private boolean doOutput(Verb verb) {
+		switch (verb) {
+		case GET:
+		case DELETE:
+			return false;
+		default:
+			return true;
+		}
+	}
 	private enum Verb {
 		GET, PUT, POST, DELETE, PATCH
 	}
