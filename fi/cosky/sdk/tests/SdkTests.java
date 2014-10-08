@@ -178,7 +178,28 @@ public class SdkTests {
 	
 	@Test
 	public void T06DeletingTaskTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		TaskData oldTask = TestHelper.getTask(api, problem);
+		TaskUpdateRequest asdf = null;
+		try {
 		
+			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			int taskCount = tasks.getItems().size();
+			assertEquals(2, taskCount);
+			//##BEGIN EXAMPLE deletingtask##	
+			ResponseData response = api.navigate(ResponseData.class, oldTask.getLink("delete"));
+			//##END EXAMPLE##
+			tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			
+			assertEquals(1,tasks.getItems().size());
+
+						
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 	
 	@Test
@@ -1255,4 +1276,37 @@ public class SdkTests {
 			System.out.println(e.toString());
 		}
 	}
+	
+	@Test
+	public void T34DeletingAllTaskTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		TaskData oldTask = TestHelper.getTask(api, problem);
+		TaskUpdateRequest asdf = null;
+		try {
+
+			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+			TaskSetImportRequest imports = new TaskSetImportRequest();
+			imports.setItems(tasks);
+			
+			api.navigate(ResponseData.class, problem.getLink("import-tasks"), imports);
+						
+			TaskDataSet taskSet = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			int taskCount = taskSet.getItems().size();
+			assertEquals(12, taskCount);
+			//##BEGIN EXAMPLE deletingtasks##			
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("delete-tasks"));
+			//##END EXAMPLE##
+			taskSet = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			
+			assertEquals(0,taskSet.getItems().size());
+
+						
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+	}
+	
 } 
