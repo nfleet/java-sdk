@@ -670,6 +670,12 @@ public class SdkTests {
 		
 		TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 		TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
+				
+		TimeWindowData tw = TestHelper.createTimeWindow(7, 20);
+		List<TimeWindowData> tws = new ArrayList<TimeWindowData>();
+		tws.add(tw);
+		pickup.setTimeWindows(tws);
+		delivery.setTimeWindows(tws);
 		
 		List<TaskEventUpdateRequest> task1 = new ArrayList<TaskEventUpdateRequest>();
 		task1.add(pickup);
