@@ -568,12 +568,9 @@ public class SdkTests {
 				
 		ResponseData a = null;
 		
-		Date startTime = new Date();
-		Date endTime = new Date();
-		endTime.setHours(20);
-		
+		TimeWindowData tw = TestHelper.createTimeWindow(5, 20);
 		ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-		timeWindows.add(new TimeWindowData(startTime, endTime));
+		timeWindows.add(tw);
  		try {
 			//##BEGIN EXAMPLE importvehicleset##
 			VehicleSetImportRequest set = new VehicleSetImportRequest();
@@ -607,30 +604,13 @@ public class SdkTests {
 		LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
 		ResponseData r = null;
 		try {
+
+			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+			
 			//##BEGIN EXAMPLE importtaskset##
-			List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
-			
-			Date start = new Date();
-			Date end = new Date();
-			end.setHours(20);
-			
-			ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-			timeWindows.add(new TimeWindowData(start, end));
-			for (int i = 0; i < 10; i++) {
-				List<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
-				TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pickupLocation, list);
-				pickup.setTimeWindows(timeWindows);
-				TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, list);
-				delivery.setTimeWindows(timeWindows);
-				taskEvents.add(pickup); taskEvents.add(delivery);
-				TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-				task.setName("kivikasat" + i);
-				tasks.add(task);
-			}
 			TaskSetImportRequest set = new TaskSetImportRequest();
 			set.setItems(tasks);
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
-			System.out.println(result.toString());
 			//##END EXAMPLE##
 			r = result;
 		} catch (Exception e) {
@@ -757,8 +737,6 @@ public class SdkTests {
 		TaskSetImportRequest tasks = new TaskSetImportRequest();
 		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
 		tasks.setItems(taskList);
-		VehicleDataSet veh = null;
-		TaskDataSet tas = null;
 		ResponseData response = null;
 		try {
 		
@@ -785,12 +763,7 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);				
 		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
-		
-		LocationData location = TestHelper.createLocationWithAddress();
-		CapacityData capacity = new CapacityData("Weight", 20);
-		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-		capacities.add(capacity);
-		
+					
 		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("TestiAuto");
 		VehicleData response = null;
 		try {

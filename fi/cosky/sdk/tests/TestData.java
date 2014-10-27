@@ -3,6 +3,7 @@ package fi.cosky.sdk.tests;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import fi.cosky.sdk.*;
@@ -23,7 +24,10 @@ public class TestData {
         
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 100000));
-        ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+        TimeWindowData twd = TestHelper.createTimeWindow(7, 20);
+        List<TimeWindowData> tws = new ArrayList<TimeWindowData>();
+        //tws.add(twd);
+        
         VehicleUpdateRequest vehicleRequest = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
         
         try {
@@ -37,8 +41,8 @@ public class TestData {
             taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
             TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
             task.setName("testTask");
-            taskEvents.get(0).setTimeWindows(timeWindows);
-            taskEvents.get(1).setTimeWindows(timeWindows);
+            taskEvents.get(0).setTimeWindows(tws);
+            taskEvents.get(1).setTimeWindows(tws);
             taskEvents.get(0).setServiceTime(10);
             taskEvents.get(1).setServiceTime(10);
 
