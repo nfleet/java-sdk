@@ -1288,4 +1288,53 @@ public class SdkTests {
 		}
 	}
 	
+	@Test
+	public void T35DeletingVehicleTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
+		int vehicleCountBefore;
+		int vehicleCountAfter;
+		
+		try {
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountBefore = vehicles.getItems().size();
+			
+			api.navigate(ResponseData.class, vehicle.getLink("delete"));
+			
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountAfter = vehicles.getItems().size();
+			
+			assertEquals(2, vehicleCountBefore);
+			assertEquals(1, vehicleCountAfter);
+		} catch (Exception e) {
+			
+		}
+	}
+	
+	@Test
+	public void T36DeletingAllVehiclesTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
+		int vehicleCountBefore = -1;
+		int vehicleCountAfter = -1;
+		
+		try {
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountBefore = vehicles.getItems().size();
+			
+			api.navigate(ResponseData.class, problem.getLink("delete-vehicles"));
+			
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountAfter = vehicles.getItems().size();
+			
+			assertEquals(2, vehicleCountBefore);
+			assertEquals(0, vehicleCountAfter);
+		} catch (Exception e) {
+			
+		}
+	}
 } 
