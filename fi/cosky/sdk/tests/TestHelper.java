@@ -37,8 +37,12 @@ public class TestHelper {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
 			UserData user = new UserData();
-			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
-			user = api.navigate(UserData.class, createdUser.getLocation());
+			
+			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+			
+			//ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
+			user = api.navigate(UserData.class, users.getItems().get(users.getItems().size()-2).getLink("self"));
+			
 			return user;
 		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
@@ -181,6 +185,7 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
+        vehicleRequest.setCanBeRelocated("None");
         return vehicleRequest;
         
 	}

@@ -33,20 +33,8 @@ public class TestData {
         try {
         	api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
         	
-            ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
-            taskCapacity.add(new CapacityData("Weight", 1));
-            
-            ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
-            taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
-            taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
-            TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-            task.setName("testTask");
-            taskEvents.get(0).setTimeWindows(tws);
-            taskEvents.get(1).setTimeWindows(tws);
-            taskEvents.get(0).setServiceTime(10);
-            taskEvents.get(1).setServiceTime(10);
-
-            api.navigate(ResponseData.class, problem.getLink("create-task"), task);
+        	List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(1);
+            api.navigate(ResponseData.class, problem.getLink("create-task"), tasks.get(0));
         } catch (NFleetRequestException e) {
         	System.out.println("Something went wrong");
         } catch (IOException e) {

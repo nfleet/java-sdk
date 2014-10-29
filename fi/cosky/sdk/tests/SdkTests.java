@@ -141,6 +141,7 @@ public class SdkTests {
             taskEvents.get(1).setTimeWindows(timeWindows);
             taskEvents.get(0).setServiceTime(10);
             taskEvents.get(1).setServiceTime(10);
+            task.setCanBeRelocated("None");
             ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), task); 
     		//##END EXAMPLE##
     		update = task;
@@ -457,6 +458,7 @@ public class SdkTests {
 		
 		RoutingProblemUpdateRequest requ = problem.toRequest();
 		requ.setState("Running");
+		
 		try {
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), requ);
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
@@ -681,12 +683,14 @@ public class SdkTests {
 		task1.add(pickup);
 		task1.add(delivery);
 		TaskUpdateRequest task = new TaskUpdateRequest(task1);
+		task.setCanBeRelocated("None");
 		task.setName("testTask");
 		List<String> types = new ArrayList<String>();
 		types.add("rekka");
 		task.setIncompatibleVehicleTypes(types);
 		
 		TaskUpdateRequest task2 = new TaskUpdateRequest(task1);
+		task2.setCanBeRelocated("None");
 		List<String> other = new ArrayList<String>();
 		other.add("henkiloauto");		
 		task2.setName("testTask2");
