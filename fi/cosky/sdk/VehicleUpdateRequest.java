@@ -37,6 +37,7 @@ public class VehicleUpdateRequest extends BaseData {
         this.EndLocation = endLoc;
         this.StartLocation = startLoc;
         this.Name = name;
+        this.CanBeRelocated = "None";
     }
 
     public int getId() {

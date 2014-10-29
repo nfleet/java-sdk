@@ -18,6 +18,10 @@ public class TaskData extends BaseData {
     private double Profit;
     private String CanBeRelocated;
     
+    public TaskData() {
+    	this.CanBeRelocated = "None";
+    }
+    
     public String getInfo() {
         return Info;
     }

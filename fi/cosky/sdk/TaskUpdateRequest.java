@@ -19,6 +19,16 @@ public class TaskUpdateRequest extends BaseData {
     private double Profit;
     private String CanBeRelocated;
     
+    
+    public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
+        this.TaskEvents = taskEvents;
+    	this.CanBeRelocated = "None";
+    }
+       
+    public TaskUpdateRequest() {
+    	this.CanBeRelocated = "None";
+    }
+    
     public String getInfo() {
         return Info;
     }
@@ -108,7 +118,5 @@ public class TaskUpdateRequest extends BaseData {
 		CanBeRelocated = canBeRelocated;
 	}
 
-	public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
-        this.TaskEvents = taskEvents;
-    }
+	
 }
