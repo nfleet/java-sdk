@@ -580,6 +580,7 @@ public class SdkTests {
 			for (int i = 0; i < 10; i++) {
 				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle" + i, list, start, end);
 				vehicle.setTimeWindows(timeWindows);
+				vehicle.setCanBeRelocated("None");
 				vehicles.add(vehicle);
 			}
 			set.setItems(vehicles);
