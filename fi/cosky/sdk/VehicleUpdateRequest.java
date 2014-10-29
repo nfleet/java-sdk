@@ -18,6 +18,7 @@ public class VehicleUpdateRequest extends BaseData {
     private String VehicleType;
     private String SpeedProfile;
     private double SpeedFactor;
+    private String CanBeRelocated;
     
     private double FixedCost;
     private double KilometerCost;
@@ -130,6 +131,14 @@ public class VehicleUpdateRequest extends BaseData {
 
 	public void setVehicleSpeedFactor(double vehicleSpeedFactor) {
 		SpeedFactor = vehicleSpeedFactor;
+	}
+
+	public String getCanBeRelocated() {
+		return CanBeRelocated;
+	}
+
+	public void setCanBeRelocated(String canBeRelocated) {
+		CanBeRelocated = canBeRelocated;
 	}
 
 	public double getFixedCost() {

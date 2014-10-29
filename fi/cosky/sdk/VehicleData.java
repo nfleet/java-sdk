@@ -18,6 +18,7 @@ public class VehicleData extends BaseData {
     private String VehicleType;
     private String SpeedProfile;
     private double SpeedFactor;
+    private String CanBeRelocated;
     
     private double FixedCost;
     private double KilometerCost;
@@ -115,6 +116,14 @@ public class VehicleData extends BaseData {
 		SpeedFactor = vehicleSpeedFactor;
 	}
 
+	public String getCanBeRelocated() {
+		return CanBeRelocated;
+	}
+
+	public void setCanBeRelocated(String canBeRelocated) {
+		CanBeRelocated = canBeRelocated;
+	}
+
 	public ArrayList<TimeWindowData> getTimeWindows() {
 		return TimeWindows;
 	}
@@ -152,6 +161,7 @@ public class VehicleData extends BaseData {
 		request.setRoute(Route);
 		request.setVehicleSpeedFactor(SpeedFactor);
 		request.setVehicleSpeedProfile(SpeedProfile);
+		request.setCanBeRelocated(CanBeRelocated);
 		return request;
 	}
 }
