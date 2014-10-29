@@ -16,6 +16,7 @@ public class TaskData extends BaseData {
     private List<String> IncompatibleVehicleTypes;
     private List<String> CompatibleVehicleTypes;
     private double Profit;
+    private String CanBeRelocated;
     
     public String getInfo() {
         return Info;
@@ -85,6 +86,14 @@ public class TaskData extends BaseData {
 		Profit = profit;
 	}
 
+	public String getCanBeRelocated() {
+		return CanBeRelocated;
+	}
+
+	public void setCanBeRelocated(String canBeRelocated) {
+		CanBeRelocated = canBeRelocated;
+	}
+
 	public TaskUpdateRequest toRequest() {
 		List<TaskEventUpdateRequest> taskevents = new ArrayList<TaskEventUpdateRequest>();
 		
@@ -97,6 +106,7 @@ public class TaskData extends BaseData {
 		update.setName(Name);
 		update.setVersionNumber(VersionNumber);
 		update.setTaskId(Id);
+		update.setCanBeRelocated(CanBeRelocated);
 		return update;
 	}
 }

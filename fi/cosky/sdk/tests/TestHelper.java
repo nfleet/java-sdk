@@ -104,6 +104,7 @@ public class TestHelper {
 		both.add(task2);
 		TaskUpdateRequest task = new TaskUpdateRequest(both);
 		task.setName("testTask");
+		task.setCanBeRelocated("None");
 		try {
 			ResponseData createdTask = api.navigate(ResponseData.class, problem.getLink("create-task"), task);
 			TaskData td = api.navigate(TaskData.class, createdTask.getLocation());
@@ -136,7 +137,7 @@ public class TestHelper {
 		both.add(task2);
 		TaskUpdateRequest task = new TaskUpdateRequest(both);
 		task.setName(name);
-		
+		task.setCanBeRelocated("None");
 		return task;
 	}
 	
@@ -162,6 +163,7 @@ public class TestHelper {
 			both.add(task2);
 			TaskUpdateRequest task = new TaskUpdateRequest(both);
 			task.setName("testTask" + i);
+			task.setCanBeRelocated("None");
 			tasks.add(task);
 		}
 		return tasks;
