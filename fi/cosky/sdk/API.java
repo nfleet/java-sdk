@@ -210,45 +210,24 @@ public class API {
 			connection.setDoOutput(doOutput);
 			connection.setRequestMethod(method(verb));
 			connection.setInstanceFollowRedirects(false);
-
-		
+			
+			addMimeTypeAcceptToRequest(object, tClass, connection);
+			
+			connection.setRequestProperty("Content-Type", "application/json");
+			
 			if (tokenData != null) {
 				connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
 			}
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Accept", "application/json");
+					
+			addVersionNumberToHeader(object, url, connection);
 			
-			Field f = null;
-			if (object != null) {
-				Object fromCache = null;
-				if (objectCache.containsUri(url))  {
-					try {
-						fromCache = objectCache.getObject(url);
-						f = fromCache.getClass().getDeclaredField("VersionNumber");
-					} catch (NoSuchFieldException e) {
-					// Object does not have versionnumber.
-					}
-					if (f != null) {
-						f.setAccessible(true);
-						int versionNumber = f.getInt(fromCache);
-						connection.setRequestProperty("If-None-Match", versionNumber + "");
-					}
-				}
-				if ((verb == Verb.POST || verb == Verb.PUT)) {
-					String json = gson.toJson(object);
+			if (verb == Verb.POST || verb == Verb.PUT) {
+					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
 					connection.addRequestProperty("Content-Length",	json.getBytes("UTF-8").length + "");
 					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
 					osw.write(json);
 					osw.flush();
 					osw.close();
-				}
-			}
-			else if (verb == Verb.POST && object == null) {
-				connection.addRequestProperty("Content-Length",	"0");
-				OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
-				osw.write("");
-				osw.flush();
-				osw.close();
 			}
 
 			connection.connect();
@@ -334,8 +313,6 @@ public class API {
 			throw e;
 		} catch (IllegalArgumentException e) {
 			throw e;
-		} catch (IllegalAccessException e) {
-			throw new IOException(e.toString());
 		} finally {
 			assert connection != null;
 			connection.disconnect();
@@ -482,10 +459,81 @@ public class API {
 			return true;
 		}
 	}
+	
 	private enum Verb {
 		GET, PUT, POST, DELETE, PATCH
 	}
+	
+	
+	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
+		if (object != null) {
+			Field f = null;
+			try {
+				f = object.getClass().getDeclaredField("MimeType");
+				String type = null;
+				if (f != null) {
+					f.setAccessible(true);
+					type = f.get(object).toString();
+				}
+				f = object.getClass().getDeclaredField("MimeVersion");
+				double version = 0;
+				if (f != null) {
+					f.setAccessible(true);
+					version = f.getDouble(object);
+				}
+				if (type != null && version > 0) 
+					connection.setRequestProperty("Accept", type + ";version=" + version);
+			} catch (Exception e) {
+				connection.setRequestProperty("Accept", "application/json");
+			}
+		} else {
+			Field f = null;
+			try {
+				
+				f = tClass.getDeclaredField("MimeType");
+				String type = null;
+				if (f != null) {
+					f.setAccessible(true);
+					type = f.get(tClass).toString();						
+				}
+				
+				double version = 0;
+				f = tClass.getDeclaredField("MimeVersion");
+				if (f != null) {
+					f.setAccessible(true);
+					version = f.getDouble(tClass);
+				}
+				if (type != null && version > 0) 
+					connection.setRequestProperty("Accept", type + ";version=" + version);
+			} catch (Exception e) {
+				connection.setRequestProperty("Accept", "application/json");
+			}
+		}
+	}
 
+	public void addVersionNumberToHeader(Object object, String url, HttpURLConnection connection) {
+		Field f = null;
+		Object fromCache = null;
+		if (objectCache.containsUri(url))  {
+			try {
+				fromCache = objectCache.getObject(url);
+				f = fromCache.getClass().getDeclaredField("VersionNumber");
+			} catch (NoSuchFieldException e) {
+			// Object does not have versionnumber.
+			}
+			if (f != null) {
+				f.setAccessible(true);
+				int versionNumber = 0;
+				try {
+					versionNumber = f.getInt(fromCache);
+				} catch (IllegalAccessException e) {
+					
+				}
+				connection.setRequestProperty("If-None-Match", versionNumber + "");
+			}
+		}
+	}
+	
 	public TokenData getTokenData() {
 		return this.tokenData;
 	}
