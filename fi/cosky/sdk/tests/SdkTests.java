@@ -141,7 +141,7 @@ public class SdkTests {
             taskEvents.get(1).setTimeWindows(timeWindows);
             taskEvents.get(0).setServiceTime(10);
             taskEvents.get(1).setServiceTime(10);
-            task.setCanBeRelocated("None");
+            
             ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), task); 
     		//##END EXAMPLE##
     		update = task;
@@ -1252,6 +1252,9 @@ public class SdkTests {
 			if (res1.getItems().size() == 2) {
 				assertEquals(2, res1.getItems().size());
 				assertEquals(6, res2.getItems().size());
+			} else if (res1.getItems().size() == 4) {
+				assertEquals(4, res1.getItems().size());
+				assertEquals(4, res2.getItems().size());
 			} else {
 				assertEquals(6, res1.getItems().size());
 				assertEquals(2, res2.getItems().size());
