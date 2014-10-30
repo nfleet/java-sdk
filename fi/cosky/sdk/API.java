@@ -73,7 +73,8 @@ public class API {
 			TokenData authenticationData = navigate(TokenData.class, result.getLocation());
 
 			this.tokenData = authenticationData;
-		} catch (IOException e) {
+		} catch (Exception e) {
+			System.out.println( e.toString());
 			return false;
 		}
 		return true;
@@ -264,43 +265,17 @@ public class API {
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
 									" " + url + ", verb: " + verb);
-				InputStream stream = connection.getErrorStream();
-				br = new BufferedReader(new InputStreamReader(stream));
-				StringBuilder sb = new StringBuilder();
-				String s;
-				while ((s = br.readLine()) != null) {
-					sb.append(s);
-				}
-				String body = sb.toString();
-				connection.disconnect();
-				throw (NFleetRequestException) gson.fromJson(body, NFleetRequestException.class);
+				
+				String errorString = readErrorStreamAndCloseConnection(connection);
+				throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
 			}
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
-				InputStream stream = connection.getErrorStream();
-				br = new BufferedReader(new InputStreamReader(stream));
-				StringBuilder sb = new StringBuilder();
-				String s;
-				while ((s = br.readLine()) != null) {
-					sb.append(s);
-				}
-				String body = sb.toString();
-				connection.disconnect();
-				throw new IOException(body);
-			}
-			InputStream is = connection.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
-
-			StringBuilder sb = new StringBuilder();
-			String sa;
-			while ((sa = br.readLine()) != null) {
-				sb.append(sa).append("\n");
-			}
-			String abba = null;
-			if ((abba = connection.getHeaderField("ETag")) != null) {
-				sb.insert(sb.lastIndexOf("}"), ",\"VersionNumber\":" + abba	+ "");
+				String errorString = readErrorStreamAndCloseConnection(connection);
+				throw new IOException(errorString);
 			}
 			
-			result = sb.toString();
+			result = readDataFromConnection(connection);
+			
 		} catch (MalformedURLException e) {
 			throw e;
 		} catch (ProtocolException e) {
@@ -374,39 +349,16 @@ public class API {
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
 									" " + url + ", verb: " + verb);
-				InputStream stream = connection.getErrorStream();
-				br = new BufferedReader(new InputStreamReader(stream));
-				StringBuilder sb = new StringBuilder();
-				String s;
-				while ((s = br.readLine()) != null) {
-					sb.append(s);
-				}
-				String body = sb.toString();
-				connection.disconnect();
-				throw (NFleetRequestException) gson.fromJson(body, NFleetRequestException.class);
+				
+				String errorString = readErrorStreamAndCloseConnection(connection);
+				throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
 			}
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
-				InputStream stream = connection.getErrorStream();
-				br = new BufferedReader(new InputStreamReader(stream));
-				StringBuilder sb = new StringBuilder();
-				String s;
-				while ((s = br.readLine()) != null) {
-					sb.append(s);
-				}
-				String body = sb.toString();
-				connection.disconnect();
-				throw new IOException(body);
+				String errorString = readErrorStreamAndCloseConnection(connection);
+				throw new IOException(errorString);
 			}
 
-			InputStream is = connection.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
-
-			StringBuilder sb = new StringBuilder();
-			String sa;
-			while ((sa = br.readLine()) != null) {
-				sb.append(sa).append("\n");
-			}
-			result = sb.toString();
+			result = readDataFromConnection(connection);
 		} catch (MalformedURLException e) {
 			throw e;
 		} catch (ProtocolException e) {
@@ -534,6 +486,45 @@ public class API {
 		}
 	}
 	
+	private String readErrorStreamAndCloseConnection(HttpURLConnection connection) {
+		InputStream stream = connection.getErrorStream();
+		BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+		StringBuilder sb = new StringBuilder();
+		String s;
+		try {
+			while ((s = br.readLine()) != null) {
+				sb.append(s);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String body = sb.toString();
+		connection.disconnect();
+		return body;
+	}
+	
+	private String readDataFromConnection(HttpURLConnection connection) {
+		InputStream is = null;
+		BufferedReader br = null;
+		StringBuilder sb = null;
+		try {
+			is = connection.getInputStream();
+			br = new BufferedReader(new InputStreamReader(is));
+
+			sb = new StringBuilder();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line).append("\n");
+			}
+			String eTag = null;
+			if ((eTag = connection.getHeaderField("ETag")) != null) {
+				sb.insert(sb.lastIndexOf("}"), ",\"VersionNumber\":" + eTag	+ "");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
 	public TokenData getTokenData() {
 		return this.tokenData;
 	}
