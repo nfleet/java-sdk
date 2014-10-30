@@ -39,7 +39,8 @@ public class API {
 	private ObjectCache objectCache;
 	private boolean retry;
 	
-	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
+	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").addSerializationExclusionStrategy(new ExcludeMimeFields())
+			.addDeserializationExclusionStrategy(new ExcludeMimeFields()).create();
 
 	public API(String baseUrl) {
 		this.baseUrl = baseUrl;
@@ -508,4 +509,16 @@ public class API {
 	public void setTimed(boolean timed) {
 		this.timed = timed;
 	}
+}
+
+class ExcludeMimeFields implements ExclusionStrategy {
+
+    public boolean shouldSkipClass(Class<?> arg0) {
+        return false;
+    }
+
+    public boolean shouldSkipField(FieldAttributes f) {
+        return (f.getName().equals("MimeType")) || (f.getName().equals("MimeVersion"));
+    }
+
 }
