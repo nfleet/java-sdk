@@ -7,6 +7,9 @@ import java.util.List;
  */
 
 public class TaskUpdateRequest extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.task+json";
+	public static final double MimeVersion = 2.1;
+	
     private String Name;
     private String Info;
     private List<TaskEventUpdateRequest> TaskEvents;

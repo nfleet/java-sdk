@@ -4,6 +4,9 @@ package fi.cosky.sdk;
  * file 'LICENSE.txt', which is part of this source code package.
  */
 public class ImportRequest {
+	public static final String MimeType = "application/vnd.jyu.nfleet.import+json";
+	public static final double MimeVersion = 2.0;
+	
 	private VehicleSetImportRequest Vehicles;
 	private TaskSetImportRequest Tasks;
 	

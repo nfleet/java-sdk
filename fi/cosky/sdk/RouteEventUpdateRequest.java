@@ -3,6 +3,9 @@ package fi.cosky.sdk;
 import java.util.Date;
 
 public class RouteEventUpdateRequest extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.route+json";
+	public static final double MimeVersion = 2.0;
+	
 	private int clientId;
 	private int userId;
 	private int problemId;

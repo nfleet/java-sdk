@@ -6,7 +6,9 @@ package fi.cosky.sdk;
  */
 
 public class RoutingProblemSettingsUpdateRequest {
-	
+	public static final String MimeType = "application/vnd.jyu.nfleet.problemsettings+json";
+	public static final double MimeVersion = 2.0;
+		
 	private double DefaultVehicleSpeedFactor;
 	private SpeedProfile DefaultVehicleSpeedProfile;
 	
