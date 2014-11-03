@@ -38,15 +38,16 @@ public class API {
 	private boolean timed;
 	private ObjectCache objectCache;
 	private boolean retry;
+	private boolean useMimeTypes;
 	
-	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").addSerializationExclusionStrategy(new ExcludeMimeFields())
-			.addDeserializationExclusionStrategy(new ExcludeMimeFields()).create();
-
+	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
+	
 	public API(String baseUrl) {
 		this.baseUrl = baseUrl;
 		this.objectCache = new ObjectCache();
 		this.timed = false;
 		this.retry  = true;
+		this.useMimeTypes = false; //change this when production will support mimetypes.
 		
 		//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
 		//this hopefully helps with that.
@@ -212,9 +213,16 @@ public class API {
 			connection.setRequestMethod(method(verb));
 			connection.setInstanceFollowRedirects(false);
 			
-			addMimeTypeAcceptToRequest(object, tClass, connection);
+			if (verb == Verb.GET && useMimeTypes)
+				addMimeTypeAcceptToRequest(object, tClass, connection);
+			if (!useMimeTypes) 
+				connection.setRequestProperty("Accept", "application/json");
 			
-			connection.setRequestProperty("Content-Type", "application/json");
+			
+			if (doOutput && useMimeTypes)
+				addMimeTypeContentTypeToRequest(object, tClass, connection);
+			if (!useMimeTypes)
+				connection.setRequestProperty("Content-Type", "application/json");
 			
 			if (tokenData != null) {
 				connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
@@ -418,51 +426,51 @@ public class API {
 	
 	
 	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
-		if (object != null) {
-			Field f = null;
-			try {
-				f = object.getClass().getDeclaredField("MimeType");
-				String type = null;
-				if (f != null) {
-					f.setAccessible(true);
-					type = f.get(object).toString();
-				}
-				f = object.getClass().getDeclaredField("MimeVersion");
-				double version = 0;
-				if (f != null) {
-					f.setAccessible(true);
-					version = f.getDouble(object);
-				}
-				if (type != null && version > 0) 
-					connection.setRequestProperty("Accept", type + ";version=" + version);
-			} catch (Exception e) {
-				connection.setRequestProperty("Accept", "application/json");
+		Field f = null;
+		try {
+			
+			f = tClass.getDeclaredField("MimeType");
+			String type = null;
+			if (f != null) {
+				f.setAccessible(true);
+				type = f.get(tClass).toString();						
 			}
-		} else {
-			Field f = null;
-			try {
-				
-				f = tClass.getDeclaredField("MimeType");
-				String type = null;
-				if (f != null) {
-					f.setAccessible(true);
-					type = f.get(tClass).toString();						
-				}
-				
-				double version = 0;
-				f = tClass.getDeclaredField("MimeVersion");
-				if (f != null) {
-					f.setAccessible(true);
-					version = f.getDouble(tClass);
-				}
-				if (type != null && version > 0) 
-					connection.setRequestProperty("Accept", type + ";version=" + version);
-			} catch (Exception e) {
-				connection.setRequestProperty("Accept", "application/json");
+			
+			double version = 0;
+			f = tClass.getDeclaredField("MimeVersion");
+			if (f != null) {
+				f.setAccessible(true);
+				version = f.getDouble(tClass);
 			}
+			if (type != null && version > 0) 
+				connection.setRequestProperty("Accept", type + ";version=" + version);
+		} catch (Exception e) {
+			connection.setRequestProperty("Accept", "application/json");
 		}
 	}
 
+	private <T> void addMimeTypeContentTypeToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
+		Field f = null;
+		try {
+			f = object.getClass().getDeclaredField("MimeType");
+			String type = null;
+			if (f != null) {
+				f.setAccessible(true);
+				type = f.get(object).toString();
+			}
+			f = object.getClass().getDeclaredField("MimeVersion");
+			double version = 0;
+			if (f != null) {
+				f.setAccessible(true);
+				version = f.getDouble(object);
+			}
+			if (type != null && version > 0) 
+				connection.setRequestProperty("Content-Type", type + ";version=" + version);
+		} catch (Exception e) {
+			connection.setRequestProperty("Accept", "application/json");
+		}
+	}
+	
 	public void addVersionNumberToHeader(Object object, String url, HttpURLConnection connection) {
 		Field f = null;
 		Object fromCache = null;
@@ -550,14 +558,3 @@ public class API {
 	}
 }
 
-class ExcludeMimeFields implements ExclusionStrategy {
-
-    public boolean shouldSkipClass(Class<?> arg0) {
-        return false;
-    }
-
-    public boolean shouldSkipField(FieldAttributes f) {
-        return (f.getName().equals("MimeType")) || (f.getName().equals("MimeVersion"));
-    }
-
-}
