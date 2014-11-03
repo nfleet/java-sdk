@@ -53,8 +53,6 @@ public class RoutingProblemUpdateRequest extends BaseData {
         this.ModifiedDate = date;
     }
 
-
-
     public void setName(String name) {
         this.Name = name;
     }
@@ -69,7 +67,11 @@ public class RoutingProblemUpdateRequest extends BaseData {
     public Date getModifiedDate() {
         return ModifiedDate;
     }
-
+    
+    public String getName() {
+        return Name;
+    }
+    
     @Override
     public String toString() {
        /* return "RoutingProblemUpdateRequest{" +
@@ -80,10 +82,4 @@ public class RoutingProblemUpdateRequest extends BaseData {
                 '}';*/
         return API.gson.toJson(this);
     }
-
-    public String getName() {
-        return Name;
-    }
-
-
 }
