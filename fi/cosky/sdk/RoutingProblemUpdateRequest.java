@@ -7,8 +7,8 @@ import java.util.Date;
  */
 
 public class RoutingProblemUpdateRequest extends BaseData {
-	public static final String MimeType = "application/vnd.jyu.nfleet.routingproblem+json";
-	public static final double MimeVersion = 2.0;
+	public static final String MimeType = RoutingProblemData.MimeType;
+	public static final double MimeVersion = RoutingProblemData.MimeVersion;
 	
     private int Id;
     private Date CreationDate;
