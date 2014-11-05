@@ -262,12 +262,8 @@ public class SdkTests {
 			routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			RouteUpdateRequest route = new RouteUpdateRequest();
 			int[] sequence = {11,12};
-			route.setClientId(user.getClientId());
-			route.setProblemId(problem.getId());
-			route.setUserId(user.getId());
 			route.setSequence(sequence);
-			
-			
+						
 			api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 			
 			//##BEGIN EXAMPLE accessingroute##
