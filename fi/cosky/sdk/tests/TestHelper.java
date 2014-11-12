@@ -29,6 +29,7 @@ public class TestHelper {
 				System.out.println("Could not authenticate, please check service and credentials");
 				return null;
 			}
+			
 		}
 		return apis;
 	}
@@ -40,8 +41,8 @@ public class TestHelper {
 			
 			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
 			
-			//ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
-			user = api.navigate(UserData.class, users.getItems().get(users.getItems().size()-2).getLink("self"));
+			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
+			user = api.navigate(UserData.class, createdUser.getLocation());
 			
 			return user;
 		} catch (NFleetRequestException e) {
@@ -185,7 +186,7 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
-        vehicleRequest.setCanBeRelocated("None");
+        //vehicleRequest.setCanBeRelocated("None");
         return vehicleRequest;
         
 	}
@@ -203,12 +204,19 @@ public class TestHelper {
 				coordinates.setLongitude(25.74892);
 				break;
 			}
+			case VEHICLE_END: {
+				coordinates.setLatitude(62.300666); 
+				coordinates.setLongitude(25.727949);
+				break;
+			}
 			case VEHICLE_START:
 			default: {
 	            coordinates.setLatitude(62.247906);
 	            coordinates.setLongitude(25.867395);
 	            break;
 			}
+			
+			
 		}
 		coordinates.setSystem(CoordinateSystem.Euclidian);
 		LocationData data = new LocationData();
@@ -252,8 +260,8 @@ public class TestHelper {
 		return null;
 	}
 	
-	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY};
-	
+	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY, VEHICLE_END };
+	 
 	static TimeWindowData createTimeWindow(int start, int end) {
 		Date startD = new Date();
 		startD.setHours(start);
