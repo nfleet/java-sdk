@@ -8,19 +8,29 @@ public class Link {
     private String Uri;
     private String Method;
     private String Rel;
+    private String Type;
     private boolean Enabled;
 
-
+    @Deprecated
     public Link(String rel, String uri, String method) {
+    	this.Uri = uri;
+    	this.Rel = rel;
+    	this.Method = method;
+    	this.Enabled = true;
+    }
+
+    public Link(String rel, String uri, String method, String type) {
         this.Uri = uri;
         this.Method = method;
         this.Rel = rel;
+        this.Type = type;
         this.Enabled = true;
     }
-    public Link(String rel, String uri, String method, boolean enabled) {
+    public Link(String rel, String uri, String method,String type, boolean enabled) {
         this.Uri = uri;
         this.Method = method;
         this.Rel = rel;
+        this.Type = type;
         this.Enabled = enabled;
     }
 
@@ -35,6 +45,7 @@ public class Link {
                 ", Method='" + Method + '\'' +
                 ", Rel='" + Rel + '\'' +
                 ", Enabled=" + Enabled +
+                ", Type=" + Type +
                 '}';
     }
 
@@ -66,4 +77,10 @@ public class Link {
         return this.Rel;
 
     }
+	public String getType() {
+		return Type;
+	}
+	public void setType(String type) {
+		Type = type;
+	}
 }
