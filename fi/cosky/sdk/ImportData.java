@@ -6,7 +6,7 @@ package fi.cosky.sdk;
 import java.util.List;
 
 public class ImportData extends BaseData {
-	public static final String MimeType = "application/vnd.jyu.nfleet.import+json";
+	public static final String MimeType = "application/vnd.jyu.nfleet.import";
 	public static final double MimeVersion = 2.0;
 	
 	private int VersionNumber;

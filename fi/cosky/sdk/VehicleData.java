@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class VehicleData extends BaseData {
-	public static final String MimeType = "application/vnd.jyu.nfleet.vehicle+json";
+	public static final String MimeType = "application/vnd.jyu.nfleet.vehicle";
     public static final double MimeVersion = 2.1;
 	
     private int Id;

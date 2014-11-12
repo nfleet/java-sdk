@@ -7,7 +7,7 @@ package fi.cosky.sdk;
 import java.util.List;
 
 public class PlanData extends BaseData {
-	public static final String MimeType = "application/vnd.jyu.nfleet.plan+json";
+	public static final String MimeType = "application/vnd.jyu.nfleet.plan";
 	public static final double MimeVersion = 2.0;
 	
 	private int VersionNumber;

@@ -6,7 +6,7 @@ package fi.cosky.sdk;
  */
 
 public class RouteData extends BaseData {
-	public static final String MimeType =  "application/vnd.jyu.nfleet.route+json";
+	public static final String MimeType =  "application/vnd.jyu.nfleet.route";
 	public static final double MimeVersion = 2.0;
 	
     private int[] Items;

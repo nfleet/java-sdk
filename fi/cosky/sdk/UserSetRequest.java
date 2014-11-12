@@ -5,6 +5,6 @@ package fi.cosky.sdk;
  */
 
 public class UserSetRequest {
-	public static final String MimeType = "application/vnd.jyu.nfleet.userset+json";
-    public static final double MimeVersion = 2.0;
+	public static final String MimeType = UserDataSet.MimeType;
+    public static final double MimeVersion = UserDataSet.MimeVersion;
 }

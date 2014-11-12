@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class VehicleUpdateRequest extends BaseData {
 	public static final String MimeType = VehicleData.MimeType;
-	public static final double MimeVersion = VehicleData.MimeVersion;
+    public static final double MimeVersion = VehicleData.MimeVersion;
 	
     private int Id;
     private String Name;

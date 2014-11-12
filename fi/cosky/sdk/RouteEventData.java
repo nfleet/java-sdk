@@ -8,7 +8,7 @@ package fi.cosky.sdk;
 import java.util.Date;
 
 public class RouteEventData extends BaseData {
-	public static final String MimeType =  "application/vnd.jyu.nfleet.routeevent+json";
+	public static final String MimeType =  "application/vnd.jyu.nfleet.routeevent";
 	public static final double MimeVersion = 2.0;
 	
 	private int TaskEventId;

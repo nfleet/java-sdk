@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class ObjectiveValueDataSet extends BaseData {
-	public static final String MimeType = "application/vnd.jyu.nfleet.objectivevalueset+json";
+	public static final String MimeType = "application/vnd.jyu.nfleet.objectivevalueset";
 	public static final double MimeVersion = 2.0;
 	
     private ArrayList<ObjectiveValueData> Items;

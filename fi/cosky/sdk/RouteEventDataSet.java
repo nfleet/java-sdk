@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 
 public class RouteEventDataSet extends BaseData {
-	public static final String MimeType = "application/vnd.jyu.nfleet.routeeventset+json";
+	public static final String MimeType = "application/vnd.jyu.nfleet.routeeventset";
 	public static final double MimeVersion = 2.0; 
 	
 	private int VersionNumber;
