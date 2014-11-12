@@ -432,51 +432,64 @@ public class API {
 	
 	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
+		StringTokenizer st = null;
+		StringBuilder sb = null;
+		Field[] fields = null;
 		try {
+			fields = object != null ? fields = object.getClass().getDeclaredFields() : tClass.getDeclaredFields();  
+			 
+			for (Field field : fields) {
+				if (field.getName().equals("MimeType")) f = field;
+			}
+			if (f == null) {
+				connection.setRequestProperty("Accept", "application/json");
+				return;
+			}
 			
-			f = tClass.getDeclaredField("MimeType");
 			String type = null;
-			if (f != null) {
-				f.setAccessible(true);
-				type = f.get(tClass).toString();						
-			}
 			
-			double version = 0;
-			f = tClass.getDeclaredField("MimeVersion");
-			if (f != null) {
-				f.setAccessible(true);
-				version = f.getDouble(tClass);
+			f.setAccessible(true);
+			type = f.get(tClass).toString();						
+						
+			if (type != null) {
+				 connection.addRequestProperty("Accept", helper.getSupportedType(type));
 			}
-			if (type != null && version > 0) 
-				connection.setRequestProperty("Accept", type + ";version=" + version);
 		} catch (Exception e) {
-			connection.setRequestProperty("Accept", "application/json");
+			
 		}
 	}
 
 	private <T> void addMimeTypeContentTypeToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
+		StringTokenizer st = null;
+		StringBuilder sb = null;
+		Field[] fields = null;
 		try {
-			f = object.getClass().getDeclaredField("MimeType");
+			fields = object != null ? fields = object.getClass().getDeclaredFields() : tClass.getDeclaredFields();
+			
+			for (Field field : fields) {
+				if (field.getName().equals("MimeType")) f = field;
+			}
+			
+			if (f == null) {
+				connection.setRequestProperty("Content-Type", "application/json");
+				return;
+			}
+
 			String type = null;
-			if (f != null) {
-				f.setAccessible(true);
-				type = f.get(object).toString();
+			
+			f.setAccessible(true);
+			type = f.get(object).toString();
+							
+			if (type != null) {
+			 	connection.addRequestProperty("Content-Type", helper.getSupportedType(type));
 			}
-			f = object.getClass().getDeclaredField("MimeVersion");
-			double version = 0;
-			if (f != null) {
-				f.setAccessible(true);
-				version = f.getDouble(object);
-			}
-			if (type != null && version > 0) 
-				connection.setRequestProperty("Content-Type", type + ";version=" + version);
 		} catch (Exception e) {
-			connection.setRequestProperty("Accept", "application/json");
+		
 		}
 	}
 	
-	public void addVersionNumberToHeader(Object object, String url, HttpURLConnection connection) {
+	private void addVersionNumberToHeader(Object object, String url, HttpURLConnection connection) {
 		Field f = null;
 		Object fromCache = null;
 		if (objectCache.containsUri(url))  {
