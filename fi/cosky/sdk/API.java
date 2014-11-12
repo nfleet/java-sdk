@@ -202,27 +202,42 @@ public class API {
 		this.baseUrl = baseUrl;
 	}
 
-	private <T extends BaseData> T sendRequest(Verb verb, String url, Class<T> tClass, Object object) throws IOException {
+	
+	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
 		URL serverAddress;
 		BufferedReader br;
 		String result = "";
 		HttpURLConnection connection = null;
+		String url = l.getUri().contains("://") ? l.getUri() : this.baseUrl + l.getUri();
 		try {
 			serverAddress = new URL(url);
 			connection = (HttpURLConnection) serverAddress.openConnection();
-			boolean doOutput = doOutput(verb);
+			boolean doOutput = doOutput(l.getMethod());
 			connection.setDoOutput(doOutput);
-			connection.setRequestMethod(method(verb));
+			connection.setRequestMethod(l.getMethod());
 			connection.setInstanceFollowRedirects(false);
 			
-			if (verb == Verb.GET && useMimeTypes)
-				addMimeTypeAcceptToRequest(object, tClass, connection);
+			if (l.getMethod().equals("GET") && useMimeTypes)
+				if (l.getType() == null || l.getType().equals("")) {
+					addMimeTypeAcceptToRequest(object, tClass, connection);
+				} else {
+					connection.addRequestProperty("Accept", helper.getSupportedType(l.getType()));
+				}
 			if (!useMimeTypes) 
 				connection.setRequestProperty("Accept", "application/json");
 			
 			
-			if (doOutput && useMimeTypes)
-				addMimeTypeContentTypeToRequest(object, tClass, connection);
+			if (doOutput && useMimeTypes) {
+				//this handles the case if the link is self made and the type field has not been set.
+				if (l.getType() == null || l.getType().equals("")) {
+					addMimeTypeContentTypeToRequest(l, tClass, connection);
+					addMimeTypeAcceptToRequest(l, tClass, connection);
+				} else {
+					connection.addRequestProperty("Accept", helper.getSupportedType(l.getType()));
+					connection.addRequestProperty("Content-Type", helper.getSupportedType(l.getType()));
+				}
+			}
+			
 			if (!useMimeTypes)
 				connection.setRequestProperty("Content-Type", "application/json");
 			
