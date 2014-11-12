@@ -426,6 +426,16 @@ public class API {
 		}
 	}
 	
+	private boolean doOutput(String verb) {
+		switch (verb) {
+		case "GET":
+		case "DELETE":
+			return false;
+		default:
+			return true;
+		}
+	}
+	
 	private enum Verb {
 		GET, PUT, POST, DELETE, PATCH
 	}
