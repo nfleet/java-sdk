@@ -179,7 +179,7 @@ public class API {
 	}
 
 	public Link getRoot() {
-		return new Link("self", baseUrl, "GET", true);
+		return new Link("self", baseUrl, "GET","", true);
 	}
 
 	public String getBaseUrl() {
@@ -335,7 +335,7 @@ public class API {
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER	|| connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
 				Link location = parseLocationLinkFromString(connection.getHeaderField("Location"));
-				Link l = new Link("self", "/tokens", "GET", true);
+				Link l = new Link("self", "/tokens", "GET","", true);
 				ArrayList<Link> links = new ArrayList<Link>();
 				links.add(l);
 				links.add(location);
