@@ -248,8 +248,9 @@ public class API {
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED || connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER ) {
 				ResponseData data = new ResponseData();
-				Link l = parseLocationLinkFromString(connection.getHeaderField("Location"));
-				data.setLocation(l);
+				Link link = parseLocationLinkFromString(connection.getHeaderField("Location"));
+				link.setType(l.getType());
+				data.setLocation(link);
 				connection.disconnect();
 				return (T) data;
 			}
