@@ -278,7 +278,7 @@ public class API {
 			
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
-									" " + url + ", verb: " + verb);
+									" " + url + ", verb: " + l.getMethod());
 				
 				String errorString = readErrorStreamAndCloseConnection(connection);
 				throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
@@ -325,6 +325,7 @@ public class API {
 			connection.setRequestMethod(method(verb));
 			connection.setRequestProperty("Authorization", headers.get("authorization"));
 			connection.addRequestProperty("Accept", "application/json");
+			
 			if (doOutput){ 
 				connection.addRequestProperty("Content-Length", "0");
 				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
@@ -562,6 +563,7 @@ public class API {
 		}
 		return sb.toString();
 	}
+	
 	public TokenData getTokenData() {
 		return this.tokenData;
 	}
