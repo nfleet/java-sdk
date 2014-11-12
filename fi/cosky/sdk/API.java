@@ -39,6 +39,7 @@ public class API {
 	private ObjectCache objectCache;
 	private boolean retry;
 	private boolean useMimeTypes;
+	private MimeTypeHelper helper;
 	
 	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
 	
@@ -48,11 +49,12 @@ public class API {
 		this.timed = false;
 		this.retry  = true;
 		this.useMimeTypes = false; //change this when production will support mimetypes.
+		this.helper = new MimeTypeHelper();
 		
 		//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
 		//this hopefully helps with that.
 		System.setProperty("http.keepAlive", "false");
-	}
+	} 
 
 	private boolean authenticate() {
 		return authenticate(this.ClientKey, this.ClientSecret);
