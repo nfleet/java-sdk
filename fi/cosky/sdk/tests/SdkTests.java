@@ -513,9 +513,9 @@ public class SdkTests {
 	
 	@Test
 	public void T19TestingConcatLink() {
-		Link self = new Link("self", "/users/1/problems/3/vehicles/2/events/4", "GET");
-		Link parentVehicle = new Link("get-vehicle", "../../",  "GET");
-		Link parentTask = new Link("get-task", "../../../../tasks/3" ,"GET");
+		Link self = new Link("self", "/users/1/problems/3/vehicles/2/events/4","", "GET");
+		Link parentVehicle = new Link("get-vehicle", "../../","application/vnd.jyu.nfleet.vehicle-2.1+json",  "GET");
+		Link parentTask = new Link("get-task", "../../../../tasks/3" ,"application/vnd.jyu.nfleet.task-2.1+json","GET");
 		
 		List<Link> meta = new ArrayList<Link>();
 		List<Link> meta2 = new ArrayList<Link>();
