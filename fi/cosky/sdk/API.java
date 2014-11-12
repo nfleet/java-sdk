@@ -386,34 +386,34 @@ public class API {
 	}
 
 	private Link getAuthLink() {
-		return new Link("authenticate", "/tokens", "POST", true);
+		return new Link("authenticate", "/tokens", "POST", "", true);
 	}
 
 	private String method(Verb verb) {
 		switch (verb) {
-		case GET:
-			return "GET";
-		case PUT:
-			return "PUT";
-		case POST:
-			return "POST";
-		case DELETE:
-			return "DELETE";
-		case PATCH:
-			return "PATCH";
+			case GET:
+				return "GET";
+			case PUT:
+				return "PUT";
+			case POST:
+				return "POST";
+			case DELETE:
+				return "DELETE";
+			case PATCH:
+				return "PATCH";
 		}
 		return "";
 	}
-
+	
 	private Link parseLocationLinkFromString(String s) {
 		//Azure emulator hack
 		if (s.contains("82"))
 			s = s.replace("82", "81");
 		if (s.contains("/tokens"))
-			return new Link("location", s, "GET", true);
+			return new Link("location", s, "GET","", true);
 		else
 			s = s.substring(s.lastIndexOf("/users"));
-		return new Link("location", s, "GET", true);
+		return new Link("location", s, "GET", "", true);
 	}
 
 	private boolean doOutput(Verb verb) {
