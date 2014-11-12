@@ -262,7 +262,7 @@ public class API {
 					retry = false;
 					if( authenticate() ) {
 						System.out.println("Authenticated again");
-						return sendRequest(verb, url, tClass, object);
+						return sendRequest(l, tClass, object);
 					}
 				}		
 				else throw new IOException("Could not authenticate");	
