@@ -104,8 +104,9 @@ public class API {
 		if (isTimed()) {
 			start = System.currentTimeMillis();
 		}
+		
 		if (tClass.equals(TokenData.class)) {
-			result = sendRequest(Verb.GET, l.getUri(), tClass, null);
+			result = sendRequest(l, tClass, null);
 			return (T) result;
 		}
 
@@ -129,15 +130,15 @@ public class API {
 		}
 
 		if (l.getMethod().equals("GET") && !uri.contains(":")) {
-			result = sendRequest(Verb.GET, this.baseUrl + uri, tClass, null);
+			result = sendRequest(l, tClass, null);
 		} else if (l.getMethod().equals("PUT")) {
-			result = sendRequest(Verb.PUT, this.baseUrl + uri, tClass, null);
+			result = sendRequest(l, tClass, null);
 		} else if (l.getMethod().equals("POST")) {
-			result = sendRequest(Verb.POST, this.baseUrl + uri, tClass, null);
+			result = sendRequest(l, tClass, null);
 		} else if (l.getMethod().equals("DELETE")) {
-			result = sendRequest(Verb.DELETE, this.baseUrl + uri, tClass, new Object());
+			result = sendRequest(l, tClass, new Object());
 		} else {
-			result = sendRequest(Verb.GET, uri, tClass, null);
+			result = sendRequest(l, tClass, null);
 		}
 		if (isTimed()) {
 			end = System.currentTimeMillis();
@@ -160,28 +161,15 @@ public class API {
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
 		long start = 0; 
 		long end;
+		
 		if (isTimed()) {
 			start = System.currentTimeMillis();
 		}
-		Object result = null;
-		if (l.getMethod().equals("PUT")) {
-			result = sendRequest(Verb.PUT, this.baseUrl + l.getUri(), tClass, object);
-		}
-
-		if (l.getMethod().equals("POST")) {
-			String url = this.baseUrl + l.getUri();
-			result = sendRequest(Verb.POST, url, tClass, object);
-		}
-
-		if (l.getMethod().equals("PATCH")) {
-			String url = this.baseUrl + l.getUri();
-			result = sendRequest(Verb.PATCH, url, tClass, object);
-		}
 		
-		if (l.getMethod().equals("DELETE")) {
-			String url = this.baseUrl + l.getUri();
-			result = sendRequest(Verb.DELETE, url, tClass, object);
-		}
+		Object result = null;
+				
+		result = sendRequest(l, tClass, object);
+				
 		if (isTimed()) {
 			end = System.currentTimeMillis();
 			long time = end - start;
