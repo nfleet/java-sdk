@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ImportData extends BaseData {
 	public static final String MimeType = "application/vnd.jyu.nfleet.import";
-	public static final double MimeVersion = 2.0;
+	public static final double MimeVersion = 2.1;
 	
 	private int VersionNumber;
 	private int ErrorCount;
