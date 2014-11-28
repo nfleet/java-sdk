@@ -8,7 +8,7 @@ import java.util.List;
 
 public class TaskDataSet extends BaseData {
 	public static final String MimeType = "application/vnd.jyu.nfleet.taskset";
-	public static final double MimeVersion = 2.0;
+	public static final double MimeVersion = 2.1;
 	
 	private List<TaskData> Items;
 	private int VersionNumber;

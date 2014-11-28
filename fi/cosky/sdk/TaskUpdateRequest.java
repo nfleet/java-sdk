@@ -21,6 +21,7 @@ public class TaskUpdateRequest extends BaseData {
     private List<String> CompatibleVehicleTypes;
     private double Profit;
     private String CanBeRelocated;
+    private String ActivityState;
     
     
     public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
@@ -119,6 +120,14 @@ public class TaskUpdateRequest extends BaseData {
 
 	public void setCanBeRelocated(String canBeRelocated) {
 		CanBeRelocated = canBeRelocated;
+	}
+
+	public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
 	}
 
 	

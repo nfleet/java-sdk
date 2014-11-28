@@ -20,9 +20,11 @@ public class TaskData extends BaseData {
     private List<String> CompatibleVehicleTypes;
     private double Profit;
     private String CanBeRelocated;
+    private String ActivityState;
     
     public TaskData() {
     	this.CanBeRelocated = "None";
+    	this.ActivityState = "Active"; // other possibility is "Inactive"
     }
     
     public String getInfo() {
@@ -101,6 +103,14 @@ public class TaskData extends BaseData {
 		CanBeRelocated = canBeRelocated;
 	}
 
+	public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
+	}
+
 	public TaskUpdateRequest toRequest() {
 		List<TaskEventUpdateRequest> taskevents = new ArrayList<TaskEventUpdateRequest>();
 		
@@ -114,6 +124,7 @@ public class TaskData extends BaseData {
 		update.setVersionNumber(VersionNumber);
 		update.setTaskId(Id);
 		update.setCanBeRelocated(CanBeRelocated);
+		update.setActivityState(ActivityState);
 		return update;
 	}
 }
