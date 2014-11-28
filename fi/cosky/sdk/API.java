@@ -48,7 +48,7 @@ public class API {
 		this.objectCache = new ObjectCache();
 		this.timed = false;
 		this.retry  = true;
-		this.useMimeTypes = false; //change this when production will support mimetypes.
+		this.useMimeTypes = true; //change this when production will support mimetypes.
 		this.helper = new MimeTypeHelper();
 		
 		//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
