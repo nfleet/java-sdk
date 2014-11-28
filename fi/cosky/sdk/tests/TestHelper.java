@@ -34,12 +34,15 @@ public class TestHelper {
 		return apis;
 	}
 	
-	static UserData getOrCreateUser( API api ) {
+	
+	static UserData getOrCreateUser( API api) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
 			UserData user = new UserData();
 			
 			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+			
+			//initialize(api, users);
 			
 			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 			user = api.navigate(UserData.class, createdUser.getLocation());
@@ -271,5 +274,19 @@ public class TestHelper {
 		
 		TimeWindowData twd = new TimeWindowData(startD, endD);
 		return twd;
+	}
+	
+	static void initialize(API api, UserDataSet users) {
+		try {
+			if (users.getItems().size() > 0) {
+				UserData us = null;
+				for (UserData u : users.getItems() ) {
+					us = api.navigate(UserData.class, u.getLink("self"));
+					Link l = null;	
+					if ((l = us.getLink("delete-user")) == null) break;  
+					ResponseData response = api.navigate(ResponseData.class, us.getLink("delete-user"));
+				}		
+			}
+		} catch (Exception e) { System.out.println("Something went wrong deleting users " + e.getMessage()); }
 	}
 }
