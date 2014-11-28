@@ -165,10 +165,8 @@ public class API {
 		if (isTimed()) {
 			start = System.currentTimeMillis();
 		}
-		
-		Object result = null;
-				
-		result = sendRequest(l, tClass, object);
+							
+		Object result = sendRequest(l, tClass, object);
 				
 		if (isTimed()) {
 			end = System.currentTimeMillis();
@@ -198,18 +196,21 @@ public class API {
 		HttpURLConnection connection = null;
 		String url = l.getUri().contains("://") ? l.getUri() : this.baseUrl + l.getUri();
 		try {
+			String method = l.getMethod();
+			String type = l.getType();
+			
 			serverAddress = new URL(url);
 			connection = (HttpURLConnection) serverAddress.openConnection();
-			boolean doOutput = doOutput(l.getMethod());
+			boolean doOutput = doOutput(method);
 			connection.setDoOutput(doOutput);
-			connection.setRequestMethod(l.getMethod());
+			connection.setRequestMethod(method);
 			connection.setInstanceFollowRedirects(false);
 			
-			if (l.getMethod().equals("GET") && useMimeTypes)
-				if (l.getType() == null || l.getType().equals("")) {
+			if (method.equals("GET") && useMimeTypes)
+				if (type == null || type.equals("")) {
 					addMimeTypeAcceptToRequest(object, tClass, connection);
 				} else {
-					connection.addRequestProperty("Accept", helper.getSupportedType(l.getType()));
+					connection.addRequestProperty("Accept", helper.getSupportedType(type));
 				}
 			if (!useMimeTypes) 
 				connection.setRequestProperty("Accept", "application/json");
@@ -217,12 +218,12 @@ public class API {
 			
 			if (doOutput && useMimeTypes) {
 				//this handles the case if the link is self made and the type field has not been set.
-				if (l.getType() == null || l.getType().equals("")) {
+				if (type == null || type.equals("")) {
 					addMimeTypeContentTypeToRequest(l, tClass, connection);
 					addMimeTypeAcceptToRequest(l, tClass, connection);
 				} else {
-					connection.addRequestProperty("Accept", helper.getSupportedType(l.getType()));
-					connection.addRequestProperty("Content-Type", helper.getSupportedType(l.getType()));
+					connection.addRequestProperty("Accept", helper.getSupportedType(type));
+					connection.addRequestProperty("Content-Type", helper.getSupportedType(type));
 				}
 			}
 			
@@ -235,13 +236,14 @@ public class API {
 					
 			addVersionNumberToHeader(object, url, connection);
 			
-			if (l.getMethod().equals("POST") || l.getMethod().equals("PUT")) {
+			if (method.equals("POST") || method.equals("PUT")) {
 					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
 					connection.addRequestProperty("Content-Length",	json.getBytes("UTF-8").length + "");
 					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
 					osw.write(json);
 					osw.flush();
 					osw.close();
+					
 			}
 
 			connection.connect();
@@ -249,7 +251,7 @@ public class API {
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED || connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER ) {
 				ResponseData data = new ResponseData();
 				Link link = parseLocationLinkFromString(connection.getHeaderField("Location"));
-				link.setType(l.getType());
+				link.setType(type);
 				data.setLocation(link);
 				connection.disconnect();
 				return (T) data;
@@ -278,7 +280,7 @@ public class API {
 			
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
-									" " + url + ", verb: " + l.getMethod());
+									" " + url + ", verb: " + method);
 				
 				String errorString = readErrorStreamAndCloseConnection(connection);
 				throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
