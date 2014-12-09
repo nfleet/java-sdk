@@ -19,18 +19,22 @@ public class TaskUpdateRequest extends BaseData {
     private int UserId;
     private List<String> IncompatibleVehicleTypes;
     private List<String> CompatibleVehicleTypes;
+    
+    @Deprecated
     private double Profit;
-    private String CanBeRelocated;
+    
+    private double Priority;
+    private String RelocationType;
     private String ActivityState;
     
     
     public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
         this.TaskEvents = taskEvents;
-    	this.CanBeRelocated = "None";
+    	this.RelocationType = "None";
     }
        
     public TaskUpdateRequest() {
-    	this.CanBeRelocated = "None";
+    	this.RelocationType = "None";
     }
     
     public String getInfo() {
@@ -105,7 +109,6 @@ public class TaskUpdateRequest extends BaseData {
         TaskEvents = taskEvents;
     }
 
-
     public double getProfit() {
 		return Profit;
 	}
@@ -114,20 +117,28 @@ public class TaskUpdateRequest extends BaseData {
 		Profit = profit;
 	}
 
-	public String getCanBeRelocated() {
-		return CanBeRelocated;
-	}
-
-	public void setCanBeRelocated(String canBeRelocated) {
-		CanBeRelocated = canBeRelocated;
-	}
-
 	public String getActivityState() {
 		return ActivityState;
 	}
 
 	public void setActivityState(String activityState) {
 		ActivityState = activityState;
+	}
+
+	public double getPriority() {
+		return Priority;
+	}
+
+	public void setPriority(double priority) {
+		Priority = priority;
+	}
+
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
 	}
 
 	

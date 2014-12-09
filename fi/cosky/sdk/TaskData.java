@@ -18,12 +18,17 @@ public class TaskData extends BaseData {
     private int VersionNumber;
     private List<String> IncompatibleVehicleTypes;
     private List<String> CompatibleVehicleTypes;
+    
+    //Profit will be removed at some point, use Priority.
+    @Deprecated
     private double Profit;
-    private String CanBeRelocated;
+    
+    private double Priority;
+    private String RelocationType;
     private String ActivityState;
     
     public TaskData() {
-    	this.CanBeRelocated = "None";
+    	this.RelocationType = "None";
     	this.ActivityState = "Active"; // other possibility is "Inactive"
     }
     
@@ -95,20 +100,28 @@ public class TaskData extends BaseData {
 		Profit = profit;
 	}
 
-	public String getCanBeRelocated() {
-		return CanBeRelocated;
-	}
-
-	public void setCanBeRelocated(String canBeRelocated) {
-		CanBeRelocated = canBeRelocated;
-	}
-
 	public String getActivityState() {
 		return ActivityState;
 	}
 
 	public void setActivityState(String activityState) {
 		ActivityState = activityState;
+	}
+
+	public double getPriority() {
+		return Priority;
+	}
+
+	public void setPriority(double priority) {
+		Priority = priority;
+	}
+
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
 	}
 
 	public TaskUpdateRequest toRequest() {
@@ -123,7 +136,7 @@ public class TaskData extends BaseData {
 		update.setName(Name);
 		update.setVersionNumber(VersionNumber);
 		update.setTaskId(Id);
-		update.setCanBeRelocated(CanBeRelocated);
+		update.setRelocationType(RelocationType);
 		update.setActivityState(ActivityState);
 		return update;
 	}
