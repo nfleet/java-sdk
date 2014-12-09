@@ -21,7 +21,7 @@ public class VehicleData extends BaseData {
     private String VehicleType;
     private String SpeedProfile;
     private double SpeedFactor;
-    private String CanBeRelocated;
+    private String RelocationType;
     
     private double FixedCost;
     private double KilometerCost;
@@ -40,7 +40,7 @@ public class VehicleData extends BaseData {
         this.EndLocation = endLoc;
         this.StartLocation = startLoc;
         this.Name = name;
-        this.CanBeRelocated = "None";
+        this.RelocationType = "None";
     }
 
     public int getId() {
@@ -120,14 +120,6 @@ public class VehicleData extends BaseData {
 		SpeedFactor = vehicleSpeedFactor;
 	}
 
-	public String getCanBeRelocated() {
-		return CanBeRelocated;
-	}
-
-	public void setCanBeRelocated(String canBeRelocated) {
-		CanBeRelocated = canBeRelocated;
-	}
-
 	public ArrayList<TimeWindowData> getTimeWindows() {
 		return TimeWindows;
 	}
@@ -156,6 +148,14 @@ public class VehicleData extends BaseData {
 		HourCost = hourCost;
 	}
 
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
+	}
+
 	public VehicleUpdateRequest toRequest() {
 		VehicleUpdateRequest request = new VehicleUpdateRequest(Name, Capacities, StartLocation, EndLocation);
 		request.setVersionNumber(VersionNumber);
@@ -165,7 +165,7 @@ public class VehicleData extends BaseData {
 		request.setRoute(Route);
 		request.setVehicleSpeedFactor(SpeedFactor);
 		request.setVehicleSpeedProfile(SpeedProfile);
-		request.setCanBeRelocated(CanBeRelocated);
+		request.setRelocationType(RelocationType);
 		return request;
 	}
 }
