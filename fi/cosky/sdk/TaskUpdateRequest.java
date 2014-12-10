@@ -31,6 +31,7 @@ public class TaskUpdateRequest extends BaseData {
     public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
         this.TaskEvents = taskEvents;
     	this.RelocationType = "None";
+    	this.ActivityState = "Active";
     }
        
     public TaskUpdateRequest() {
