@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 
 public class VehicleData extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.vehicle";
+    public static final double MimeVersion = 2.1;
+	
     private int Id;
     private String Name;
     private ArrayList<CapacityData> Capacities;
@@ -18,6 +21,7 @@ public class VehicleData extends BaseData {
     private String VehicleType;
     private String SpeedProfile;
     private double SpeedFactor;
+    private String RelocationType;
     
     private double FixedCost;
     private double KilometerCost;
@@ -36,6 +40,7 @@ public class VehicleData extends BaseData {
         this.EndLocation = endLoc;
         this.StartLocation = startLoc;
         this.Name = name;
+        this.RelocationType = "None";
     }
 
     public int getId() {
@@ -143,6 +148,14 @@ public class VehicleData extends BaseData {
 		HourCost = hourCost;
 	}
 
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
+	}
+
 	public VehicleUpdateRequest toRequest() {
 		VehicleUpdateRequest request = new VehicleUpdateRequest(Name, Capacities, StartLocation, EndLocation);
 		request.setVersionNumber(VersionNumber);
@@ -152,6 +165,7 @@ public class VehicleData extends BaseData {
 		request.setRoute(Route);
 		request.setVehicleSpeedFactor(SpeedFactor);
 		request.setVehicleSpeedProfile(SpeedProfile);
+		request.setRelocationType(RelocationType);
 		return request;
 	}
 }

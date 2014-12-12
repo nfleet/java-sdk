@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 
 public class VehicleUpdateRequest extends BaseData {
+	public static final String MimeType = VehicleData.MimeType;
+    public static final double MimeVersion = VehicleData.MimeVersion;
+	
     private int Id;
     private String Name;
     private ArrayList<CapacityData> Capacities;
@@ -18,6 +21,7 @@ public class VehicleUpdateRequest extends BaseData {
     private String VehicleType;
     private String SpeedProfile;
     private double SpeedFactor;
+    private String RelocationType;
     
     private double FixedCost;
     private double KilometerCost;
@@ -36,6 +40,7 @@ public class VehicleUpdateRequest extends BaseData {
         this.EndLocation = endLoc;
         this.StartLocation = startLoc;
         this.Name = name;
+        this.RelocationType = "None";
     }
 
     public int getId() {
@@ -146,6 +151,30 @@ public class VehicleUpdateRequest extends BaseData {
 
 	public void setKilometerCost(double kilometerCost) {
 		KilometerCost = kilometerCost;
+	}
+
+	public String getSpeedProfile() {
+		return SpeedProfile;
+	}
+
+	public void setSpeedProfile(String speedProfile) {
+		SpeedProfile = speedProfile;
+	}
+
+	public double getSpeedFactor() {
+		return SpeedFactor;
+	}
+
+	public void setSpeedFactor(double speedFactor) {
+		SpeedFactor = speedFactor;
+	}
+
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
 	}
 
 	public double getHourCost() {

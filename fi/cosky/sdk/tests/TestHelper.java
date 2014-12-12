@@ -29,16 +29,24 @@ public class TestHelper {
 				System.out.println("Could not authenticate, please check service and credentials");
 				return null;
 			}
+			
 		}
 		return apis;
 	}
 	
-	static UserData getOrCreateUser( API api ) {
+	
+	static UserData getOrCreateUser( API api) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
 			UserData user = new UserData();
+			
+			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+			
+			//initialize(api, users);
+			
 			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 			user = api.navigate(UserData.class, createdUser.getLocation());
+			
 			return user;
 		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
@@ -104,6 +112,8 @@ public class TestHelper {
 		both.add(task2);
 		TaskUpdateRequest task = new TaskUpdateRequest(both);
 		task.setName("testTask");
+		task.setRelocationType("None");
+		task.setActivityState("Active");
 		try {
 			ResponseData createdTask = api.navigate(ResponseData.class, problem.getLink("create-task"), task);
 			TaskData td = api.navigate(TaskData.class, createdTask.getLocation());
@@ -136,7 +146,7 @@ public class TestHelper {
 		both.add(task2);
 		TaskUpdateRequest task = new TaskUpdateRequest(both);
 		task.setName(name);
-		
+		task.setRelocationType("None");
 		return task;
 	}
 	
@@ -162,6 +172,8 @@ public class TestHelper {
 			both.add(task2);
 			TaskUpdateRequest task = new TaskUpdateRequest(both);
 			task.setName("testTask" + i);
+			task.setRelocationType("None");
+			task.setActivityState("Active");
 			tasks.add(task);
 		}
 		return tasks;
@@ -179,6 +191,7 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
+        //vehicleRequest.setCanBeRelocated("None");
         return vehicleRequest;
         
 	}
@@ -196,12 +209,19 @@ public class TestHelper {
 				coordinates.setLongitude(25.74892);
 				break;
 			}
+			case VEHICLE_END: {
+				coordinates.setLatitude(62.300666); 
+				coordinates.setLongitude(25.727949);
+				break;
+			}
 			case VEHICLE_START:
 			default: {
 	            coordinates.setLatitude(62.247906);
 	            coordinates.setLongitude(25.867395);
 	            break;
 			}
+			
+			
 		}
 		coordinates.setSystem(CoordinateSystem.Euclidian);
 		LocationData data = new LocationData();
@@ -245,8 +265,8 @@ public class TestHelper {
 		return null;
 	}
 	
-	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY};
-	
+	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY, VEHICLE_END };
+	 
 	static TimeWindowData createTimeWindow(int start, int end) {
 		Date startD = new Date();
 		startD.setHours(start);
@@ -256,5 +276,19 @@ public class TestHelper {
 		
 		TimeWindowData twd = new TimeWindowData(startD, endD);
 		return twd;
+	}
+	
+	static void initialize(API api, UserDataSet users) {
+		try {
+			if (users.getItems().size() > 0) {
+				UserData us = null;
+				for (UserData u : users.getItems() ) {
+					us = api.navigate(UserData.class, u.getLink("self"));
+					Link l = null;	
+					if ((l = us.getLink("delete-user")) == null) break;  
+					ResponseData response = api.navigate(ResponseData.class, us.getLink("delete-user"));
+				}		
+			}
+		} catch (Exception e) { System.out.println("Something went wrong deleting users " + e.getMessage()); }
 	}
 }

@@ -5,5 +5,6 @@ package fi.cosky.sdk;
  */
 
 public class UserSetRequest {
-
+	public static final String MimeType = UserDataSet.MimeType;
+    public static final double MimeVersion = UserDataSet.MimeVersion;
 }

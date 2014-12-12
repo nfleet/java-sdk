@@ -8,6 +8,9 @@ import java.util.List;
  */
 
 public class TaskData extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.task";
+	public static final double MimeVersion = 2.1;
+	
     private String Name;
     private String Info;
     private List<TaskEventData> TaskEvents;
@@ -15,7 +18,19 @@ public class TaskData extends BaseData {
     private int VersionNumber;
     private List<String> IncompatibleVehicleTypes;
     private List<String> CompatibleVehicleTypes;
+    
+    //Profit will be removed at some point, use Priority.
+    @Deprecated
     private double Profit;
+    
+    private double Priority;
+    private String RelocationType;
+    private String ActivityState;
+    
+    public TaskData() {
+    	this.RelocationType = "None";
+    	this.ActivityState = "Active"; // other possibility is "Inactive"
+    }
     
     public String getInfo() {
         return Info;
@@ -85,6 +100,30 @@ public class TaskData extends BaseData {
 		Profit = profit;
 	}
 
+	public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
+	}
+
+	public double getPriority() {
+		return Priority;
+	}
+
+	public void setPriority(double priority) {
+		Priority = priority;
+	}
+
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
+	}
+
 	public TaskUpdateRequest toRequest() {
 		List<TaskEventUpdateRequest> taskevents = new ArrayList<TaskEventUpdateRequest>();
 		
@@ -97,6 +136,8 @@ public class TaskData extends BaseData {
 		update.setName(Name);
 		update.setVersionNumber(VersionNumber);
 		update.setTaskId(Id);
+		update.setRelocationType(RelocationType);
+		update.setActivityState(ActivityState);
 		return update;
 	}
 }

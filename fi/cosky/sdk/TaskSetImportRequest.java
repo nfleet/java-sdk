@@ -9,6 +9,9 @@ package fi.cosky.sdk;
 import java.util.List;
 
 public class TaskSetImportRequest {
+	public static final String MimeType = "application/vnd.jyu.nfleet.taskset";
+    public static final double MimeVersion = TaskUpdateRequest.MimeVersion;
+	
 	private List<TaskUpdateRequest> Items;
 
 	public List<TaskUpdateRequest> getItems() {

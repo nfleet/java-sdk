@@ -6,12 +6,13 @@ import java.util.Date;
  * file 'LICENSE.txt', which is part of this source code package.
  */
 
-public class RoutingProblemData extends BaseData{
+public class RoutingProblemData extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.problem";
+    public static final double MimeVersion = 2.0;
+	
     private int Id;
     private Date CreationDate;
-   
-
-	private Date ModifiedDate;
+   	private Date ModifiedDate;
     private String Name;
     private String State;
     private int Progress;

@@ -5,6 +5,9 @@ package fi.cosky.sdk;
  */
 
 public class ErrorData extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.error";
+	public static final double MimeVersion = 2.0;
+	
     private int Code;
     private String Message;
         public ErrorData() {

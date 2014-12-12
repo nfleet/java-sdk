@@ -6,6 +6,9 @@ package fi.cosky.sdk;
  */
 
 public class UserData extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.user";
+	public static final double MimeVersion = 2.0;
+	
     private int Id;
     private int ClientId;
     private int VersionNumber;

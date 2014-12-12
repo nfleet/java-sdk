@@ -5,6 +5,9 @@ package fi.cosky.sdk;
  */
 
 public class UserUpdateRequest extends BaseData {
+	public static final String MimeType = UserData.MimeType;
+	public static final double MimeVersion = UserData.MimeVersion;
+	
 	private int VersionNumber;
 	private int ClientId;
 	private int UserId;

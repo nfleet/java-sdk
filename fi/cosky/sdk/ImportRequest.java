@@ -4,6 +4,9 @@ package fi.cosky.sdk;
  * file 'LICENSE.txt', which is part of this source code package.
  */
 public class ImportRequest {
+	public static final String MimeType = ImportData.MimeType;
+	public static final double MimeVersion = ImportData.MimeVersion;
+	
 	private VehicleSetImportRequest Vehicles;
 	private TaskSetImportRequest Tasks;
 	

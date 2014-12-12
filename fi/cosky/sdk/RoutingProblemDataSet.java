@@ -7,6 +7,10 @@ import java.util.List;
  */
 
 public class RoutingProblemDataSet extends BaseData {
+	public static final String MimeType = "application/vnd.jyu.nfleet.problemset";
+    public static final double MimeVersion = 2.0;
+
+	
     private List<RoutingProblemData> Items;
     private int VersionNumber;
 

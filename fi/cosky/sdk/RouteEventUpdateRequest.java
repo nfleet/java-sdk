@@ -3,6 +3,9 @@ package fi.cosky.sdk;
 import java.util.Date;
 
 public class RouteEventUpdateRequest extends BaseData {
+	public static final String MimeType = RouteEventData.MimeType;
+	public static final double MimeVersion = RouteEventData.MimeVersion;
+	
 	private int clientId;
 	private int userId;
 	private int problemId;
@@ -10,6 +13,7 @@ public class RouteEventUpdateRequest extends BaseData {
 	private int eventSequenceNumber;
 	private Date actualArrivalTime;
 	private String state;
+	
 	public int getClientId() {
 		return clientId;
 	}

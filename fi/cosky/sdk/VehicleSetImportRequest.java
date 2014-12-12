@@ -8,6 +8,8 @@ package fi.cosky.sdk;
 import java.util.List;
 
 public class VehicleSetImportRequest {
+	public static final String MimeType = "application/vnd.jyu.nfleet.vehicleset";
+    public static final double MimeVersion = VehicleUpdateRequest.MimeVersion;
 	
 	private List<VehicleUpdateRequest> Items;
 
@@ -17,6 +19,5 @@ public class VehicleSetImportRequest {
 
 	public void setItems(List<VehicleUpdateRequest> items) {
 		Items = items;
-	}
-	
+	}	
 }

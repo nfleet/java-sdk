@@ -7,6 +7,9 @@ import java.util.List;
  */
 
 public class TaskUpdateRequest extends BaseData {
+	public static final String MimeType = TaskData.MimeType;
+	public static final double MimeVersion = TaskData.MimeVersion;
+	
     private String Name;
     private String Info;
     private List<TaskEventUpdateRequest> TaskEvents;
@@ -16,7 +19,24 @@ public class TaskUpdateRequest extends BaseData {
     private int UserId;
     private List<String> IncompatibleVehicleTypes;
     private List<String> CompatibleVehicleTypes;
+    
+    @Deprecated
     private double Profit;
+    
+    private double Priority;
+    private String RelocationType;
+    private String ActivityState;
+    
+    
+    public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
+        this.TaskEvents = taskEvents;
+    	this.RelocationType = "None";
+    	this.ActivityState = "Active";
+    }
+       
+    public TaskUpdateRequest() {
+    	this.RelocationType = "None";
+    }
     
     public String getInfo() {
         return Info;
@@ -90,7 +110,6 @@ public class TaskUpdateRequest extends BaseData {
         TaskEvents = taskEvents;
     }
 
-
     public double getProfit() {
 		return Profit;
 	}
@@ -99,7 +118,29 @@ public class TaskUpdateRequest extends BaseData {
 		Profit = profit;
 	}
 
-	public TaskUpdateRequest(List<TaskEventUpdateRequest> taskEvents) {
-        this.TaskEvents = taskEvents;
-    }
+	public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
+	}
+
+	public double getPriority() {
+		return Priority;
+	}
+
+	public void setPriority(double priority) {
+		Priority = priority;
+	}
+
+	public String getRelocationType() {
+		return RelocationType;
+	}
+
+	public void setRelocationType(String relocationType) {
+		RelocationType = relocationType;
+	}
+
+	
 }

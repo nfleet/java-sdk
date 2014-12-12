@@ -141,6 +141,8 @@ public class SdkTests {
             taskEvents.get(1).setTimeWindows(timeWindows);
             taskEvents.get(0).setServiceTime(10);
             taskEvents.get(1).setServiceTime(10);
+            task.setActivityState("Active");
+            
             ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), task); 
     		//##END EXAMPLE##
     		update = task;
@@ -261,12 +263,8 @@ public class SdkTests {
 			routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			RouteUpdateRequest route = new RouteUpdateRequest();
 			int[] sequence = {11,12};
-			route.setClientId(user.getClientId());
-			route.setProblemId(problem.getId());
-			route.setUserId(user.getId());
 			route.setSequence(sequence);
-			
-			
+						
 			api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 			
 			//##BEGIN EXAMPLE accessingroute##
@@ -457,6 +455,7 @@ public class SdkTests {
 		
 		RoutingProblemUpdateRequest requ = problem.toRequest();
 		requ.setState("Running");
+		
 		try {
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), requ);
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
@@ -515,9 +514,9 @@ public class SdkTests {
 	
 	@Test
 	public void T19TestingConcatLink() {
-		Link self = new Link("self", "/users/1/problems/3/vehicles/2/events/4", "GET");
-		Link parentVehicle = new Link("get-vehicle", "../../",  "GET");
-		Link parentTask = new Link("get-task", "../../../../tasks/3" ,"GET");
+		Link self = new Link("self", "/users/1/problems/3/vehicles/2/events/4","", "GET");
+		Link parentVehicle = new Link("get-vehicle", "../../","application/vnd.jyu.nfleet.vehicle-2.1+json",  "GET");
+		Link parentTask = new Link("get-task", "../../../../tasks/3" ,"application/vnd.jyu.nfleet.task-2.1+json","GET");
 		
 		List<Link> meta = new ArrayList<Link>();
 		List<Link> meta2 = new ArrayList<Link>();
@@ -568,12 +567,9 @@ public class SdkTests {
 				
 		ResponseData a = null;
 		
-		Date startTime = new Date();
-		Date endTime = new Date();
-		endTime.setHours(20);
-		
+		TimeWindowData tw = TestHelper.createTimeWindow(5, 20);
 		ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-		timeWindows.add(new TimeWindowData(startTime, endTime));
+		timeWindows.add(tw);
  		try {
 			//##BEGIN EXAMPLE importvehicleset##
 			VehicleSetImportRequest set = new VehicleSetImportRequest();
@@ -581,6 +577,7 @@ public class SdkTests {
 			for (int i = 0; i < 10; i++) {
 				VehicleUpdateRequest vehicle = new VehicleUpdateRequest("vehicle" + i, list, start, end);
 				vehicle.setTimeWindows(timeWindows);
+				vehicle.setRelocationType("None");
 				vehicles.add(vehicle);
 			}
 			set.setItems(vehicles);
@@ -607,30 +604,13 @@ public class SdkTests {
 		LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
 		ResponseData r = null;
 		try {
+
+			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+			
 			//##BEGIN EXAMPLE importtaskset##
-			List<TaskUpdateRequest> tasks = new ArrayList<TaskUpdateRequest>();
-			
-			Date start = new Date();
-			Date end = new Date();
-			end.setHours(20);
-			
-			ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
-			timeWindows.add(new TimeWindowData(start, end));
-			for (int i = 0; i < 10; i++) {
-				List<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
-				TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pickupLocation, list);
-				pickup.setTimeWindows(timeWindows);
-				TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, list);
-				delivery.setTimeWindows(timeWindows);
-				taskEvents.add(pickup); taskEvents.add(delivery);
-				TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-				task.setName("kivikasat" + i);
-				tasks.add(task);
-			}
 			TaskSetImportRequest set = new TaskSetImportRequest();
 			set.setItems(tasks);
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
-			System.out.println(result.toString());
 			//##END EXAMPLE##
 			r = result;
 		} catch (Exception e) {
@@ -690,17 +670,27 @@ public class SdkTests {
 		
 		TaskEventUpdateRequest pickup = new TaskEventUpdateRequest(Type.Pickup, pi, capacities);
 		TaskEventUpdateRequest delivery = new TaskEventUpdateRequest(Type.Delivery, de, capacities);
+				
+		TimeWindowData tw = TestHelper.createTimeWindow(7, 20);
+		List<TimeWindowData> tws = new ArrayList<TimeWindowData>();
+		tws.add(tw);
+		pickup.setTimeWindows(tws);
+		delivery.setTimeWindows(tws);
 		
 		List<TaskEventUpdateRequest> task1 = new ArrayList<TaskEventUpdateRequest>();
 		task1.add(pickup);
 		task1.add(delivery);
 		TaskUpdateRequest task = new TaskUpdateRequest(task1);
+		task.setActivityState("Active");
+		task.setRelocationType("None");
 		task.setName("testTask");
 		List<String> types = new ArrayList<String>();
 		types.add("rekka");
 		task.setIncompatibleVehicleTypes(types);
 		
 		TaskUpdateRequest task2 = new TaskUpdateRequest(task1);
+		task2.setRelocationType("None");
+		task2.setActivityState("Active");
 		List<String> other = new ArrayList<String>();
 		other.add("henkiloauto");		
 		task2.setName("testTask2");
@@ -757,8 +747,6 @@ public class SdkTests {
 		TaskSetImportRequest tasks = new TaskSetImportRequest();
 		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
 		tasks.setItems(taskList);
-		VehicleDataSet veh = null;
-		TaskDataSet tas = null;
 		ResponseData response = null;
 		try {
 		
@@ -785,12 +773,7 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);				
 		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
-		
-		LocationData location = TestHelper.createLocationWithAddress();
-		CapacityData capacity = new CapacityData("Weight", 20);
-		ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-		capacities.add(capacity);
-		
+					
 		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("TestiAuto");
 		VehicleData response = null;
 		try {
@@ -1100,7 +1083,7 @@ public class SdkTests {
 		
 		
 	}
-	
+	/*
 	@Test
 	public void T32UsingCompatibilitysWithTasks() {
 		API api = TestHelper.authenticate();
@@ -1176,7 +1159,7 @@ public class SdkTests {
 		assertEquals(12, res2.getItems().size());
 		assertEquals(12, res3.getItems().size());
 	}
-	
+	*/
 	@Test
 	public void T33LockingDrivenRoute() {
 		API api = TestHelper.authenticate();
@@ -1268,6 +1251,9 @@ public class SdkTests {
 			if (res1.getItems().size() == 2) {
 				assertEquals(2, res1.getItems().size());
 				assertEquals(6, res2.getItems().size());
+			} else if (res1.getItems().size() == 4) {
+				assertEquals(4, res1.getItems().size());
+				assertEquals(4, res2.getItems().size());
 			} else {
 				assertEquals(6, res1.getItems().size());
 				assertEquals(2, res2.getItems().size());
@@ -1309,4 +1295,129 @@ public class SdkTests {
 		}
 	}
 	
+	@Test
+	public void T35DeletingVehicleTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
+		int vehicleCountBefore;
+		int vehicleCountAfter;
+		
+		try {
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountBefore = vehicles.getItems().size();
+			
+			api.navigate(ResponseData.class, vehicle.getLink("delete"));
+			
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountAfter = vehicles.getItems().size();
+			
+			assertEquals(2, vehicleCountBefore);
+			assertEquals(1, vehicleCountAfter);
+		} catch (Exception e) {
+			
+		}
+	}
+	
+	@Test
+	public void T36DeletingAllVehiclesTest() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
+		int vehicleCountBefore = -1;
+		int vehicleCountAfter = -1;
+		
+		try {
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountBefore = vehicles.getItems().size();
+			
+			api.navigate(ResponseData.class, problem.getLink("delete-vehicles"));
+			
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicleCountAfter = vehicles.getItems().size();
+			
+			assertEquals(2, vehicleCountBefore);
+			assertEquals(0, vehicleCountAfter);
+		} catch (Exception e) {
+			
+		}
+	}
+	/*
+	@Test
+	public void T37TestingTest() {
+		//test creating a case, optimizing it, changing the location of a vehicle, then optimizing again.
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
+		try {
+			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+			RoutingProblemUpdateRequest updated = problem.toRequest();
+			updated.setState("Running");
+			ResponseData data = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updated);
+			problem = api.navigate(RoutingProblemData.class, data.getLocation());
+			
+			while( problem.getProgress() <= 100) {
+				System.out.println(problem.getState() + " " + problem.getProgress());
+				Thread.sleep(1500);
+				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+				if (!problem.getState().equals("Running")) break;
+			}
+			
+			LocationData newStart = TestHelper.createLocationWithCoordinates(Location.VEHICLE_END);
+			
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			
+			VehicleData asdf = api.navigate(VehicleData.class, vehicles.getItems().get(0).getLink("self"));
+			
+			VehicleUpdateRequest vehicleToUpdate = asdf.toRequest();  
+			
+			vehicleToUpdate.setStartLocation(newStart);
+			
+			data = api.navigate(ResponseData.class, asdf.getLink("update"), vehicleToUpdate);
+			
+			System.out.println(data);
+			
+			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+			System.out.println(problem);
+			
+			updated = problem.toRequest();
+			updated.setState("Running");
+			
+			data = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updated);
+			
+			problem = api.navigate(RoutingProblemData.class, data.getLocation());	
+			
+			while( problem.getState().equals("Running")) {
+				Thread.sleep(1500);
+				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+			}
+			
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			for (VehicleData veh : vehicles.getItems()) {
+				System.out.println(veh);
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e.getStackTrace());
+		}
+	}
+	*/
+	@Test
+	public void T38GettingVehicleWithCustomLink() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
+		VehicleData vehicle2 = null;
+		try {
+			vehicle2 = api.navigate(VehicleData.class, new Link("location", vehicle.getLink("self").getUri(), "GET"));
+			assertNotNull(vehicle2);
+		} catch (Exception e) {
+			
+		}
+		
+	}
 } 

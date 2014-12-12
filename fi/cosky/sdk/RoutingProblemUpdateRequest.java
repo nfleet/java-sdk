@@ -7,6 +7,9 @@ import java.util.Date;
  */
 
 public class RoutingProblemUpdateRequest extends BaseData {
+	public static final String MimeType = RoutingProblemData.MimeType;
+	public static final double MimeVersion = RoutingProblemData.MimeVersion;
+	
     private int Id;
     private Date CreationDate;
     private Date ModifiedDate;
@@ -50,8 +53,6 @@ public class RoutingProblemUpdateRequest extends BaseData {
         this.ModifiedDate = date;
     }
 
-
-
     public void setName(String name) {
         this.Name = name;
     }
@@ -66,7 +67,11 @@ public class RoutingProblemUpdateRequest extends BaseData {
     public Date getModifiedDate() {
         return ModifiedDate;
     }
-
+    
+    public String getName() {
+        return Name;
+    }
+    
     @Override
     public String toString() {
        /* return "RoutingProblemUpdateRequest{" +
@@ -77,10 +82,4 @@ public class RoutingProblemUpdateRequest extends BaseData {
                 '}';*/
         return API.gson.toJson(this);
     }
-
-    public String getName() {
-        return Name;
-    }
-
-
 }
