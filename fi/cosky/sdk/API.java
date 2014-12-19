@@ -431,7 +431,7 @@ public class API {
 	}
 	
 	private boolean doOutput(String verb) {
-		return (verb.equals("GET") || verb.equals("DELETE"));
+		return (verb.equals("POST") || verb.equals("PUT") || verb.equals("PATCH"));
 	}
 	
 	private enum Verb {
