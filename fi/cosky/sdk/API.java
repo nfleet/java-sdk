@@ -98,6 +98,7 @@ public class API {
 	@SuppressWarnings("unchecked")
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
 		Object result;
+		retry = true;
 		long start = 0; 
 		long end;
 		
@@ -430,13 +431,7 @@ public class API {
 	}
 	
 	private boolean doOutput(String verb) {
-		switch (verb) {
-		case "GET":
-		case "DELETE":
-			return false;
-		default:
-			return true;
-		}
+		return (verb.equals("POST") || verb.equals("PUT") || verb.equals("PATCH"));
 	}
 	
 	private enum Verb {
