@@ -430,13 +430,7 @@ public class API {
 	}
 	
 	private boolean doOutput(String verb) {
-		switch (verb) {
-		case "GET":
-		case "DELETE":
-			return false;
-		default:
-			return true;
-		}
+		return (verb.equals("GET") || verb.equals("DELETE"));
 	}
 	
 	private enum Verb {
