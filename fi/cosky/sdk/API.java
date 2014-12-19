@@ -98,6 +98,7 @@ public class API {
 	@SuppressWarnings("unchecked")
 	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
 		Object result;
+		retry = true;
 		long start = 0; 
 		long end;
 		
