@@ -71,7 +71,7 @@ public class API {
 			ResponseData result = navigate(ResponseData.class, getAuthLink());
 
 			if (result == null || result.getItems() != null) {
-				System.out.println("Could not authenticate, please check credentials");
+				System.out.println("Could not authenticate, please check credentials and service status from http://status.nfleet.fi");
 				return false;
 			}
 
@@ -258,16 +258,16 @@ public class API {
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-				System.out.println("Authentication expired " + connection.getResponseMessage());
+				System.out.println("Authentication expired " + connection.getResponseMessage() + " trying to reauthenticate");
 				if (retry && this.tokenData != null) {
 					this.tokenData = null;
 					retry = false;
 					if( authenticate() ) {
-						System.out.println("Authenticated again");
+						System.out.println("Reauthentication success, will continue with " + l.getMethod() + " request on " + l.getRel());
 						return sendRequest(l, tClass, object);
 					}
 				}		
-				else throw new IOException("Could not authenticate");	
+				else throw new IOException("Tried to reauthenticate but failed, please check the credentials and status of NFleet-API");	
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
