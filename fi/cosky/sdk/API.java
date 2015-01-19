@@ -337,7 +337,7 @@ public class API {
 			}
 			connection.connect();
 
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER	|| connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER || connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
 				Link location = parseLocationLinkFromString(connection.getHeaderField("Location"));
 				Link l = new Link("self", "/tokens", "GET","", true);
 				ArrayList<Link> links = new ArrayList<Link>();
