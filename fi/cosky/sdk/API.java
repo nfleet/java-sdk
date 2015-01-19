@@ -191,7 +191,6 @@ public class API {
 		this.baseUrl = baseUrl;
 	}
 
-	
 	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
 		URL serverAddress;
 		BufferedReader br;
@@ -217,7 +216,6 @@ public class API {
 				}
 			if (!useMimeTypes) 
 				connection.setRequestProperty("Accept", "application/json");
-			
 			
 			if (doOutput && useMimeTypes) {
 				//this handles the case if the link is self made and the type field has not been set.
@@ -245,8 +243,7 @@ public class API {
 					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
 					osw.write(json);
 					osw.flush();
-					osw.close();
-					
+					osw.close();		
 			}
 
 			connection.connect();
