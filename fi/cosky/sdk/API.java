@@ -41,6 +41,8 @@ public class API {
 	private boolean useMimeTypes;
 	private MimeTypeHelper helper;
 	
+	private static int RETRY_WAIT_TIME = 2000;
+	
 	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
 	
 	public API(String baseUrl) {
