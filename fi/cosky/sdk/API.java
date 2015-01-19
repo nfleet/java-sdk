@@ -560,11 +560,11 @@ public class API {
 				sb.append(s);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Could not read error stream from the connection.");
+		} finally {
+			connection.disconnect();
 		}
-		String body = sb.toString();
-		connection.disconnect();
-		return body;
+		return sb.toString();
 	}
 	
 	private String readDataFromConnection(HttpURLConnection connection) {
