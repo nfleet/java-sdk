@@ -1396,7 +1396,31 @@ public class SdkTests {
 			assertNotNull(vehicle2);
 		} catch (Exception e) {
 			
+		}		
+	}
+	
+	@Test
+	public void T39CreatingUserWithLimits() {
+		API api = TestHelper.authenticate();
+		ApiData apidata = null;
+		UserData user = null;		
+		UserUpdateRequest newuser = null;
+		int limit = 10;
+		try {
+			apidata = api.navigate(ApiData.class, api.getRoot());
+			newuser = new UserUpdateRequest();
+			newuser.setDepotLimit(limit);
+			newuser.setOptimizationQueueLimit(limit);
+			newuser.setVehicleLimit(limit);
+			newuser.setTaskLimit(limit);
+			newuser.setProblemLimit(limit);
+			
+			ResponseData response = api.navigate(ResponseData.class, apidata.getLink("create-user"), newuser);
+			
+			user = api.navigate(UserData.class, response.getLocation());
+		} catch (Exception e) {
+			
 		}
-		
+		assertEquals(user.getDepotLimit(), newuser.getDepotLimit());
 	}
 } 
