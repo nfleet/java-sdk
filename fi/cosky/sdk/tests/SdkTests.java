@@ -1423,4 +1423,32 @@ public class SdkTests {
 		}
 		assertEquals(user.getDepotLimit(), newuser.getDepotLimit());
 	}
+	
+	@Test
+	public void T40UpdatingRoutingProblemSettings() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		RoutingProblemSettingsData settings = null;
+		RoutingProblemSettingsData settingsAfterUpdate = null;
+		RoutingProblemSettingsUpdateRequest update = null;
+		try {
+			settings = api.navigate(RoutingProblemSettingsData.class, problem.getLink("view-settings"));
+			update = new RoutingProblemSettingsUpdateRequest();
+			update.setAlgorithmTree(settings.getAlgorithmTree());
+			update.setDateTimeFormatString(settings.getDateTimeFormatString());
+			update.setDefaultVehicleSpeedFactor(settings.getDefaultVehicleSpeedFactor());
+			update.setDefaultVehicleSpeedProfile(SpeedProfile.Max80Kmh);
+			update.setInsertionAggressiveness(1);
+			
+			api.navigate(ResponseData.class, settings.getLink("update-settings"), update);
+		
+			settingsAfterUpdate = api.navigate(RoutingProblemSettingsData.class, problem.getLink("view-settings"));
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(settings);
+		assertNotNull(settingsAfterUpdate);
+		assertEquals(update.getInsertionAggressiveness(), settingsAfterUpdate.getInsertionAggressiveness(), 0.001);
+	}
 } 
