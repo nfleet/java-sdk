@@ -439,9 +439,6 @@ public class API {
 	}
 	
 	private Link parseLocationLinkFromString(String s) {
-		//Azure emulator hack
-		if (s.contains("82"))
-			s = s.replace("82", "81");
 		if (s.contains("/tokens"))
 			return new Link("location", s, "GET","", true);
 		else
