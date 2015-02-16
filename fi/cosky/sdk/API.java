@@ -439,9 +439,7 @@ public class API {
 	}
 	
 	private Link parseLocationLinkFromString(String s) {
-		if (s.contains("/tokens"))
-			return new Link("location", s, "GET","", true);
-		else
+		if (!s.contains("/tokens"))
 			s = s.substring(s.lastIndexOf("/users"));
 		return new Link("location", s, "GET", "", true);
 	}
