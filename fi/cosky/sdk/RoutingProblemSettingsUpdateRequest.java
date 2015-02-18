@@ -15,6 +15,17 @@ public class RoutingProblemSettingsUpdateRequest {
 	private String AlgorithmTree;
 	private String DateTimeFormatString;
 	
+	/**
+	 * Default constructor with good values for settings. These
+	 * are also the ones that NFleet uses when settings
+	 * are not specified 
+	 */
+	public RoutingProblemSettingsUpdateRequest() {
+		this.DefaultVehicleSpeedFactor = 0.9;
+		this.DefaultVehicleSpeedProfile = SpeedProfile.Max100Kmh;
+		this.InsertionAggressiveness = 1;
+	}
+	
 	public double getDefaultVehicleSpeedFactor() {
 		return DefaultVehicleSpeedFactor;
 	}
