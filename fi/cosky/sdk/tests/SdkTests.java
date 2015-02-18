@@ -1059,24 +1059,10 @@ public class SdkTests {
 		   
 		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
 		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
-		   
-		   
-		   if (res1.getItems().size() == 2 ) {
-			   assertEquals(2, res1.getItems().size());
-			   assertEquals(6, res2.getItems().size());
-		   } 
-		   
-		   if (res2.getItems().size() == 2) {
-			   assertEquals(6, res1.getItems().size());
-			   assertEquals(2, res2.getItems().size());
-		   } 
-		   
-		   if (res1.getItems().size() == 4) {
-			   assertEquals(4, res1.getItems().size());
-			   assertEquals(4, res2.getItems().size());
-		   }
-		   
-		   
+		   		   
+		   assertTrue(res1.getItems().size() > 0);
+		   assertTrue(res2.getItems().size() > 0);
+		   		   
 		} catch (Exception e) {
 			System.out.println("Something went wrong.");
 		}
@@ -1248,16 +1234,9 @@ public class SdkTests {
 			res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
 			res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 			
-			if (res1.getItems().size() == 2) {
-				assertEquals(2, res1.getItems().size());
-				assertEquals(6, res2.getItems().size());
-			} else if (res1.getItems().size() == 4) {
-				assertEquals(4, res1.getItems().size());
-				assertEquals(4, res2.getItems().size());
-			} else {
-				assertEquals(6, res1.getItems().size());
-				assertEquals(2, res2.getItems().size());
-			}			
+			assertTrue(res1.getItems().size() > 0);
+			assertTrue(res2.getItems().size() > 0);
+						
 		} catch (Exception e){
 			System.out.println(e.toString());
 		}
@@ -1417,7 +1396,59 @@ public class SdkTests {
 			assertNotNull(vehicle2);
 		} catch (Exception e) {
 			
+		}		
+	}
+	
+	@Test
+	public void T39CreatingUserWithLimits() {
+		API api = TestHelper.authenticate();
+		ApiData apidata = null;
+		UserData user = null;		
+		UserUpdateRequest newuser = null;
+		int limit = 10;
+		try {
+			apidata = api.navigate(ApiData.class, api.getRoot());
+			newuser = new UserUpdateRequest();
+			newuser.setDepotLimit(limit);
+			newuser.setOptimizationQueueLimit(limit);
+			newuser.setVehicleLimit(limit);
+			newuser.setTaskLimit(limit);
+			newuser.setProblemLimit(limit);
+			
+			ResponseData response = api.navigate(ResponseData.class, apidata.getLink("create-user"), newuser);
+			
+			user = api.navigate(UserData.class, response.getLocation());
+		} catch (Exception e) {
+			
 		}
+		assertEquals(user.getDepotLimit(), newuser.getDepotLimit());
+	}
+	
+	@Test
+	public void T40UpdatingRoutingProblemSettings() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		RoutingProblemSettingsData settings = null;
+		RoutingProblemSettingsData settingsAfterUpdate = null;
+		RoutingProblemSettingsUpdateRequest update = null;
+		try {
+			settings = api.navigate(RoutingProblemSettingsData.class, problem.getLink("view-settings"));
+			update = new RoutingProblemSettingsUpdateRequest();
+			update.setAlgorithmTree(settings.getAlgorithmTree());
+			update.setDateTimeFormatString(settings.getDateTimeFormatString());
+			update.setDefaultVehicleSpeedFactor(settings.getDefaultVehicleSpeedFactor());
+			update.setDefaultVehicleSpeedProfile(SpeedProfile.Max80Kmh);
+			update.setInsertionAggressiveness(1);
+			
+			api.navigate(ResponseData.class, settings.getLink("update-settings"), update);
 		
+			settingsAfterUpdate = api.navigate(RoutingProblemSettingsData.class, problem.getLink("view-settings"));
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(settings);
+		assertNotNull(settingsAfterUpdate);
+		assertEquals(update.getInsertionAggressiveness(), settingsAfterUpdate.getInsertionAggressiveness(), 0.001);
 	}
 } 
