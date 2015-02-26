@@ -22,6 +22,7 @@ public class VehicleUpdateRequest extends BaseData {
     private String SpeedProfile;
     private double SpeedFactor;
     private String RelocationType;
+    private String ActivityState;    
     
     private double FixedCost;
     private double KilometerCost;
@@ -41,6 +42,7 @@ public class VehicleUpdateRequest extends BaseData {
         this.StartLocation = startLoc;
         this.Name = name;
         this.RelocationType = "None";
+        this.ActivityState = "Active";
     }
 
     public int getId() {
@@ -183,5 +185,13 @@ public class VehicleUpdateRequest extends BaseData {
 
 	public void setHourCost(double hourCost) {
 		HourCost = hourCost;
+	}
+
+	public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
 	}
 }

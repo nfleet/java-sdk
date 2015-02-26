@@ -23,7 +23,9 @@ public class VehicleData extends BaseData {
     private double SpeedFactor;
     private String RelocationType;
     
-    private double FixedCost;
+    private String ActivityState;
+    
+	private double FixedCost;
     private double KilometerCost;
     private double HourCost;
 
@@ -41,6 +43,7 @@ public class VehicleData extends BaseData {
         this.StartLocation = startLoc;
         this.Name = name;
         this.RelocationType = "None";
+        this.ActivityState = "Active"; //has the same possibilities as activitystate in taskdata: Active and Inactive
     }
 
     public int getId() {
@@ -155,6 +158,14 @@ public class VehicleData extends BaseData {
 	public void setRelocationType(String relocationType) {
 		RelocationType = relocationType;
 	}
+	
+    public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
+	}
 
 	public VehicleUpdateRequest toRequest() {
 		VehicleUpdateRequest request = new VehicleUpdateRequest(Name, Capacities, StartLocation, EndLocation);
@@ -166,6 +177,8 @@ public class VehicleData extends BaseData {
 		request.setVehicleSpeedFactor(SpeedFactor);
 		request.setVehicleSpeedProfile(SpeedProfile);
 		request.setRelocationType(RelocationType);
+		request.setActivityState(ActivityState);
 		return request;
 	}
+
 }
