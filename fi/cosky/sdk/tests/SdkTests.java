@@ -67,9 +67,13 @@ public class SdkTests {
 		try {
 			ResponseData created = api.navigate(ResponseData.class, user.getLink("create-problem"), requ);
 			
-			//##BEGIN EXAMPLE accessingproblem##
+			//##BEGIN EXAMPLE accessingnewproblem##
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			//##END EXAMPLE##
+
+            //##BEGIN EXAMPLE accessingproblem##
+            RoutingProblemData p = api.navigate(RoutingProblemData.class, created.getLocation());
+            //##END EXAMPLE##
 			check = problem;
 		} catch (Exception e) {
 			System.out.println(e.toString());
