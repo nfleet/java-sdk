@@ -25,7 +25,7 @@ import org.apache.commons.codec.binary.Base64;
  */
 
 /**
- * API-class to handle the communication between SDK-user and CO-SKY
+ * API-class to handle the communication between SDK-user and NFleet
  * optimization's REST-API.
  */
 public class API {
