@@ -653,6 +653,9 @@ public class SdkTests {
 			ImportData result = api.navigate(ImportData.class, response.getLocation());
 			//##END EXAMPLE##
 			r = result;
+            //##BEGIN EXAMPLE getimportresults##
+            ImportData imp = api.navigate(ImportData.class, response.getLocation());
+            //##END EXAMPLE##
 			
 		} catch (Exception e){
 			System.out.println(e.toString());
