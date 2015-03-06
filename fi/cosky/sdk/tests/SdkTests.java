@@ -801,7 +801,7 @@ public class SdkTests {
 		RoutingProblemSettingsData before = null;
 		RoutingProblemSettingsData after = null;
 		try {
-			//##BEGIN EXAMPLE changeproblemsettings##
+			//##BEGIN EXAMPLE updatingroutingproblemsettings##
 			RoutingProblemSettingsData settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
 			RoutingProblemSettingsUpdateRequest updatedSettings = new RoutingProblemSettingsUpdateRequest();
 			updatedSettings.setDefaultVehicleSpeedFactor(0.8);
