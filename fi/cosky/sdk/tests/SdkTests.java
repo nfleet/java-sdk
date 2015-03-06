@@ -389,18 +389,19 @@ public class SdkTests {
 		update.setState("Running");
 	
 		try {
+            //##BEGIN EXAMPLE getprogress##
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			
 			Thread.sleep(5000);
 			
-			//##BEGIN EXAMPLE getprogress 
+
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
 			
 			while ( problem.getProgress() < 100 ) {
 				Thread.sleep(1000);
 				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			}
-			//##END EXAMPLE 
+			//##END EXAMPLE##
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
