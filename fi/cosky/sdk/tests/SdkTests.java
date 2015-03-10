@@ -1459,4 +1459,13 @@ public class SdkTests {
 		assertNotNull(settingsAfterUpdate);
 		assertEquals(update.getInsertionAggressiveness(), settingsAfterUpdate.getInsertionAggressiveness(), 0.001);
 	}
+
+    @Test
+    public void T41CreateDepot() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+
+
+    }
 } 
