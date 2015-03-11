@@ -27,7 +27,7 @@ public class SdkTests {
 		ApiData data2 = null;
 		try {
 			//##BEGIN EXAMPLE accessingapi##
-            API api = new API("https://test-api.nfleet.fi");
+            API api = new API(TestHelper.apiUrl);
 			api.authenticate(clientKey, clientSecret);
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
@@ -1487,6 +1487,48 @@ public class SdkTests {
             //##END EXAMPLE##
 
             assertEquals(request.getName(), depot.getName());
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    public void T42CreateDepotSet() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+
+        LocationData location = new LocationData();
+        location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+        ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+        capacities.add(new CapacityData("weight", 10));
+        capacities.add(new CapacityData("volume", 30));
+
+        try {
+            //##BEGIN EXAMPLE importdepots##
+            ArrayList<DepotUpdateRequest> depots = new ArrayList<DepotUpdateRequest>();
+
+            for (int i = 1; i < 4; i++) {
+                DepotUpdateRequest depot = new DepotUpdateRequest();
+                depot.setLocation(location);
+                depot.setCapacities(capacities);
+                depot.setName("Depot0"+i);
+                depot.setType("SomeType");
+                depot.setInfo1("Info");
+
+                depots.add(depot);
+            }
+
+            DepotSetImportRequest request = new DepotSetImportRequest();
+            request.setItems(depots);
+
+            ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-depots"), request);
+
+            DepotDataSet result = api.navigate(DepotDataSet.class, problem.getLink("list-depots"));
+            //##END EXAMPLE##
+
+            assertEquals(3, result.getItems().size());
         } catch (Exception e) {
 
         }
