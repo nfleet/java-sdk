@@ -1466,6 +1466,29 @@ public class SdkTests {
         UserData user = TestHelper.getOrCreateUser(api);
         RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 
+        LocationData location = new LocationData();
+        location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
 
+        ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+        capacities.add(new CapacityData("weight", 10));
+        capacities.add(new CapacityData("volume", 30));
+
+        try {
+            //##BEGIN EXAMPLE createdepot##
+            DepotUpdateRequest request = new DepotUpdateRequest();
+            request.setLocation(location);
+            request.setCapacities(capacities);
+            request.setName("Depot01");
+            request.setType("SomeType");
+            request.setInfo1("Info");
+
+            ResponseData response = api.navigate(ResponseData.class, problem.getLink("create-depot"), request);
+            DepotData depot = api.navigate(DepotData.class, response.getLocation());
+            //##END EXAMPLE##
+
+            assertEquals(request.getName(), depot.getName());
+        } catch (Exception e) {
+
+        }
     }
 } 
