@@ -34,4 +34,12 @@ public class CoordinateData {
     }
 
     public enum CoordinateSystem{WGS84, Euclidian};
+
+    public CoordinateData(double lat, double lon, CoordinateSystem system) {
+        this.Latitude = lat;
+        this.Longitude = lon;
+        this.System = system;
+    }
+
+    public CoordinateData() {}
 }
