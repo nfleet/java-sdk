@@ -1533,4 +1533,42 @@ public class SdkTests {
 
         }
     }
+    
+    @Test
+    public void T43UpdateDepot() {
+    	 API api = TestHelper.authenticate();
+         UserData user = TestHelper.getOrCreateUser(api);
+         RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+
+         LocationData location = new LocationData();
+         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+         capacities.add(new CapacityData("weight", 10));
+         capacities.add(new CapacityData("volume", 30));
+
+         try {
+             //##BEGIN EXAMPLE createdepot##
+             DepotUpdateRequest request = new DepotUpdateRequest();
+             request.setLocation(location);
+             request.setCapacities(capacities);
+             request.setName("Depot01");
+             request.setType("SomeType");
+             request.setInfo1("Info");
+
+             ResponseData response = api.navigate(ResponseData.class, problem.getLink("create-depot"), request);
+             DepotData depot = api.navigate(DepotData.class, response.getLocation());
+             //##END EXAMPLE##
+
+             request.setInfo1("Lol");
+             request.setDepotId(depot.getId());
+             response = api.navigate(ResponseData.class, depot.getLink("update"), request);
+             
+             depot = api.navigate(DepotData.class, depot.getLink("self"));
+                          
+             assertEquals(request.getInfo1(), depot.getInfo1());
+         } catch (Exception e) {
+
+         }
+    }
 } 
