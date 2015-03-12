@@ -9,6 +9,7 @@ public class ImportRequest {
 	
 	private VehicleSetImportRequest Vehicles;
 	private TaskSetImportRequest Tasks;
+	private DepotSetImportRequest Depots;
 	
 	public VehicleSetImportRequest getVehicles() {
 		return Vehicles;
@@ -21,5 +22,11 @@ public class ImportRequest {
 	}
 	public void setTasks(TaskSetImportRequest tasks) {
 		Tasks = tasks;
+	}
+	public DepotSetImportRequest getDepots() {
+		return Depots;
+	}
+	public void setDepots(DepotSetImportRequest depots) {
+		Depots = depots;
 	}
 }
