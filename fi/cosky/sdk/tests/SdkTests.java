@@ -1470,8 +1470,8 @@ public class SdkTests {
         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
 
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-        capacities.add(new CapacityData("weight", 10));
-        capacities.add(new CapacityData("volume", 30));
+        capacities.add(new CapacityData("Weight", 10));
+        capacities.add(new CapacityData("Volume", 30));
 
         try {
             //##BEGIN EXAMPLE createdepot##
@@ -1502,8 +1502,8 @@ public class SdkTests {
         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
 
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-        capacities.add(new CapacityData("weight", 10));
-        capacities.add(new CapacityData("volume", 30));
+        capacities.add(new CapacityData("Weight", 10));
+        capacities.add(new CapacityData("Volume", 30));
 
         try {
             //##BEGIN EXAMPLE importdepots##
@@ -1544,8 +1544,8 @@ public class SdkTests {
          location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
 
          ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-         capacities.add(new CapacityData("weight", 10));
-         capacities.add(new CapacityData("volume", 30));
+         capacities.add(new CapacityData("Weight", 10));
+         capacities.add(new CapacityData("Volume", 30));
 
          try {
              //##BEGIN EXAMPLE createdepot##
