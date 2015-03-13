@@ -1256,7 +1256,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData oldTask = TestHelper.getTask(api, problem);
-		TaskUpdateRequest asdf = null;
+		TaskUpdateRequest update = null;
 		try {
 
 			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
@@ -1331,7 +1331,7 @@ public class SdkTests {
 			
 		}
 	}
-	
+
 	@Test
 	public void T38GettingVehicleWithCustomLink() {
 		API api = TestHelper.authenticate();
