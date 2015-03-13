@@ -1331,67 +1331,7 @@ public class SdkTests {
 			
 		}
 	}
-	/*
-	@Test
-	public void T37TestingTest() {
-		//test creating a case, optimizing it, changing the location of a vehicle, then optimizing again.
-		API api = TestHelper.authenticate();
-		UserData user = TestHelper.getOrCreateUser(api);
-		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
-		try {
-			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-			RoutingProblemUpdateRequest updated = problem.toRequest();
-			updated.setState("Running");
-			ResponseData data = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updated);
-			problem = api.navigate(RoutingProblemData.class, data.getLocation());
-			
-			while( problem.getProgress() <= 100) {
-				System.out.println(problem.getState() + " " + problem.getProgress());
-				Thread.sleep(1500);
-				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-				if (!problem.getState().equals("Running")) break;
-			}
-			
-			LocationData newStart = TestHelper.createLocationWithCoordinates(Location.VEHICLE_END);
-			
-			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
-			
-			VehicleData asdf = api.navigate(VehicleData.class, vehicles.getItems().get(0).getLink("self"));
-			
-			VehicleUpdateRequest vehicleToUpdate = asdf.toRequest();  
-			
-			vehicleToUpdate.setStartLocation(newStart);
-			
-			data = api.navigate(ResponseData.class, asdf.getLink("update"), vehicleToUpdate);
-			
-			System.out.println(data);
-			
-			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-			System.out.println(problem);
-			
-			updated = problem.toRequest();
-			updated.setState("Running");
-			
-			data = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updated);
-			
-			problem = api.navigate(RoutingProblemData.class, data.getLocation());	
-			
-			while( problem.getState().equals("Running")) {
-				Thread.sleep(1500);
-				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-			}
-			
-			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
-			for (VehicleData veh : vehicles.getItems()) {
-				System.out.println(veh);
-			}
-			
-		} catch (Exception e) {
-			System.out.println(e.getStackTrace());
-		}
-	}
-	*/
+	
 	@Test
 	public void T38GettingVehicleWithCustomLink() {
 		API api = TestHelper.authenticate();
@@ -1548,7 +1488,7 @@ public class SdkTests {
          capacities.add(new CapacityData("volume", 30));
 
          try {
-             //##BEGIN EXAMPLE createdepot##
+             //##BEGIN EXAMPLE updatedepot##
              DepotUpdateRequest request = new DepotUpdateRequest();
              request.setLocation(location);
              request.setCapacities(capacities);
