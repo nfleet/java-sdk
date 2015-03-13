@@ -43,18 +43,18 @@ public class SdkTests {
 	public void T01CreatingProblemTest() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
-		RoutingProblemData asdf = null;
+		RoutingProblemData problem = null;
 		try {
 			//##BEGIN EXAMPLE creatingproblem##
 			RoutingProblemUpdateRequest update = new RoutingProblemUpdateRequest("TestProblem");
 			ResponseData createdProblem = api.navigate(ResponseData.class, user.getLink("create-problem"), update);
-			RoutingProblemData problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
+			problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
 			//##END EXAMPLE##
-			asdf = problem;
+
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertNotNull(asdf);
+		assertNotNull(problem);
 	}
 	
 	@Test
@@ -105,22 +105,18 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		TaskData asdf = null;
+		TaskData task = null;
 		TaskUpdateRequest update = null;
 
         try {
     		//##BEGIN EXAMPLE creatingtask##		      
-            CoordinateData pickup = new CoordinateData();
-            pickup.setLatitude(54.14454);
-            pickup.setLongitude(12.108808);
-            pickup.setSystem(CoordinateSystem.Euclidian);
+            CoordinateData pickup = new CoordinateData(54.14454,12.108808,CoordinateSystem.Euclidian);
+
             LocationData pickupLocation = new LocationData();
             pickupLocation.setCoordinatesData(pickup);
 
-            CoordinateData delivery = new CoordinateData();
-            delivery.setLatitude(53.545867);
-            delivery.setLongitude(10.276409);
-            delivery.setSystem(CoordinateSystem.Euclidian);
+            CoordinateData delivery = new CoordinateData(53.545867,10.276409,CoordinateSystem.Euclidian);
+
             LocationData deliveryLocation = new LocationData();
             deliveryLocation.setCoordinatesData(delivery);
 
@@ -139,23 +135,23 @@ public class SdkTests {
             ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
             taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
             taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
-            TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-            task.setName("testTask");
+            update = new TaskUpdateRequest(taskEvents);
+            update.setName("testTask");
             taskEvents.get(0).setTimeWindows(timeWindows);
             taskEvents.get(1).setTimeWindows(timeWindows);
             taskEvents.get(0).setServiceTime(10);
             taskEvents.get(1).setServiceTime(10);
-            task.setActivityState("Active");
+            update.setActivityState("Active");
             
-            ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), task); 
+            ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), update);
     		//##END EXAMPLE##
-    		update = task;
-            asdf = api.navigate(TaskData.class, result.getLocation());
+
+            task = api.navigate(TaskData.class, result.getLocation());
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 
-        assertEquals(asdf.getName(), update.getName());
+        assertEquals(task.getName(), update.getName());
 	}
 	
 	@SuppressWarnings("unused")
@@ -166,7 +162,7 @@ public class SdkTests {
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData oldTask = TestHelper.getTask(api, problem);
 		List<TaskEventUpdateRequest> events = new ArrayList<TaskEventUpdateRequest>();
-		TaskUpdateRequest asdf = null;
+		TaskUpdateRequest update = null;
 		try {
 			//##BEGIN EXAMPLE updatingtask##
 			TaskUpdateRequest task = oldTask.toRequest();
@@ -174,12 +170,12 @@ public class SdkTests {
 			ResponseData newTaskLocation = api.navigate(ResponseData.class, oldTask.getLink("update"), task);
 			//##END EXAMPLE##
 			oldTask = api.navigate(TaskData.class, oldTask.getLink("self"));
-			asdf = task;
+			update = task;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 			
-		assertEquals(oldTask.getName(), asdf.getName());
+		assertEquals(oldTask.getName(), update.getName());
 	}
 	
 	@Test
@@ -188,7 +184,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData oldTask = TestHelper.getTask(api, problem);
-		TaskUpdateRequest asdf = null;
+		TaskUpdateRequest update = null;
 		try {
 		
 			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
@@ -213,17 +209,16 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		VehicleDataSet asdf = null;
+		VehicleDataSet vehicles = null;
 		try { 
 			//##BEGIN EXAMPLE listingvehicles##
-			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 			//##END EXAMPLE##
-			asdf = vehicles;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 		
-		assertNotNull(asdf.getItems());
+		assertNotNull(vehicles.getItems());
 	}
 	
 	@Test
@@ -232,7 +227,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		RouteEventDataSet asdf = null;
+		RouteEventDataSet routeEvents = null;
 		try {
 			RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			RouteUpdateRequest route = new RouteUpdateRequest();
@@ -248,12 +243,12 @@ public class SdkTests {
 			//##BEGIN EXAMPLE accessingtaskseq##
 			RouteEventDataSet events = api.navigate(RouteEventDataSet.class, vehicle.getLink("list-events"));
 			//##END EXAMPLE##
-			asdf = events;
+			routeEvents = events;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 		
-		assertNotNull(asdf);
+		assertNotNull(routeEvents);
 	}
 	
 	@Test
@@ -297,7 +292,7 @@ public class SdkTests {
 			RouteUpdateRequest route = new RouteUpdateRequest();
 			int[] sequence = {11, 12};		
 			route.setSequence(sequence);
-			ResponseData asdf = api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
+			ResponseData response = api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 			//##END EXAMPLE##
 			
 			RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));
@@ -315,7 +310,7 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		ResponseData asdf = null;
+		ResponseData response = null;
 		try { 
 			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			
@@ -324,11 +319,11 @@ public class SdkTests {
 			update.setState("Running");
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			//##END EXAMPLE##
-			asdf = result;
+			response = result;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertNotNull(asdf);
+		assertNotNull(response);
 	}
 	
 	@Test
@@ -414,7 +409,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		ArrayList<TimeWindowData> akkuna = vehicle.getTimeWindows();
+		ArrayList<TimeWindowData> timeWindows = vehicle.getTimeWindows();
 		String updatedName = null;
 		try {
 			VehicleUpdateRequest updatedVehicle = vehicle.toRequest();
@@ -426,7 +421,7 @@ public class SdkTests {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertEquals(vehicle.getTimeWindows().get(0).getStart(), akkuna.get(0).getStart());
+		assertEquals(vehicle.getTimeWindows().get(0).getStart(), timeWindows.get(0).getStart());
 		assertEquals(vehicle.getName(), updatedName);
 	}
 	
