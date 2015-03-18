@@ -642,11 +642,13 @@ public class SdkTests {
 		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
 		tasks.setItems(taskList);
 		ImportData r = null;
+		DepotSetImportRequest depots = new DepotSetImportRequest();
 		try {
 			//##BEGIN EXAMPLE importtasksandvehicles##
 			ImportRequest importRequest = new ImportRequest();
 			importRequest.setVehicles(vehicles);
 			importRequest.setTasks(tasks);
+			importRequest.setDepots(depots);
 			
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
 			System.out.println(response.getLocation());
