@@ -1473,8 +1473,7 @@ public class SdkTests {
 
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 10));
-        capacities.add(new CapacityData("Volume", 30));
-
+                
         try {
             //##BEGIN EXAMPLE createdepot##
             DepotUpdateRequest request = new DepotUpdateRequest();
@@ -1505,8 +1504,7 @@ public class SdkTests {
 
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 10));
-        capacities.add(new CapacityData("Volume", 30));
-
+        
         try {
             //##BEGIN EXAMPLE importdepots##
             ArrayList<DepotUpdateRequest> depots = new ArrayList<DepotUpdateRequest>();
@@ -1547,8 +1545,7 @@ public class SdkTests {
 
          ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
          capacities.add(new CapacityData("Weight", 10));
-         capacities.add(new CapacityData("Volume", 30));
-
+         
          try {
              //##BEGIN EXAMPLE createdepot##
              DepotUpdateRequest request = new DepotUpdateRequest();
