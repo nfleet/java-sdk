@@ -1535,7 +1535,7 @@ public class SdkTests {
 		depots.setItems(depotList);
 		
 		try {
-			//##BEGIN EXAMPLE importtasksandvehicles##
+			
 			ImportRequest importRequest = new ImportRequest();
 			importRequest.setVehicles(vehicles);
 			importRequest.setTasks(tasks);
@@ -1543,11 +1543,11 @@ public class SdkTests {
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
 			System.out.println(response.getLocation());
 			ImportData result = api.navigate(ImportData.class, response.getLocation());
-			//##END EXAMPLE##
+			
 			r = result;
-            //##BEGIN EXAMPLE getimportresults##
+           
             ImportData imp = api.navigate(ImportData.class, response.getLocation());
-            //##END EXAMPLE##
+     
 			
 		} catch (Exception e){
 			System.out.println(e.toString());
