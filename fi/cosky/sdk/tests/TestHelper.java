@@ -196,6 +196,22 @@ public class TestHelper {
         
 	}
 	
+	static DepotUpdateRequest createDepotUpdateRquest(String name) {
+		 LocationData location = new LocationData();
+         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+         capacities.add(new CapacityData("Weight", 1000));
+         DepotUpdateRequest request = new DepotUpdateRequest();
+         request.setLocation(location);
+         request.setCapacities(capacities);
+         request.setName(name);
+         request.setType("SomeType");
+         request.setInfo1("Info");
+         
+         return request;
+	}
+	
 	static LocationData createLocationWithCoordinates(Location name) {
 		CoordinateData coordinates = new CoordinateData();
 		switch (name){
