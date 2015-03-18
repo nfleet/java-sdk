@@ -1570,4 +1570,54 @@ public class SdkTests {
 
          }
     }
+    
+	@Test
+	public void T44ImportVehiclesAndTasksAnDepots() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
+		
+		for (int i = 0; i < 3; i++) {
+			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
+		}
+		vehicles.setItems(vehicleList);
+		
+		TaskSetImportRequest tasks = new TaskSetImportRequest();
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
+		tasks.setItems(taskList);
+		ImportData r = null;
+		
+		DepotSetImportRequest depots = new DepotSetImportRequest();
+		List<DepotUpdateRequest> depotList = new ArrayList<DepotUpdateRequest>();
+		
+		for (int i = 0; i < 2; i++) {
+			depotList.add(TestHelper.createDepotUpdateRquest("depot" +i) );
+		}
+				
+		depots.setItems(depotList);
+		
+		try {
+			//##BEGIN EXAMPLE importtasksandvehicles##
+			ImportRequest importRequest = new ImportRequest();
+			importRequest.setVehicles(vehicles);
+			importRequest.setTasks(tasks);
+			importRequest.setDepots(depots);
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
+			System.out.println(response.getLocation());
+			ImportData result = api.navigate(ImportData.class, response.getLocation());
+			//##END EXAMPLE##
+			r = result;
+            //##BEGIN EXAMPLE getimportresults##
+            ImportData imp = api.navigate(ImportData.class, response.getLocation());
+            //##END EXAMPLE##
+			
+		} catch (Exception e){
+			System.out.println(e.toString());
+		}
+		
+		assertEquals(0,  r.getErrorCount());		
+	}
 } 
