@@ -1,19 +1,18 @@
 package fi.cosky.sdk;
 
-
-import java.util.ArrayList;
+import java.util.List;
 
 public class DepotSetImportRequest {
     public static final String MimeType = DepotDataSet.MimeType;
     public static final double MimeVersion = DepotDataSet.MimeVersion;
 
-    private ArrayList<DepotUpdateRequest> Items;
+    private List<DepotUpdateRequest> Items;
 
-    public ArrayList<DepotUpdateRequest> getItems() {
+    public List<DepotUpdateRequest> getItems() {
         return Items;
     }
 
-    public void setItems(ArrayList<DepotUpdateRequest> items) {
+    public void setItems(List<DepotUpdateRequest> items) {
         Items = items;
     }
 }
