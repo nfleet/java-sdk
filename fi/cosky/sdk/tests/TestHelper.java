@@ -7,6 +7,7 @@ package fi.cosky.sdk.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -284,12 +285,14 @@ public class TestHelper {
 	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY, VEHICLE_END };
 	 
 	static TimeWindowData createTimeWindow(int start, int end) {
-		Date startD = new Date();
-		startD.setHours(start);
+		Calendar calendar = Calendar.getInstance();
 		
-		Date endD = new Date();
-		endD.setHours(end);
-		
+		calendar.set(Calendar.HOUR_OF_DAY, start);
+		Date startD = calendar.getTime();
+				
+		calendar.set(Calendar.HOUR_OF_DAY, end);
+		Date endD = calendar.getTime();
+				
 		TimeWindowData twd = new TimeWindowData(startD, endD);
 		return twd;
 	}
