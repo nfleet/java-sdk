@@ -17,8 +17,11 @@ public class RoutingProblemData extends BaseData {
     private String State;
     private int Progress;
     private int VersionNumber;
+    private String DataState;
     
-    public int getProgress() {
+   
+
+	public int getProgress() {
         return Progress;
     }
 
@@ -54,11 +57,10 @@ public class RoutingProblemData extends BaseData {
         this.ModifiedDate = date;
     }
 
-
-
     public void setName(String name) {
         this.Name = name;
     }
+    
     public int getId() {
         return Id;
     }
@@ -88,6 +90,14 @@ public class RoutingProblemData extends BaseData {
         return Name;
     }
 
+    public String getDataState() {
+		return DataState;
+	}
+
+	public void setDataState(String dataState) {
+		DataState = dataState;
+	}
+	
     public RoutingProblemUpdateRequest toRequest() {
         RoutingProblemUpdateRequest request = new RoutingProblemUpdateRequest(Name);
         request.setCreationDate(this.getCreationDate());
