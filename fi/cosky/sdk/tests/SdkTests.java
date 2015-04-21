@@ -766,9 +766,20 @@ public class SdkTests {
 			//##BEGIN EXAMPLE applyimport##
 			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
 			//##END EXAMPLE##
+			
+			
+			routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+			
+			while (routingProblemData.getDataState().equals("Pending")) {
+				System.out.println("State is pending");
+				Thread.sleep(1000);
+				routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+			}
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
+		
+		
 		assertNotEquals(response, null);
 		assertNotEquals(response.getLocation(), null);
 	}
