@@ -1566,4 +1566,49 @@ public class SdkTests {
 		
 		assertEquals(0,  r.getErrorCount());		
 	}
+	
+	@Test
+	public void T45GettingRoutingProblemSummary() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		RoutingProblemSummaryData summary = null;
+		
+		try {
+			while (problem.getState().equals("Pending")) {
+				System.out.println("state is pending, waiting");
+				Thread.sleep(1000);
+				problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
+			}
+			
+			summary = api.navigate(RoutingProblemSummaryData.class, problem.getLink("summary"));
+
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(summary);
+	}
+	
+	@Test
+	public void T46GettingRoutingProblemSummaries() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		RoutingProblemSummaryDataSet summary = null;
+		
+		try {
+			while (problem.getState().equals("Pending")) {
+				System.out.println("state is pending, waiting");
+				Thread.sleep(1000);
+				problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
+			}
+				
+			summary = api.navigate(RoutingProblemSummaryDataSet.class, user.getLink("list-summaries"));
+		
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(summary);
+		
+	}
 } 
