@@ -6,6 +6,7 @@ package fi.cosky.sdk;
  */
 
 import java.util.Date;
+import java.util.List;
 
 public class RouteEventData extends BaseData {
 	public static final String MimeType =  "application/vnd.jyu.nfleet.routeevent";
@@ -20,6 +21,7 @@ public class RouteEventData extends BaseData {
 	private Date DepartureTime;
 	private String State;
 	private KPIData KPIs;
+	private List<Float> Geometry;
 		
 	int getVersionNumber() {
 		return VersionNumber;
@@ -91,5 +93,12 @@ public class RouteEventData extends BaseData {
 	public void setKPIs(KPIData kPIs) {
 		KPIs = kPIs;
 	}
-	
+
+	public List<Float> getGeometry() {
+		return Geometry;
+	}
+
+	public void setGeometry(List<Float> geometry) {
+		Geometry = geometry;
+	}	
 }
