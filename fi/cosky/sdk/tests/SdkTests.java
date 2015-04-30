@@ -1580,9 +1580,9 @@ public class SdkTests {
 				Thread.sleep(1000);
 				problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
 			}
-			
+            //##BEGIN EXAMPLE getproblemsummary##
 			summary = api.navigate(RoutingProblemSummaryData.class, problem.getLink("summary"));
-
+            //##END EXAMPLE##
 		} catch (Exception e) {
 			
 		}
