@@ -31,6 +31,10 @@ public class SdkTests {
 			api.authenticate(clientKey, clientSecret);
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
+
+            //##BEGIN EXAMPLE oauth##
+            api.authenticate(clientKey, clientSecret);
+            //##END EXAMPLE##
 			data2 = data;
 		} catch (Exception e) {
 			System.out.println(e.toString());
