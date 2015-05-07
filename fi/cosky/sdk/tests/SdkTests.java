@@ -769,16 +769,16 @@ public class SdkTests {
 	
 			//##BEGIN EXAMPLE applyimport##
 			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
-			//##END EXAMPLE##
-			
-			
+
 			routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
-			
+
+            // now we wait for NFleet to do geocoding i.e. data state turns from 'Pending' into 'Ready'
 			while (routingProblemData.getDataState().equals("Pending")) {
 				System.out.println("State is pending");
 				Thread.sleep(1000);
 				routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
 			}
+            //##END EXAMPLE##
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
@@ -1523,6 +1523,10 @@ public class SdkTests {
     
 	@Test
 	public void T44ImportVehiclesAndTasksAnDepots() {
+        int vehicleCount = 3;
+        int taskCount = 3;
+        int depotCount = 2;
+
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblem(api, user);
@@ -1530,20 +1534,20 @@ public class SdkTests {
 		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
 		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
 		
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < vehicleCount; i++) {
 			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
 		}
 		vehicles.setItems(vehicleList);
 		
 		TaskSetImportRequest tasks = new TaskSetImportRequest();
-		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(taskCount);
 		tasks.setItems(taskList);
 		ImportData r = null;
 		
 		DepotSetImportRequest depots = new DepotSetImportRequest();
 		List<DepotUpdateRequest> depotList = new ArrayList<DepotUpdateRequest>();
 		
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < depotCount; i++) {
 			depotList.add(TestHelper.createDepotUpdateRquest("depot" +i) );
 		}
 				
@@ -1562,8 +1566,26 @@ public class SdkTests {
 			r = result;
            
             ImportData imp = api.navigate(ImportData.class, response.getLocation());
-     
-			
+            assertTrue(imp.getErrorCount() < 1); // we can't do apply if there are any errors
+            System.out.println("Applying ...");
+            api.navigate(ResponseData.class, imp.getLink("apply-import"));
+
+            // now we wait for NFleet to do geocoding
+            while (problem.getDataState().equals("Pending")) {
+                System.out.println("state is pending, waiting");
+                Thread.sleep(1000);
+                problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
+            }
+            System.out.println("Geocoding is ready");
+
+            VehicleDataSet vs = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+            TaskDataSet ts = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+            DepotDataSet ds = api.navigate(DepotDataSet.class, problem.getLink("list-depots"));
+
+            assertEquals(vehicleCount, vs.getItems().size());
+            assertEquals(taskCount, ts.getItems().size());
+            assertEquals(depotCount, ds.getItems().size());
+
 		} catch (Exception e){
 			System.out.println(e.toString());
 		}
