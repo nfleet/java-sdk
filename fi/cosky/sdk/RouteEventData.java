@@ -22,6 +22,9 @@ public class RouteEventData extends BaseData {
 	private String State;
 	private KPIData KPIs;
 	private List<Float> Geometry;
+	private String Type;
+	private int SequenceNumber;
+	private int TaskId;
 		
 	int getVersionNumber() {
 		return VersionNumber;
@@ -100,5 +103,29 @@ public class RouteEventData extends BaseData {
 
 	public void setGeometry(List<Float> geometry) {
 		Geometry = geometry;
+	}
+
+	public String getType() {
+		return Type;
+	}
+
+	public void setType(String type) {
+		Type = type;
+	}
+
+	public int getSequenceNumber() {
+		return SequenceNumber;
+	}
+
+	public void setSequenceNumber(int sequenceNumber) {
+		SequenceNumber = sequenceNumber;
+	}
+
+	public int getTaskId() {
+		return TaskId;
+	}
+
+	public void setTaskId(int taskId) {
+		TaskId = taskId;
 	}	
 }
