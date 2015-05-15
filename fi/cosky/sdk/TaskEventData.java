@@ -21,6 +21,7 @@ public class TaskEventData extends BaseData {
         this.Type = type;
         this.Location = location;
         this.Capacities = capacities;
+        this.ServiceTime = 0;
     }
 
     public int getId() {

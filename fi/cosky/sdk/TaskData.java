@@ -30,6 +30,7 @@ public class TaskData extends BaseData {
     public TaskData() {
     	this.RelocationType = "None";
     	this.ActivityState = "Active"; // other possibility is "Inactive"
+    	this.Priority = 0;
     }
     
     public String getInfo() {
