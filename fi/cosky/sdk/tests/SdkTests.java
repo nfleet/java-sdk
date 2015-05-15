@@ -1637,4 +1637,37 @@ public class SdkTests {
 		assertNotNull(summary);
 		
 	}
+	
+	@Test
+	public void WritingCSVFromAFinishedOptimization() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		
+		RoutingProblemUpdateRequest requ = problem.toRequest();
+		requ.setState("Running");
+		boolean wasPending = false;
+		try {
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), requ);
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			while (problem.getState().equals("Running")) {
+				Thread.sleep(1000);
+				System.out.println(problem.getProgress());
+				problem = api.navigate(RoutingProblemData.class, response.getLocation());
+				if (problem.getDataState().equals("Pending")) wasPending = true;
+			}
+
+			
+			
+			PlanData plan = api.navigate(PlanData.class, problem.getLink("plan"));
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			
+			CsvWriter csv = new CsvWriter();
+			csv.write(plan, vehicles, tasks);
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		assertEquals(problem.getState(), "Stopped");
+	}
 } 
