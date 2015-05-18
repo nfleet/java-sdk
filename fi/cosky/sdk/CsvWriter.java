@@ -27,6 +27,13 @@ public class CsvWriter {
 	
 	private final String noString = '"' + "(no)" + '"' + ";";
 	
+	/**
+	 * Writes vehicles.csv and tasks.csv for importing to NFleet web app. 
+	 *  
+	 * @param plan 
+	 * @param vehicles
+	 * @param tasks
+	 */
 	public void write(PlanData plan, VehicleDataSet vehicles, TaskDataSet tasks) {
 		if (plan == null || vehicles == null || tasks == null) {
 			System.out.println("one of the parameters for write is null, breaking");
@@ -49,43 +56,41 @@ public class CsvWriter {
 			
 			for (TaskData t : tasks.getItems()) {
 				sb = new StringBuilder();
-				sb.append('"' + t.getName() + '"'+ ";");
+				sb.append("\"" + t.getName() + "\";");
 				if (isNullOrEmpty(t.getInfo()))
 					sb.append(noString);
 				else
-					sb.append('"' + t.getInfo() + '"'+ ";");
+					sb.append("\"" + t.getInfo() + "\";");
 				sb.append(noString);
 				sb.append(noString);
 				sb.append(noString);
 				sb.append( capacityStrings(t.getTaskEvents().get(0).getCapacities()) );	
-				sb.append('"' );
+				sb.append("\"");
 				sb.append( t.getPriority() );
-				sb.append( '"' + ";");
-				sb.append( locationString(t.getTaskEvents().get(0).getLocation()) + '"'); 
+				sb.append( "\";");
+				sb.append( locationString(t.getTaskEvents().get(0).getLocation()) + "\""); 
 				sb.append( t.getTaskEvents().get(0).getServiceTime());
-				sb.append( '"'+ ";" + '"');
-				sb.append("0" );
-				sb.append('"'+ ";");
-				sb.append('"' + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getStart()) + '"'+ ";");
-				sb.append('"' + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getEnd()) + '"'+ ";");
-				sb.append( locationString(t.getTaskEvents().get(1).getLocation()) +'"');
+				sb.append( "\";");
+				sb.append("\"0\";" );
+				sb.append("\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getStart()) + "\";");
+				sb.append("\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getEnd()) + "\";");
+				sb.append( locationString(t.getTaskEvents().get(1).getLocation()) + "\"");
 				sb.append( t.getTaskEvents().get(1).getServiceTime() );
-				sb.append( '"'+ ";" + '"');
-				sb.append( "0" );
-				sb.append( '"'+ ";");
-				sb.append('"' + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getStart()) + '"'+ ";");
-				sb.append('"' + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getEnd()) + '"'+ ";");
+				sb.append( "\";" );
+				sb.append( "\"0\";" );
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getStart()) + "\";");
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getEnd()) + "\";");
 				if (t.getIncompatibleVehicleTypes() != null && t.getIncompatibleVehicleTypes().size() > 1 ) 
-					sb.append('"' + t.getIncompatibleVehicleTypes().toString() + '"'+ ";");
+					sb.append("\"" + t.getIncompatibleVehicleTypes().toString() + "\";");
 				else 
 					sb.append(noString);
 				if (t.getCompatibleVehicleTypes() != null && t.getCompatibleVehicleTypes().size() > 1)
-					sb.append('"' + t.getCompatibleVehicleTypes().toString() + '"'+ ";");
+					sb.append("\"" + t.getCompatibleVehicleTypes().toString() + "\";");
 				else
 					sb.append(noString);
-				sb.append('"' + t.getRelocationType() + '"'+ ";");
+				sb.append('"' + t.getRelocationType() + "\";");
 				sb.append( fromPlan.get(t.getId()) );
-				sb.append('"' + "Unlocked" + '"' + ";");
+				sb.append("\"Unlocked\";" );
 				sb.append("\n");
 				output.write(sb.toString());
 			}
@@ -109,12 +114,12 @@ public class CsvWriter {
 		for (FieldsItem fi : plan.getItems()) {
 			for (RouteEventData event : fi.getEvents()) {
 				if (event.getType().equals("Pickup")) {
-					map.put(event.getTaskId(), '"' + buildDateTimeString(event.getArrivalTime()) + '"' + ";" + '"' + fi.getName() + '"' + ";" +'"' + "" +event.getSequenceNumber() +""+ '"' + ";" );
+					map.put(event.getTaskId(), "\"" + buildDateTimeString(event.getArrivalTime()) + "\";\"" + fi.getName() + "\";\"" +event.getSequenceNumber() + "\";");
 				}
 				if (event.getType().equals("Delivery")) {
 					String s = map.get(event.getTaskId());
 					map.remove(event.getTaskId());
-					s += '"' + "" + event.getSequenceNumber() + "" + '"' + ";";
+					s += "\"" + event.getSequenceNumber() + "\";";
 					map.put(event.getTaskId(), s);
 				}
 			}
@@ -134,25 +139,25 @@ public class CsvWriter {
 			
 			for (VehicleData vehicle : vehicles.getItems()) {
 				sb = new StringBuilder();
-				sb.append('"' + vehicle.getName() + '"'+ ";");
+				sb.append("\"" + vehicle.getName() + "\";");
 				if (isNullOrEmpty(vehicle.getVehicleType()))
 					sb.append(noString);
 				else				
-					sb.append('"' + vehicle.getVehicleType() + '"' + ";");
-				sb.append( capacityStrings(vehicle.getCapacities()) + '"');
+					sb.append("\"" + vehicle.getVehicleType() + "\";");
+				sb.append( capacityStrings(vehicle.getCapacities()) + "\"");
 				sb.append( vehicle.getFixedCost());
-				sb.append( '"'+ ";" + '"');
+				sb.append( "\";\"");
 				sb.append( vehicle.getKilometerCost());
-				sb.append(  '"'+ ";" + '"');
+				sb.append(  "\";\"");
 				sb.append( vehicle.getHourCost() );
-				sb.append( '"'+ ";" );
+				sb.append( "\";" );
 				sb.append( locationString( vehicle.getStartLocation()) );
 				sb.append( locationString( vehicle.getEndLocation()) );
 				if (vehicle.getTimeWindows().size() == 1) {
-					sb.append('"' + buildDateTimeString(vehicle.getTimeWindows().get(0).getStart()) + '"'+ ";");
-					sb.append('"' + buildDateTimeString(vehicle.getTimeWindows().get(0).getEnd()) + '"'+ ";");
+					sb.append("\"" + buildDateTimeString(vehicle.getTimeWindows().get(0).getStart()) + "\";");
+					sb.append("\"" + buildDateTimeString(vehicle.getTimeWindows().get(0).getEnd()) + "\";");
 				}
-				sb.append('"' + vehicle.getRelocationType() + '"' + ";");
+				sb.append("\"" + vehicle.getRelocationType() + "\";");
 				sb.append("\n");
 				output.write(sb.toString());
 			}			
@@ -178,29 +183,29 @@ public class CsvWriter {
 			if (isNullOrEmpty(location.getAddress().getStreet()))
 				sb.append(noString);
 			else 
-				sb.append('"' + location.getAddress().getStreet() + " " + location.getAddress().getApartmentNumber() +'"'+ ";");
+				sb.append("\"" + location.getAddress().getStreet() + " " + location.getAddress().getApartmentNumber() + "\";");
 			if (isNullOrEmpty(location.getAddress().getPostalCode())) 
 				sb.append(noString);
 			else
-				sb.append('"' + location.getAddress().getPostalCode()+ '"'+ ";");
+				sb.append( "\"" + location.getAddress().getPostalCode()+ "\";");
 			if (isNullOrEmpty(location.getAddress().getCity()))
 				sb.append(noString);
 			else 
-				sb.append('"' + location.getAddress().getCity() + '"'+ ";");
+				sb.append("\"" + location.getAddress().getCity() + "\";");
 			if (isNullOrEmpty(location.getAddress().getCountry()))
 				sb.append(noString);
 			else
-				sb.append('"' + location.getAddress().getCountry()+ '"'+ ";");
+				sb.append("\"" + location.getAddress().getCountry()+ "\";");
 		} else {
 			sb.append(noString + noString + noString + noString );
 		}
 		
 		if (location.getCoordinatesData() != null) {
-			sb.append('"');
+			sb.append("\"");
 			sb.append(location.getCoordinatesData().getLatitude());
-			sb.append( '"' + ";" + '"');
+			sb.append( "\";\"");
 			sb.append(location.getCoordinatesData().getLongitude());
-			sb.append( '"' + ";" );
+			sb.append( "\";");
 		} else {
 			sb.append(noString + noString);
 		}
@@ -217,15 +222,15 @@ public class CsvWriter {
 		
 		switch (caps.size()){
 			case 1: {
-				sb.append('"' + caps.get(0).getAmount() + '"' + ";" + '"' + "(no)" + '"' + ";" + '"' + "(no)" + '"' + ";");
+				sb.append("\"" + caps.get(0).getAmount() + "\";\"(no)\";\"(no)\";");
 				break;
 			}
 			case 2: {
-				sb.append('"' + caps.get(0).getAmount() + '"' + ";" + '"' + caps.get(1).getAmount() + '"' + ";" + '"' + "(no)" + '"' + ";");
+				sb.append('"' + caps.get(0).getAmount() + "\";\"" + caps.get(1).getAmount() + "\";\"(no)\";" );
 				break;
 			}
 			case 3: {
-				sb.append('"' + caps.get(0).getAmount() + '"' + ";" + '"' + caps.get(1).getAmount() + '"' + ";" + '"' + caps.get(2).getAmount() + '"' + ";");
+				sb.append('"' + caps.get(0).getAmount() + "\";\"" + caps.get(1).getAmount() + "\";\"" + caps.get(2).getAmount() + "\";");
 				break;
 			}
 		}
@@ -236,7 +241,7 @@ public class CsvWriter {
 		StringBuilder sb = new StringBuilder();
 		
 		for (int i = 0; i < headers.length; i++) {
-			sb.append('"' + headers[i] + '"' + ";");
+			sb.append("\"" + headers[i] + "\";");
 		}
 		
 		sb.append("\n");
