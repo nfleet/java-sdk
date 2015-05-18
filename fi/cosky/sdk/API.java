@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -239,7 +240,7 @@ public class API {
 			if (method.equals("POST") || method.equals("PUT")) {
 					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
 					connection.addRequestProperty("Content-Length",	json.getBytes("UTF-8").length + "");
-					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream(), Charset.forName("UTF-8").newEncoder());
 					osw.write(json);
 					osw.flush();
 					osw.close();		
@@ -567,7 +568,7 @@ public class API {
 		StringBuilder sb = null;
 		try {
 			is = connection.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
+			br = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8").newDecoder()));
 
 			sb = new StringBuilder();
 			String line;
