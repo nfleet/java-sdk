@@ -347,7 +347,7 @@ public class API {
 			
 			if (doOutput){ 
 				connection.addRequestProperty("Content-Length", "0");
-				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
+				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
 				os.write("");
 				os.flush();
 				os.close();
@@ -567,7 +567,7 @@ public class API {
 		StringBuilder sb = null;
 		try {
 			is = connection.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
+			br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
 			sb = new StringBuilder();
 			String line;
