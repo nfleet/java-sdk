@@ -14,6 +14,7 @@ public class TaskEventData extends BaseData {
     private List<TimeWindowData> TimeWindows;
     private LocationData Location;
     private int ServiceTime;
+    private int StoppingTime;
     private List<CapacityData> Capacities;
         
     //Constructor uses only the required fields, others can be accessed via getters and setters
@@ -80,7 +81,15 @@ public class TaskEventData extends BaseData {
         ServiceTime = serviceTime;
     }
 
-    public List<CapacityData> getCapacities() {
+    public int getStoppingTime() {
+		return StoppingTime;
+	}
+
+	public void setStoppingTime(int stoppingTime) {
+		StoppingTime = stoppingTime;
+	}
+
+	public List<CapacityData> getCapacities() {
         return Capacities;
     }
 
