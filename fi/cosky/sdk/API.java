@@ -239,7 +239,7 @@ public class API {
 			if (method.equals("POST") || method.equals("PUT")) {
 					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
 					connection.addRequestProperty("Content-Length",	json.getBytes("UTF-8").length + "");
-					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream(), "UTF-8" );
 					osw.write(json);
 					osw.flush();
 					osw.close();		
