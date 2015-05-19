@@ -25,7 +25,7 @@ public class CsvWriter {
 											  "VPPc","VPCity","VPCtry","VPLat","VPLon","VDAdd","VDPc","VDCity","VDCtry",
 											  "VDLat","VDLon","VTWStart","VTWEnd","VRel"};
 	
-	private final String noString = '"' + "(no)" + '"' + ";";
+	private static final String noString = '"' + "(no)" + '"' + ";";
 	
 	/**
 	 * Writes vehicles.csv and tasks.csv for importing to NFleet web app. 
@@ -57,41 +57,38 @@ public class CsvWriter {
 			for (TaskData t : tasks.getItems()) {
 				sb = new StringBuilder();
 				sb.append("\"" + t.getName() + "\";");
-				if (isNullOrEmpty(t.getInfo()))
-					sb.append(noString);
-				else
-					sb.append("\"" + t.getInfo() + "\";");
-				sb.append(noString);
-				sb.append(noString);
-				sb.append(noString);
+				
+				sb.append(valueOrNoString(t.getInfo()));
+				sb.append(valueOrNoString(t.getInfo2()));
+				sb.append(valueOrNoString(t.getInfo3()));
+				sb.append(valueOrNoString(t.getInfo4()));
+
 				sb.append( capacityStrings(t.getTaskEvents().get(0).getCapacities()) );	
-				sb.append("\"");
-				sb.append( t.getPriority() );
-				sb.append( "\";");
-				sb.append( locationString(t.getTaskEvents().get(0).getLocation()) + "\""); 
-				sb.append( t.getTaskEvents().get(0).getServiceTime());
-				sb.append( "\";");
-				sb.append("\"0\";" );
-				sb.append("\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getStart()) + "\";");
-				sb.append("\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getEnd()) + "\";");
-				sb.append( locationString(t.getTaskEvents().get(1).getLocation()) + "\"");
-				sb.append( t.getTaskEvents().get(1).getServiceTime() );
-				sb.append( "\";" );
-				sb.append( "\"0\";" );
+				sb.append( "\"" + t.getPriority() + "\";");
+				sb.append( locationString(t.getTaskEvents().get(0).getLocation()) ); 
+				sb.append( "\"" + t.getTaskEvents().get(0).getServiceTime() + "\";");
+				sb.append( "\"" + t.getTaskEvents().get(0).getStoppingTime() + "\";" );
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getStart()) + "\";");
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getEnd()) + "\";");
+				sb.append( locationString(t.getTaskEvents().get(1).getLocation()) );
+				sb.append( "\"" + t.getTaskEvents().get(1).getServiceTime() + "\";");
+				sb.append( "\"" + t.getTaskEvents().get(1).getStoppingTime() +"\";" );
 				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getStart()) + "\";");
 				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getEnd()) + "\";");
-				if (t.getIncompatibleVehicleTypes() != null && t.getIncompatibleVehicleTypes().size() > 1 ) 
+				if ( t.getIncompatibleVehicleTypes() != null && t.getIncompatibleVehicleTypes().size() > 1 ) 
 					sb.append("\"" + t.getIncompatibleVehicleTypes().toString() + "\";");
 				else 
 					sb.append(noString);
-				if (t.getCompatibleVehicleTypes() != null && t.getCompatibleVehicleTypes().size() > 1)
+				
+				if ( t.getCompatibleVehicleTypes() != null && t.getCompatibleVehicleTypes().size() > 1)
 					sb.append("\"" + t.getCompatibleVehicleTypes().toString() + "\";");
 				else
 					sb.append(noString);
-				sb.append('"' + t.getRelocationType() + "\";");
+				
+				sb.append( "\"" + t.getRelocationType() + "\";" );
 				sb.append( fromPlan.get(t.getId()) );
-				sb.append("\"Unlocked\";" );
-				sb.append("\n");
+				sb.append( "\"Unlocked\";" );
+				sb.append( "\n" );
 				output.write(sb.toString());
 			}
 			
@@ -139,18 +136,12 @@ public class CsvWriter {
 			
 			for (VehicleData vehicle : vehicles.getItems()) {
 				sb = new StringBuilder();
-				sb.append("\"" + vehicle.getName() + "\";");
-				if (isNullOrEmpty(vehicle.getVehicleType()))
-					sb.append(noString);
-				else				
-					sb.append("\"" + vehicle.getVehicleType() + "\";");
-				sb.append( capacityStrings(vehicle.getCapacities()) + "\"");
-				sb.append( vehicle.getFixedCost());
-				sb.append( "\";\"");
-				sb.append( vehicle.getKilometerCost());
-				sb.append(  "\";\"");
-				sb.append( vehicle.getHourCost() );
-				sb.append( "\";" );
+				sb.append( "\"" + vehicle.getName() + "\";" );
+				sb.append( "\"" + valueOrNoString(vehicle.getVehicleType()) + "\";" );
+				sb.append( capacityStrings(vehicle.getCapacities()) );
+				sb.append( "\"" + vehicle.getFixedCost() + "\";" );
+				sb.append( "\"" + vehicle.getKilometerCost() + "\";");
+				sb.append( "\"" + vehicle.getHourCost() + "\";" );
 				sb.append( locationString( vehicle.getStartLocation()) );
 				sb.append( locationString( vehicle.getEndLocation()) );
 				if (vehicle.getTimeWindows().size() == 1) {
@@ -215,6 +206,10 @@ public class CsvWriter {
 	
 	private static boolean isNullOrEmpty(String param) {
 		return param == null || param.trim().length() == 0;
+	}
+	
+	private static String valueOrNoString(String param) {
+		return (isNullOrEmpty(param)) ? noString : "\"" + param + "\";";  
 	}
 	
 	private String capacityStrings(List<CapacityData> caps) {
