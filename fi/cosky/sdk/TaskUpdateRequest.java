@@ -12,6 +12,9 @@ public class TaskUpdateRequest extends BaseData {
 	
     private String Name;
     private String Info;
+    private String Info2;
+    private String Info3;
+    private String Info4;
     private List<TaskEventUpdateRequest> TaskEvents;
     private int TaskId;
     private int VersionNumber;
@@ -86,7 +89,31 @@ public class TaskUpdateRequest extends BaseData {
         Info = info;
     }
 
-    public List<String> getIncompatibleVehicleTypes() {
+    public String getInfo2() {
+		return Info2;
+	}
+
+	public void setInfo2(String info2) {
+		Info2 = info2;
+	}
+
+	public String getInfo3() {
+		return Info3;
+	}
+
+	public void setInfo3(String info3) {
+		Info3 = info3;
+	}
+
+	public String getInfo4() {
+		return Info4;
+	}
+
+	public void setInfo4(String info4) {
+		Info4 = info4;
+	}
+
+	public List<String> getIncompatibleVehicleTypes() {
 		return IncompatibleVehicleTypes;
 	}
 

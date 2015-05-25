@@ -13,6 +13,9 @@ public class TaskData extends BaseData {
 	
     private String Name;
     private String Info;
+    private String Info2;
+    private String Info3;
+    private String Info4;
     private List<TaskEventData> TaskEvents;
     private int Id;
     private int VersionNumber;
@@ -30,6 +33,7 @@ public class TaskData extends BaseData {
     public TaskData() {
     	this.RelocationType = "None";
     	this.ActivityState = "Active"; // other possibility is "Inactive"
+    	this.Priority = 0;
     }
     
     public String getInfo() {
@@ -48,7 +52,31 @@ public class TaskData extends BaseData {
         Info = info;
     }
 
-    public List<TaskEventData> getTaskEvents() {
+    public String getInfo2() {
+		return Info2;
+	}
+
+	public void setInfo2(String info2) {
+		Info2 = info2;
+	}
+
+	public String getInfo3() {
+		return Info3;
+	}
+
+	public void setInfo3(String info3) {
+		Info3 = info3;
+	}
+
+	public String getInfo4() {
+		return Info4;
+	}
+
+	public void setInfo4(String info4) {
+		Info4 = info4;
+	}
+
+	public List<TaskEventData> getTaskEvents() {
         return TaskEvents;
     }
 
