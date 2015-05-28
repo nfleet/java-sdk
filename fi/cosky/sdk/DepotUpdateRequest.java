@@ -13,7 +13,8 @@ public class DepotUpdateRequest {
     private String Type;
     private ArrayList<CapacityData> Capacities;
     private LocationData Location;
-
+    private double StoppingTime;
+    
     public int getDepotId() {
         return DepotId;
     }
@@ -61,4 +62,12 @@ public class DepotUpdateRequest {
     public void setLocation(LocationData location) {
         Location = location;
     }
+
+	public double getStoppingTime() {
+		return StoppingTime;
+	}
+
+	public void setStoppingTime(double stoppingTime) {
+		StoppingTime = stoppingTime;
+	}
 }

@@ -15,6 +15,7 @@ public class DepotData extends BaseData {
     private ArrayList<CapacityData> Capacities;
     private LocationData Location;
     private int VersionNumber;
+    private double StoppingTime;
 
 
     public DepotData() {
@@ -84,4 +85,12 @@ public class DepotData extends BaseData {
     public void setVersionNumber(int versionNumber) {
         VersionNumber = versionNumber;
     }
+
+	public double getStoppingTime() {
+		return StoppingTime;
+	}
+
+	public void setStoppingTime(double stoppingTime) {
+		StoppingTime = stoppingTime;
+	}
 }
