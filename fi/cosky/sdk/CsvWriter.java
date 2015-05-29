@@ -56,38 +56,38 @@ public class CsvWriter {
 			
 			for (TaskData t : tasks.getItems()) {
 				sb = new StringBuilder();
-				sb.append("\"" + t.getName() + "\";");
+				sb.append("\"" + t.getName() + "\";");   //taskid
 				
-				sb.append(valueOrNoString(t.getInfo()));
-				sb.append(valueOrNoString(t.getInfo2()));
-				sb.append(valueOrNoString(t.getInfo3()));
-				sb.append(valueOrNoString(t.getInfo4()));
+				sb.append(valueOrNoString(t.getInfo())); //info1
+				sb.append(valueOrNoString(t.getInfo2())); //info2
+				sb.append(valueOrNoString(t.getInfo3())); //info3
+				sb.append(valueOrNoString(t.getInfo4())); //info4
 
-				sb.append( capacityStrings(t.getTaskEvents().get(0).getCapacities()) );	
-				sb.append( "\"" + t.getPriority() + "\";");
-				sb.append( locationString(t.getTaskEvents().get(0).getLocation()) ); 
-				sb.append( "\"" + t.getTaskEvents().get(0).getServiceTime() + "\";");
-				sb.append( "\"" + t.getTaskEvents().get(0).getStoppingTime() + "\";" );
-				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getStart()) + "\";");
-				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getEnd()) + "\";");
-				sb.append( locationString(t.getTaskEvents().get(1).getLocation()) );
-				sb.append( "\"" + t.getTaskEvents().get(1).getServiceTime() + "\";");
-				sb.append( "\"" + t.getTaskEvents().get(1).getStoppingTime() +"\";" );
-				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getStart()) + "\";");
-				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getEnd()) + "\";");
-				if ( t.getIncompatibleVehicleTypes() != null && t.getIncompatibleVehicleTypes().size() > 1 ) 
+				sb.append( capacityStrings(t.getTaskEvents().get(0).getCapacities()) ); //cap1, cap2, cap3	
+				sb.append( "\"" + t.getPriority() + "\";"); //Priority
+				sb.append( locationString(t.getTaskEvents().get(0).getLocation()) ); // "PAdd", "PPc","PCity","PCtry","PLat","PLon"
+				sb.append( "\"" + t.getTaskEvents().get(0).getServiceTime() + "\";"); //PSerT
+				sb.append( "\"" + t.getTaskEvents().get(0).getStoppingTime() + "\";" ); //PStopt
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getStart()) + "\";"); //PTWStart (pickupTimewindowStart)
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(0).getTimeWindows().get(0).getEnd()) + "\";"); //PTWEnd (pickupTimeWindowEnd
+				sb.append( locationString(t.getTaskEvents().get(1).getLocation()) ); //"DAdd", "DPc","DCity","DCtry","DLat","DLon"
+				sb.append( "\"" + t.getTaskEvents().get(1).getServiceTime() + "\";"); //DSerT 
+				sb.append( "\"" + t.getTaskEvents().get(1).getStoppingTime() +"\";" ); //Stopt
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getStart()) + "\";"); //DTWStart
+				sb.append( "\"" + buildDateTimeString(t.getTaskEvents().get(1).getTimeWindows().get(0).getEnd()) + "\";"); //DTWEnd
+				if ( t.getIncompatibleVehicleTypes() != null && t.getIncompatibleVehicleTypes().size() > 1 ) //Incomp
 					sb.append("\"" + t.getIncompatibleVehicleTypes().toString() + "\";");
 				else 
 					sb.append(noString);
 				
-				if ( t.getCompatibleVehicleTypes() != null && t.getCompatibleVehicleTypes().size() > 1)
+				if ( t.getCompatibleVehicleTypes() != null && t.getCompatibleVehicleTypes().size() > 1) //Comp
 					sb.append("\"" + t.getCompatibleVehicleTypes().toString() + "\";");
 				else
 					sb.append(noString);
 				
-				sb.append( "\"" + t.getRelocationType() + "\";" );
-				sb.append( fromPlan.get(t.getId()) );
-				sb.append( "\"Unlocked\";" );
+				sb.append( "\"" + t.getRelocationType() + "\";" ); //TRel
+				sb.append( fromPlan.get(t.getId()) ); //PATime(pickup time), VehId(vehicle id), PSeq(pickup sequence number), DSeq (delivery sequence number) 
+				sb.append( "\"Unlocked\";" ); //IsLocked (if task laready has pa time the lock is created, thus this can be unlocked)
 				sb.append( "\n" );
 				output.write(sb.toString());
 			}
@@ -136,19 +136,19 @@ public class CsvWriter {
 			
 			for (VehicleData vehicle : vehicles.getItems()) {
 				sb = new StringBuilder();
-				sb.append( "\"" + vehicle.getName() + "\";" );
-				sb.append( "\"" + valueOrNoString(vehicle.getVehicleType()) + "\";" );
-				sb.append( capacityStrings(vehicle.getCapacities()) );
-				sb.append( "\"" + vehicle.getFixedCost() + "\";" );
-				sb.append( "\"" + vehicle.getKilometerCost() + "\";");
-				sb.append( "\"" + vehicle.getHourCost() + "\";" );
-				sb.append( locationString( vehicle.getStartLocation()) );
-				sb.append( locationString( vehicle.getEndLocation()) );
+				sb.append( "\"" + vehicle.getName() + "\";" ); //VehID
+				sb.append( "\"" + valueOrNoString(vehicle.getVehicleType()) + "\";" ); //VType
+				sb.append( capacityStrings(vehicle.getCapacities()) );  // vcap1, vcap2, vcap3
+				sb.append( "\"" + vehicle.getFixedCost() + "\";" ); //VFixedC
+				sb.append( "\"" + vehicle.getKilometerCost() + "\";"); //VKmC
+				sb.append( "\"" + vehicle.getHourCost() + "\";" ); //VHourC
+				sb.append( locationString( vehicle.getStartLocation()) ); //"VPAdd", "VPPc","VPCity","VPCtry","VPLat","VPLon"
+				sb.append( locationString( vehicle.getEndLocation()) ); // "DAdd", "DPc","DCity","DCtry","DLat","DLon"
 				if (vehicle.getTimeWindows().size() == 1) {
-					sb.append("\"" + buildDateTimeString(vehicle.getTimeWindows().get(0).getStart()) + "\";");
-					sb.append("\"" + buildDateTimeString(vehicle.getTimeWindows().get(0).getEnd()) + "\";");
+					sb.append("\"" + buildDateTimeString(vehicle.getTimeWindows().get(0).getStart()) + "\";"); //VTWStart (vehicleTimeWindowStart)
+					sb.append("\"" + buildDateTimeString(vehicle.getTimeWindows().get(0).getEnd()) + "\";"); //VTWEnd (VehicleTimeWindowEnd)
 				}
-				sb.append("\"" + vehicle.getRelocationType() + "\";");
+				sb.append("\"" + vehicle.getRelocationType() + "\";"); //VRel (Can be relocated)
 				sb.append("\n");
 				output.write(sb.toString());
 			}			
