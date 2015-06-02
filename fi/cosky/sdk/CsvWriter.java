@@ -21,9 +21,52 @@ public class CsvWriter {
 										   "DPc","DCity","DCtry","DLat","DLon","DSerT","DStopT","DTWStart","DTWEnd","Incomp",
 										   "Comp","TRel", "PATime","TVehId","PSeq","DSeq","IsLocked" };
 	
+	
+	/*
+	 * TaskId						| name of the task
+	 * Info1-4						| info fields
+	 * Cap1-3						| capacities
+	 * Prio							| priority
+	 * PAdd/DAdd					| pickup/delivery address
+	 * PPc/DPc						| pickup/delivery postal code
+	 * PCity/DCity					| pickup/delivery city
+	 * PCtry/DCtry					| pickup/delivery country
+	 * PLat/DLat					| pickup/delivery latitude
+	 * PLon/DLon					| pickup/delivery longitude
+	 * PSerT/DSerT					| pickup/delivery service time
+	 * PStopT/DStopT				| pickup/delivery stopping time
+	 * PTWStart/DTWStart			| pickup/delivery time window start
+	 * PTWEnd/DTWEnd				| pickup/delivery time window end
+	 * Incomp						| incompatible vehicle types
+	 * Comp							| compatible vehicle types
+	 * TRel							| can be relocated
+	 * ---------------- following used when optimization has been done ----------------------------------------- 
+	 * PATime						| pickup time 
+	 * TVehId						| vehicle id
+	 * PSeq							| pickup sequence number 
+	 * DSeq							| delivery sequence number
+	 * IsLocked						| lock state
+	 */
+	
+	
 	private final String[] vehicleHeaders = { "VehID","VehType","VCap1","VCap2","VCap3","VFixedC","VKmC","VHourC","VPAdd",
 											  "VPPc","VPCity","VPCtry","VPLat","VPLon","VDAdd","VDPc","VDCity","VDCtry",
 											  "VDLat","VDLon","VTWStart","VTWEnd","VRel"};
+	
+	/*
+	 * VehID						| vehicle name
+	 * VehType						| vehicle type
+	 * VCap1-3						| capacities
+	 * VPAdd/VDAdd					| start/end address
+	 * VPPc/VDPc					| start/end postal code
+	 * VPCity/VDCity				| start/end city
+	 * VPCtry/VDCtry				| start/end country
+	 * VPLat/VDLat					| start/end latitude
+	 * VPLon/VDLon					| start/end longitude
+	 * VTWStart/VTWStart			| vehicle time window start and end
+	 * VRel							| vehicle relocation type
+	 */
+	
 	
 	private static final String noString = '"' + "(no)" + '"' + ";";
 	
