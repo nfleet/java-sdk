@@ -23,16 +23,23 @@ public class AppService {
 		private String ClientSecret;
 		private boolean retry;
 		public AppUserDataSet Root;	
+		private String user;
+		private String password;
 		private static int RETRY_WAIT_TIME = 2000;
+		private String appServiceUrl;
+		private AppTokenData token;
+		private int currentAppUserId;
+		private String appUrl;
 		
 		static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
 		
-		public AppService(String baseUrl, String clientKey, String clientSecret) {
-			this.baseUrl = baseUrl + "/appusers";
+		public AppService(String appServiceUrl,String appUrl, String clientKey, String clientSecret) {
+			this.baseUrl = appServiceUrl + "/appusers";
 			this.retry  = true;
 			this.ClientKey = clientKey;
 			this.ClientSecret = clientSecret;
-						
+			this.appServiceUrl = appServiceUrl;
+			this.appUrl = appUrl;
 			//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
 			//this hopefully helps with that.
 			System.setProperty("http.keepAlive", "false");
@@ -59,26 +66,25 @@ public class AppService {
 		 * @throws IOException when there is problems with infrastructure (connection etc..)
 		 */
 		public <T extends BaseData> T navigate(Class<T> tClass, Link l) throws IOException {
-			return navigate(tClass, l, null);
+			return navigate(tClass, l, null, null, null);
+		}
+
+		
+		public <T extends BaseData> T navigate(Class<T> tClass, Link l, String user, String password) throws IOException {
+			return navigate(tClass, l, null, user, password);
 		}
 
 		@SuppressWarnings("unchecked")
-		public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
+		public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters, String user, String password) throws IOException {
 			Object result;
 			retry = true;
 						
 			String uri = l.getUri();
-
-			if (l.getMethod().equals("GET") && !uri.contains(":")) {
-				result = sendRequest(l, tClass, null);
-			} else if (l.getMethod().equals("PUT")) {
-				result = sendRequest(l, tClass, null);
-			} else if (l.getMethod().equals("POST")) {
-				result = sendRequest(l, tClass, null);
-			} else if (l.getMethod().equals("DELETE")) {
-				result = sendRequest(l, tClass, new Object());
+			//check
+			if (l.getMethod().equals("DELETE")) {
+				result = sendRequest(l, tClass, new Object(), user, password);
 			} else {
-				result = sendRequest(l, tClass, null);
+				result = sendRequest(l, tClass, null, user, password);
 			}
 			return (T) result;
 		}
@@ -93,10 +99,13 @@ public class AppService {
 		 * @throws	IOException  when there is problems with infrastructure ( connection etc.. )
 		 */
 		@SuppressWarnings("unchecked")
-		public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
-			 return (T)  sendRequest(l, tClass, object);
+		public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object, String user, String password) throws IOException {
+			 return (T) sendRequest(l, tClass, object, user, password);
 		}
 
+		public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
+			 return (T) sendRequest(l, tClass, object, null, null);
+		}
 		public Link getRoot() {
 			return new Link("self", baseUrl, "GET","", true);
 		}
@@ -109,7 +118,7 @@ public class AppService {
 			this.baseUrl = baseUrl;
 		}
 
-		private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
+		private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object, String user, String password) throws IOException {
 			URL serverAddress;
 			BufferedReader br;
 			String result = "";
@@ -130,8 +139,10 @@ public class AppService {
 				connection.setRequestProperty("Content-Type", "application/json");
 				connection.setRequestProperty("Accept", "application/json");
 				
-				connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes()));
-				
+				if (user == null || password == null)
+					connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes()));
+				else
+					connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBase64String((user+ ":" + password).getBytes()));
 							
 				if (method.equals("POST") || method.equals("PUT")) {
 						String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
@@ -156,7 +167,7 @@ public class AppService {
 				}
 
 				if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-					throw new IOException("App: Tried to reauthenticate but failed, please check the credentials and status of NFleet-API");	
+					throw new NFleetUnauthorizedException();	
 				}
 				
 				if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
@@ -172,8 +183,10 @@ public class AppService {
 				}
 				else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
 					if (retry) {
+						
 						System.out.println("App: Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-						return waitAndRetry(connection, l, tClass, object);
+						System.out.println("Url was " + url);
+						return waitAndRetry(connection, l, tClass, object, user, password);
 					} else {
 						System.out.println("App: Request caused internal server error, please contact dev@nfleet.fi");
 						String errorString = readErrorStreamAndCloseConnection(connection);
@@ -184,7 +197,7 @@ public class AppService {
 				if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY) {
 					if (retry) {
 						System.out.println("App: Could not connect to NFleet-API, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-						return waitAndRetry(connection, l, tClass, object);
+						return waitAndRetry(connection, l, tClass, object, user, password);
 					} else {
 						System.out.println("App: Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
 						String errorString = readErrorStreamAndCloseConnection(connection);
@@ -296,11 +309,11 @@ public class AppService {
 			return sb.toString();
 		}
 		
-		private <T extends BaseData> T waitAndRetry(HttpURLConnection connection, Link l, Class<T> tClass, Object object) {
+		private <T extends BaseData> T waitAndRetry(HttpURLConnection connection, Link l, Class<T> tClass, Object object, String user, String password) {
 			try {
 				retry = false;
 				Thread.sleep(RETRY_WAIT_TIME);
-				return sendRequest(l, tClass, object);
+				return sendRequest(l, tClass, object, user, password);
 			} catch (InterruptedException e) {
 				return null;
 			} catch (IOException e) {
@@ -308,6 +321,51 @@ public class AppService {
 			}
 		}
 		
-		
+		public boolean Login(String user, String password) throws IOException {
+			Link l = new Link("signin", appServiceUrl + "/signin", "GET","" , true);
+			
+			try {
+				this.token = navigate(AppTokenData.class, l, user, password);
+				this.user = user;
+				this.password = password;
+				
+			} catch (NFleetUnauthorizedException e) {
+				System.out.println(e);
+				Logout();
+				return false;
+			} 
+			
+			return true;
+			
 		}
+		
+		public boolean Login() throws IOException {
+			return Login(this.user, this.password);
+		}
+		
+		public boolean HasValidToken() {
+			return true;
+		}
+		
+		public String MakeAppUrl(String url) {
+			url = url.replaceAll("/users/\\d+", "");
+			return appUrl + "/#view" + url + "/plan?accesstoken=" + token.getToken();
+		}
+		
+		public void Logout() {
+			token = null;
+			user = null;
+			password = null;
+		}
+
+
+		public int getCurrentAppUserId() {
+			return currentAppUserId;
+		}
+
+
+		public void setCurrentAppUserId(int currentAppUserId) {
+			this.currentAppUserId = currentAppUserId;
+		}
+}
 
