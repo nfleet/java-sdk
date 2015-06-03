@@ -1729,4 +1729,30 @@ public class SdkTests {
 		assertNotNull(r.getLocation());
 	}
 	
+	@Test
+	public void T48TestCreatingAppServiceUsers() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api); // create new user to be used later
+		
+		AppService app = new AppService("appserviceURL", "your apiKey" ,"your apiSecret" );
+		AppUserDataSet users = app.Root;
+		AppUserUpdateRequest req = new AppUserUpdateRequest();
+		req.setEmail("some@thing.ccom");
+		req.setPassword("password");
+		req.setUsername("user");
+		req.setId(user.getId()); // this should be the same id as the one that has been created 
+		
+		AppUserData appuser = null;
+		try {
+			ResponseData response = app.navigate(ResponseData.class, users.getLink("create-user"), req);
+			appuser = app.navigate(AppUserData.class, response.getLocation());
+			
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		assertNotNull(appuser);
+		assertEquals(1, users.Items.size());
+	}
 } 
