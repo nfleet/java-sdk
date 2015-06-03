@@ -1670,4 +1670,63 @@ public class SdkTests {
 		}
 		assertEquals(problem.getState(), "Stopped");
 	}
+	
+	@Test
+	public void T47TaskMassModify() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		CapacityData capa = new CapacityData("Weight", 10);
+		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
+		list.add(capa);
+	
+		LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);
+		LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
+		ResponseData r = null;
+		try {
+
+			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+			
+			//##BEGIN EXAMPLE importtaskset##
+			TaskSetImportRequest set = new TaskSetImportRequest();
+			set.setItems(tasks);
+			ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
+			//##END EXAMPLE##
+			r = result;
+			
+			ArrayList<Integer> ids = new ArrayList<Integer>();
+			ids.add(1); ids.add(3); ids.add(5);
+			
+			BatchUpdateRequest batch = new BatchUpdateRequest();
+			batch.setIds(ids);
+			
+			ModifyOperationData operation = new ModifyOperationData();
+			operation.setName("set-compatibility");
+			
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("lol"); params.add("apua");
+			operation.setParams(params);
+			
+			ArrayList<ModifyOperationData> ops = new ArrayList<>();
+			ops.add(operation);
+			
+			batch.setOps(ops);
+			
+			TaskDataSet tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			
+			result = api.navigate(ResponseData.class, tasks2.getLink("batch-edit-tasks"), batch);
+			
+			
+			tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+		
+			for (TaskData t : tasks2.getItems()) {
+				System.out.println(t.getCompatibleVehicleTypes().toString());
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		assertNotNull(r.getLocation());
+	}
+	
 } 
