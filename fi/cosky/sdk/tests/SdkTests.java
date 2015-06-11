@@ -981,6 +981,9 @@ public class SdkTests {
 		TaskData task1res = TestHelper.createAndGetTask(api, problem, task1);
 		TaskData task2res = TestHelper.createAndGetTask(api, problem, task2);
 		
+		RouteEventDataSet res1 = null;
+		RouteEventDataSet res2 = null;
+		
 		try {
 			api.navigate(RouteData.class, veh1res.getLink("get-route"));
 			api.navigate(RouteData.class, veh2res.getLink("get-route"));
@@ -996,22 +999,35 @@ public class SdkTests {
 			api.navigate(ResponseData.class, veh2res.getLink("set-route"), routeReq2);
 			
 		   
-		   RouteEventDataSet res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
-		   RouteEventDataSet res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
+		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
+		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 		   
+		   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   
+		   while(problem.getState().equals("Pending")) {
+			   Thread.sleep(1000);
+			   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   }
 		   for (RouteEventData re : res1.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 20000 ) {
-				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   	   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Locked");
 				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
 			   }
 		   }
 		   
+		   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   
+		   while(problem.getState().equals("Pending")) {
+			   Thread.sleep(1000);
+			   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   }
+		   
 		   for (RouteEventData re : res2.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 20000 ) {
-				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   	   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Locked");
 				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
 			   }
