@@ -170,7 +170,6 @@ public class VehicleData extends BaseData {
 	public VehicleUpdateRequest toRequest() {
 		VehicleUpdateRequest request = new VehicleUpdateRequest(Name, Capacities, StartLocation, EndLocation);
 		request.setVersionNumber(VersionNumber);
-		request.setId(Id);
 		request.setName(Name);
 		request.setTimeWindows(TimeWindows);
 		request.setRoute(Route);

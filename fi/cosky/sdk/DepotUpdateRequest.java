@@ -7,7 +7,6 @@ public class DepotUpdateRequest {
     public static final String MimeType = DepotData.MimeType;
     public static final double MimeVersion = DepotData.MimeVersion;
 
-    private int DepotId;
     private String Name;
     private String Info1;
     private String Type;
@@ -15,14 +14,6 @@ public class DepotUpdateRequest {
     private LocationData Location;
     private double StoppingTime;
     
-    public int getDepotId() {
-        return DepotId;
-    }
-
-    public void setDepotId(int depotId) {
-        DepotId = depotId;
-    }
-
     public String getName() {
         return Name;
     }

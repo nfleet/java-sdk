@@ -102,7 +102,6 @@ public class RoutingProblemData extends BaseData {
         RoutingProblemUpdateRequest request = new RoutingProblemUpdateRequest(Name);
         request.setCreationDate(this.getCreationDate());
         request.setModifiedDate(this.getModifiedDate());
-        request.setId(this.getId());
         request.setState(this.getState());
         request.setVersionNumber(this.getVersionNumber());
         return request;

@@ -10,7 +10,6 @@ public class VehicleUpdateRequest extends BaseData {
 	public static final String MimeType = VehicleData.MimeType;
     public static final double MimeVersion = VehicleData.MimeVersion;
 	
-    private int Id;
     private String Name;
     private ArrayList<CapacityData> Capacities;
     private LocationData StartLocation;
@@ -45,17 +44,10 @@ public class VehicleUpdateRequest extends BaseData {
         this.ActivityState = "Active";
     }
 
-    public int getId() {
-        return this.Id;
-    }
-
     public void setCapacities(ArrayList<CapacityData> capa) {
         this.Capacities = capa;
     }
 
-    public void setId(int id) {
-        this.Id = id;
-    }
 
     public void setName(String name) {
         this.Name = name;
@@ -97,7 +89,6 @@ public class VehicleUpdateRequest extends BaseData {
 	@Override
     public String toString() {
         return "VehicleData{" +
-                "Id=" + Id +
                 ", Name='" + Name + '\'' +
                 ", Capacities=" + Capacities +
                 ", StartLocation=" + StartLocation +
