@@ -899,6 +899,8 @@ public class SdkTests {
 		
 			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
 			System.out.println(response);
+			
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
 			problem.setState("Running");
 			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem.toRequest());
 			
