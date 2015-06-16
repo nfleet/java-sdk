@@ -708,7 +708,7 @@ public class SdkTests {
 		
 		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("Auto");
 		vehicle.setVehicleType("rekka");
-		List<FieldsItem> items = null;
+		List<VehiclePlanData> items = null;
 		
 		try {
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicle);
@@ -727,7 +727,7 @@ public class SdkTests {
              
              //Go through the plan.
 			 items = v.getItems();
-             for (FieldsItem el : v.getItems()) {
+             for (VehiclePlanData el : v.getItems()) {
              	System.out.println(el);                      
              }
 			

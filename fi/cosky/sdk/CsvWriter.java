@@ -151,7 +151,7 @@ public class CsvWriter {
 	
 	private HashMap<Integer, String> extractFromPlan(PlanData plan) {
 		HashMap<Integer, String> map = new HashMap<Integer, String>();
-		for (FieldsItem fi : plan.getItems()) {
+		for (VehiclePlanData fi : plan.getItems()) {
 			for (RouteEventData event : fi.getEvents()) {
 				if (event.getType().equals("Pickup")) {
 					map.put(event.getTaskId(), "\"" + buildDateTimeString(event.getArrivalTime()) + "\";\"" + fi.getName() + "\";\"" +event.getSequenceNumber() + "\";");
