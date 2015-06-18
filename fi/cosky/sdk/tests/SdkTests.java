@@ -236,9 +236,6 @@ public class SdkTests {
 			RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			RouteUpdateRequest route = new RouteUpdateRequest();
 			int[] sd = {11,12};
-			route.setClientId(user.getClientId());
-			route.setProblemId(problem.getId());
-			route.setUserId(user.getId());
 			route.setSequence(sd);
 			
 			
@@ -1063,8 +1060,8 @@ public class SdkTests {
 		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 
 		   for (RouteEventData re : res1.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 50 ) {
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Unlocked");
 				   api.navigate(ResponseData.class, event.getLink("unlock"), req);
@@ -1072,9 +1069,9 @@ public class SdkTests {
 		   }
 
 		   for (RouteEventData re : res2.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 50) {
-				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   	   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Unlocked");
 				   api.navigate(ResponseData.class, event.getLink("unlock"), req);
 			   }
@@ -1098,14 +1095,16 @@ public class SdkTests {
 		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
 		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 		   		   
-		   assertTrue(res1.getItems().size() > 0);
-		   assertTrue(res2.getItems().size() > 0);
+		   
 		   		   
 		} catch (Exception e) {
 			System.out.println("Something went wrong.");
 		}
+		assertNotNull(res1.getItems());
+		assertNotNull(res2.getItems());
 		
-		
+		assertTrue(res1.getItems().size() > 0);
+		assertTrue(res2.getItems().size() > 0);
 	}
 	/*
 	@Test
@@ -1484,7 +1483,7 @@ public class SdkTests {
                 depot.setName("Depot0"+i);
                 depot.setType("SomeType");
                 depot.setInfo1("Info");
-
+                depot.setStoppingTime( (double)i + 10.0);
                 depots.add(depot);
             }
 
@@ -1497,6 +1496,9 @@ public class SdkTests {
             //##END EXAMPLE##
 
             assertEquals(3, result.getItems().size());
+            for (DepotData d : result.getItems()) {
+            	assertTrue(d.getStoppingTime() > 0);
+            }
         } catch (Exception e) {
 
         }
@@ -1527,8 +1529,7 @@ public class SdkTests {
              DepotData depot = api.navigate(DepotData.class, response.getLocation());
              //##END EXAMPLE##
 
-             request.setInfo1("Lol");
-             request.setDepotId(depot.getId());
+             request.setInfo1("NewInfo");
              response = api.navigate(ResponseData.class, depot.getLink("update"), request);
              
              depot = api.navigate(DepotData.class, depot.getLink("self"));
