@@ -1747,13 +1747,73 @@ public class SdkTests {
 		}
 		assertNotNull(r.getLocation());
 	}
-	
-	@Test
+
+    @Test
+    public void T47TaskMassDeactivation() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblem(api, user);
+
+        CapacityData capa = new CapacityData("Weight", 10);
+        ArrayList<CapacityData> list = new ArrayList<CapacityData>();
+        list.add(capa);
+
+        LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);
+        LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
+        ResponseData r = null;
+        try {
+
+            List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+
+
+            TaskSetImportRequest set = new TaskSetImportRequest();
+            set.setItems(tasks);
+            ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
+
+            r = result;
+
+            ArrayList<Integer> ids = new ArrayList<Integer>();
+            ids.add(1);
+            ids.add(3);
+            ids.add(5);
+
+            BatchUpdateRequest batch = new BatchUpdateRequest();
+            batch.setIds(ids);
+
+            ModifyOperationData operation = new ModifyOperationData();
+            operation.setName("set-activity");
+
+            ArrayList<String> params = new ArrayList<String>();
+            params.add("Inactive");
+            operation.setParams(params);
+
+            ArrayList<ModifyOperationData> ops = new ArrayList<ModifyOperationData>();
+            ops.add(operation);
+
+            batch.setOps(ops);
+
+            TaskDataSet tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+
+            result = api.navigate(ResponseData.class, tasks2.getLink("batch-edit-tasks"), batch);
+
+
+            tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+
+            for (TaskData t : tasks2.getItems()) {
+                System.out.println(t.getActivityState());
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        assertNotNull(r.getLocation());
+    }
+
+    @Test
 	public void T48TestCreatingAppServiceUsers() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api); // create new user to be used later
 		
-		AppService app = new AppService("appserviceURL", "your apiKey" ,"your apiSecret" );
+		AppService app = new AppService("","appserviceURL", "your apiKey" ,"your apiSecret" );
 		AppUserDataSet users = app.Root;
 		AppUserUpdateRequest req = new AppUserUpdateRequest();
 		req.setEmail("some@thing.ccom");
