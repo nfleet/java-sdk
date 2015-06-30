@@ -1707,11 +1707,11 @@ public class SdkTests {
 
 			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
 			
-			//##BEGIN EXAMPLE importtaskset##
+
 			TaskSetImportRequest set = new TaskSetImportRequest();
 			set.setItems(tasks);
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
-			//##END EXAMPLE##
+
 			r = result;
 			
 			ArrayList<Integer> ids = new ArrayList<Integer>();
