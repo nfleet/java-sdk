@@ -1727,7 +1727,7 @@ public class SdkTests {
 			params.add("lol"); params.add("apua");
 			operation.setParams(params);
 			
-			ArrayList<ModifyOperationData> ops = new ArrayList<>();
+			ArrayList<ModifyOperationData> ops = new ArrayList<ModifyOperationData>();
 			ops.add(operation);
 			
 			batch.setOps(ops);
