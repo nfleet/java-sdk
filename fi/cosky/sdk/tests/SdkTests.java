@@ -1747,13 +1747,13 @@ public class SdkTests {
 		}
 		assertNotNull(r.getLocation());
 	}
-	
+	/*
 	@Test
 	public void T48TestCreatingAppServiceUsers() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api); // create new user to be used later
 		
-		AppService app = new AppService("appserviceURL", "your apiKey" ,"your apiSecret" );
+		AppService app = new AppService("appserviceURL","appurl", "your apiKey" ,"your apiSecret" );
 		AppUserDataSet users = app.Root;
 		AppUserUpdateRequest req = new AppUserUpdateRequest();
 		req.setEmail("some@thing.ccom");
@@ -1774,4 +1774,5 @@ public class SdkTests {
 		assertNotNull(appuser);
 		assertEquals(1, users.Items.size());
 	}
+	*/
 } 
