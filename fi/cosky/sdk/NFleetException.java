@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NFleetException extends IOException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private List<ErrorData> Items;
 
 	public NFleetException() {
