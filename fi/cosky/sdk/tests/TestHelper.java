@@ -15,14 +15,15 @@ import fi.cosky.sdk.*;
 import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 
 public class TestHelper {
-	private static API apis  = null;
+	public static API apis  = null;
+	
+	static String apiUrl = "";
 	static String clientKey    = "";
 	static String clientSecret = "";
 	
 	static API authenticate() {
-		String url = "https://api.nfleet.fi";
 		if (apis == null) {
-			API api = new API(url);
+			API api = new API(apiUrl);
 			api.setTimed(true);
 			if (api.authenticate(clientKey, clientSecret)) {
 				apis = api;
@@ -35,13 +36,12 @@ public class TestHelper {
 		return apis;
 	}
 	
-	
 	static UserData getOrCreateUser( API api) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
 			UserData user = new UserData();
 			
-			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+			//UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
 			
 			//initialize(api, users);
 			
@@ -192,7 +192,6 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
-        //vehicleRequest.setCanBeRelocated("None");
         return vehicleRequest;
         
 	}
@@ -207,9 +206,7 @@ public class TestHelper {
          request.setLocation(location);
          request.setCapacities(capacities);
          request.setName(name);
-         request.setType("SomeType");
          request.setInfo1("Info");
-         
          return request;
 	}
 	
@@ -250,8 +247,9 @@ public class TestHelper {
 		AddressData address = new AddressData();
 		address.setCity("Jyväskylä");
 		address.setCountry("Finland");
-		address.setPostalCode("40100");
-		address.setStreet("Mattilanniemi 2");
+		address.setPostalCode("40320");
+		address.setStreet("Tuohitie");
+		address.setApartmentNumber(22);
 		
 		LocationData data = new LocationData();
 		data.setAddress(address);
@@ -309,5 +307,15 @@ public class TestHelper {
 				}		
 			}
 		} catch (Exception e) { System.out.println("Something went wrong deleting users " + e.getMessage()); }
+	}
+	
+	static String getInfo1WithRouteEvent(RouteEventData routeEvent, TaskDataSet tasks) {
+		  if (routeEvent == null) return "";
+		  if (tasks == null) return "";
+		  		  
+		  for (TaskData t : tasks.getItems()) {
+		    if (t.getId() == routeEvent.getTaskId()) return t.getInfo();
+		  }
+		  return "";
 	}
 }
