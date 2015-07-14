@@ -13,7 +13,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import com.google.gson.*;
 
@@ -190,9 +189,9 @@ public class API {
 		this.baseUrl = baseUrl;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
 		URL serverAddress;
-		BufferedReader br;
 		String result = "";
 		HttpURLConnection connection = null;
 		String url = l.getUri().contains("://") ? l.getUri() : this.baseUrl + l.getUri();
@@ -332,10 +331,10 @@ public class API {
 		return (T) newEntity;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends BaseData> T sendRequestWithAddedHeaders(Verb verb, String url, Class<T> tClass, Object object, HashMap<String, String> headers) throws IOException {
 		URL serverAddress;
 		HttpURLConnection connection;
-		BufferedReader br;
 		String result = "";
 		try {
 			serverAddress = new URL(url);
@@ -466,8 +465,6 @@ public class API {
 	
 	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
-		StringTokenizer st = null;
-		StringBuilder sb = null;
 		Field[] fields = null;
 		try {
 			fields = object != null ? fields = object.getClass().getDeclaredFields() : tClass.getDeclaredFields();  
@@ -495,8 +492,6 @@ public class API {
 
 	private <T> void addMimeTypeContentTypeToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
-		StringTokenizer st = null;
-		StringBuilder sb = null;
 		Field[] fields = null;
 		try {
 			fields = object != null ? fields = object.getClass().getDeclaredFields() : tClass.getDeclaredFields();
