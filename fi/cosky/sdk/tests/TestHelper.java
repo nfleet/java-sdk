@@ -22,7 +22,7 @@ public class TestHelper {
 	static String clientSecret = "";
 	
 	static API authenticate() {
-		if (apis == null) {
+ 		if (apis == null) {
 			API api = new API(apiUrl);
 			api.setTimed(true);
 			if (api.authenticate(clientKey, clientSecret)) {
@@ -35,19 +35,24 @@ public class TestHelper {
 		}
 		return apis;
 	}
-	
-	static UserData getOrCreateUser( API api) {
+		
+	static UserData getOrCreateUser( API api ) {
+		return getOrCreateUser(api, false);
+	}
+
+	static UserData getOrCreateUser( API api, boolean initialize ) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
 			UserData user = new UserData();
-			
-			//UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
-			
-			//initialize(api, users);
-			
+
+			if (initialize) {
+				UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+				initialize(api, users);
+			}
+
 			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 			user = api.navigate(UserData.class, createdUser.getLocation());
-			
+
 			return user;
 		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
@@ -56,7 +61,7 @@ public class TestHelper {
 			return null;
 		}
 	}
-	
+
 	static RoutingProblemData createProblem(API api, UserData user) {
 		try {
 			RoutingProblemData problem = new RoutingProblemData("exampleProblem");
@@ -156,7 +161,7 @@ public class TestHelper {
 		for (int i = 0; i < howMany; i++) {
 			LocationData pi = createLocationWithCoordinates(Location.TASK_PICKUP);
 			LocationData de = createLocationWithCoordinates(Location.TASK_DELIVERY);
-						
+				
 			CapacityData capacity = new CapacityData("Weight", 20);
 			List<CapacityData> capacities = new ArrayList<CapacityData>();
 			capacities.add(capacity);
