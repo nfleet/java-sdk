@@ -14,6 +14,7 @@ public class PlanData extends BaseData {
 	private List<VehiclePlanData> Items;
 	private KPIData KPIs;
 	private List<TaskData> Unassigned;
+    private List<DepotData> Depots;
 	
 	public int getVersionNumber() {
 		return VersionNumber;
@@ -40,4 +41,12 @@ public class PlanData extends BaseData {
 	public void setUnassigned(List<TaskData> unassigned) {
 		Unassigned = unassigned;
 	}
+
+    public List<DepotData> getDepots() {
+        return Depots;
+    }
+
+    public void setDepots(List<DepotData> depots) {
+        Depots = depots;
+    }
 }
