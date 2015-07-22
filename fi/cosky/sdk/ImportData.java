@@ -7,13 +7,14 @@ import java.util.List;
 
 public class ImportData extends BaseData {
 	public static final String MimeType = "application/vnd.jyu.nfleet.import";
-	public static final double MimeVersion = 2.1;
+	public static final double MimeVersion = 2.2;
 	
 	private int VersionNumber;
 	private int ErrorCount;
 	private String State;
 	private List<VehicleError> Vehicles;
 	private List<TaskError> Tasks;
+    private List<DepotError> Depots;
 	
 	public int getVersionNumber() {
 		return VersionNumber;
@@ -45,5 +46,6 @@ public class ImportData extends BaseData {
 	public void setTasks(List<TaskError> tasks) {
 		Tasks = tasks;
 	}
-
+    public List<DepotError> getDepots() { return Depots; }
+    public void setDepots(List<DepotError> depots) { Depots = depots; }
 }

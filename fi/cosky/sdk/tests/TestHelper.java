@@ -7,6 +7,7 @@ package fi.cosky.sdk.tests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -14,14 +15,15 @@ import fi.cosky.sdk.*;
 import fi.cosky.sdk.CoordinateData.CoordinateSystem;
 
 public class TestHelper {
-	private static API apis  = null;
+	public static API apis  = null;
+	
+	static String apiUrl = "";
 	static String clientKey    = "";
 	static String clientSecret = "";
 	
 	static API authenticate() {
-		String url = "https://api.nfleet.fi";
-		if (apis == null) {
-			API api = new API(url);
+ 		if (apis == null) {
+			API api = new API(apiUrl);
 			api.setTimed(true);
 			if (api.authenticate(clientKey, clientSecret)) {
 				apis = api;
@@ -33,20 +35,24 @@ public class TestHelper {
 		}
 		return apis;
 	}
-	
-	
-	static UserData getOrCreateUser( API api) {
+		
+	static UserData getOrCreateUser( API api ) {
+		return getOrCreateUser(api, false);
+	}
+
+	static UserData getOrCreateUser( API api, boolean initialize ) {
 		try {
 			ApiData apiData = api.navigate(ApiData.class, api.getRoot());
 			UserData user = new UserData();
-			
-			UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
-			
-			//initialize(api, users);
-			
+
+			if (initialize) {
+				UserDataSet users = api.navigate(UserDataSet.class, apiData.getLink("list-users"));
+				initialize(api, users);
+			}
+
 			ResponseData createdUser = api.navigate(ResponseData.class, apiData.getLink("create-user"), user);
 			user = api.navigate(UserData.class, createdUser.getLocation());
-			
+
 			return user;
 		} catch (NFleetRequestException e) {
 			System.out.println("Something went wrong");
@@ -55,7 +61,7 @@ public class TestHelper {
 			return null;
 		}
 	}
-	
+
 	static RoutingProblemData createProblem(API api, UserData user) {
 		try {
 			RoutingProblemData problem = new RoutingProblemData("exampleProblem");
@@ -155,7 +161,7 @@ public class TestHelper {
 		for (int i = 0; i < howMany; i++) {
 			LocationData pi = createLocationWithCoordinates(Location.TASK_PICKUP);
 			LocationData de = createLocationWithCoordinates(Location.TASK_DELIVERY);
-						
+				
 			CapacityData capacity = new CapacityData("Weight", 20);
 			List<CapacityData> capacities = new ArrayList<CapacityData>();
 			capacities.add(capacity);
@@ -191,9 +197,22 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
-        //vehicleRequest.setCanBeRelocated("None");
         return vehicleRequest;
         
+	}
+	
+	static DepotUpdateRequest createDepotUpdateRquest(String name) {
+		 LocationData location = new LocationData();
+         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+         capacities.add(new CapacityData("Weight", 1000));
+         DepotUpdateRequest request = new DepotUpdateRequest();
+         request.setLocation(location);
+         request.setCapacities(capacities);
+         request.setName(name);
+         request.setInfo1("Info");
+         return request;
 	}
 	
 	static LocationData createLocationWithCoordinates(Location name) {
@@ -233,8 +252,9 @@ public class TestHelper {
 		AddressData address = new AddressData();
 		address.setCity("Jyväskylä");
 		address.setCountry("Finland");
-		address.setPostalCode("40100");
-		address.setStreet("Mattilanniemi 2");
+		address.setPostalCode("40320");
+		address.setStreet("Tuohitie");
+		address.setApartmentNumber(22);
 		
 		LocationData data = new LocationData();
 		data.setAddress(address);
@@ -268,12 +288,14 @@ public class TestHelper {
 	enum Location{ VEHICLE_START, TASK_PICKUP, TASK_DELIVERY, VEHICLE_END };
 	 
 	static TimeWindowData createTimeWindow(int start, int end) {
-		Date startD = new Date();
-		startD.setHours(start);
+		Calendar calendar = Calendar.getInstance();
 		
-		Date endD = new Date();
-		endD.setHours(end);
-		
+		calendar.set(Calendar.HOUR_OF_DAY, start);
+		Date startD = calendar.getTime();
+				
+		calendar.set(Calendar.HOUR_OF_DAY, end);
+		Date endD = calendar.getTime();
+				
 		TimeWindowData twd = new TimeWindowData(startD, endD);
 		return twd;
 	}
@@ -290,5 +312,15 @@ public class TestHelper {
 				}		
 			}
 		} catch (Exception e) { System.out.println("Something went wrong deleting users " + e.getMessage()); }
+	}
+	
+	static String getInfo1WithRouteEvent(RouteEventData routeEvent, TaskDataSet tasks) {
+		  if (routeEvent == null) return "";
+		  if (tasks == null) return "";
+		  		  
+		  for (TaskData t : tasks.getItems()) {
+		    if (t.getId() == routeEvent.getTaskId()) return t.getInfo();
+		  }
+		  return "";
 	}
 }

@@ -167,7 +167,7 @@ public class UsingCoSkyAPIv2 {
                     PlanData v = api.navigate(PlanData.class, problem1.getLink("plan"));
 
                     //Go through the plan.
-                    for (FieldsItem el : v.getItems()) {
+                    for (VehiclePlanData el : v.getItems()) {
                     	System.out.println(el);                      
                     }
                 }

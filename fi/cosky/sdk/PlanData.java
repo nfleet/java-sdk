@@ -11,9 +11,10 @@ public class PlanData extends BaseData {
 	public static final double MimeVersion = 2.0;
 	
 	private int VersionNumber;
-	private List<FieldsItem> Items;
+	private List<VehiclePlanData> Items;
 	private KPIData KPIs;
 	private List<TaskData> Unassigned;
+    private List<DepotData> Depots;
 	
 	public int getVersionNumber() {
 		return VersionNumber;
@@ -21,10 +22,10 @@ public class PlanData extends BaseData {
 	public void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
 	}
-	public List<FieldsItem> getItems() {
+	public List<VehiclePlanData> getItems() {
 		return Items;
 	}
-	public void setItems(List<FieldsItem> items) {
+	public void setItems(List<VehiclePlanData> items) {
 		Items = items;
 	}
 	
@@ -40,4 +41,12 @@ public class PlanData extends BaseData {
 	public void setUnassigned(List<TaskData> unassigned) {
 		Unassigned = unassigned;
 	}
+
+    public List<DepotData> getDepots() {
+        return Depots;
+    }
+
+    public void setDepots(List<DepotData> depots) {
+        Depots = depots;
+    }
 }

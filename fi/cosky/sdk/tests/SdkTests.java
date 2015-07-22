@@ -27,10 +27,14 @@ public class SdkTests {
 		ApiData data2 = null;
 		try {
 			//##BEGIN EXAMPLE accessingapi##
-            API api = new API("https://test-api.nfleet.fi");
+            API api = new API(TestHelper.apiUrl);
 			api.authenticate(clientKey, clientSecret);
 			ApiData data = api.navigate(ApiData.class, api.getRoot());
 			//##END EXAMPLE##
+
+            //##BEGIN EXAMPLE oauth##
+            api.authenticate(clientKey, clientSecret);
+            //##END EXAMPLE##
 			data2 = data;
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -43,18 +47,18 @@ public class SdkTests {
 	public void T01CreatingProblemTest() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
-		RoutingProblemData asdf = null;
+		RoutingProblemData problem = null;
 		try {
 			//##BEGIN EXAMPLE creatingproblem##
 			RoutingProblemUpdateRequest update = new RoutingProblemUpdateRequest("TestProblem");
 			ResponseData createdProblem = api.navigate(ResponseData.class, user.getLink("create-problem"), update);
-			RoutingProblemData problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
+			problem = api.navigate(RoutingProblemData.class, createdProblem.getLocation());
 			//##END EXAMPLE##
-			asdf = problem;
+
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertNotNull(asdf);
+		assertNotNull(problem);
 	}
 	
 	@Test
@@ -67,9 +71,13 @@ public class SdkTests {
 		try {
 			ResponseData created = api.navigate(ResponseData.class, user.getLink("create-problem"), requ);
 			
-			//##BEGIN EXAMPLE accessingproblem##
+			//##BEGIN EXAMPLE accessingnewproblem##
 			RoutingProblemData problem = api.navigate(RoutingProblemData.class, created.getLocation());
 			//##END EXAMPLE##
+
+            //##BEGIN EXAMPLE accessingproblem##
+            RoutingProblemData p = api.navigate(RoutingProblemData.class, created.getLocation());
+            //##END EXAMPLE##
 			check = problem;
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -101,22 +109,18 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		TaskData asdf = null;
+		TaskData task = null;
 		TaskUpdateRequest update = null;
 
         try {
     		//##BEGIN EXAMPLE creatingtask##		      
-            CoordinateData pickup = new CoordinateData();
-            pickup.setLatitude(54.14454);
-            pickup.setLongitude(12.108808);
-            pickup.setSystem(CoordinateSystem.Euclidian);
+            CoordinateData pickup = new CoordinateData(54.14454,12.108808,CoordinateSystem.Euclidian);
+
             LocationData pickupLocation = new LocationData();
             pickupLocation.setCoordinatesData(pickup);
 
-            CoordinateData delivery = new CoordinateData();
-            delivery.setLatitude(53.545867);
-            delivery.setLongitude(10.276409);
-            delivery.setSystem(CoordinateSystem.Euclidian);
+            CoordinateData delivery = new CoordinateData(53.545867,10.276409,CoordinateSystem.Euclidian);
+
             LocationData deliveryLocation = new LocationData();
             deliveryLocation.setCoordinatesData(delivery);
 
@@ -135,23 +139,23 @@ public class SdkTests {
             ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
             taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
             taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
-            TaskUpdateRequest task = new TaskUpdateRequest(taskEvents);
-            task.setName("testTask");
+            update = new TaskUpdateRequest(taskEvents);
+            update.setName("testTask");
             taskEvents.get(0).setTimeWindows(timeWindows);
             taskEvents.get(1).setTimeWindows(timeWindows);
             taskEvents.get(0).setServiceTime(10);
             taskEvents.get(1).setServiceTime(10);
-            task.setActivityState("Active");
+            update.setActivityState("Active");
             
-            ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), task); 
+            ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), update);
     		//##END EXAMPLE##
-    		update = task;
-            asdf = api.navigate(TaskData.class, result.getLocation());
+
+            task = api.navigate(TaskData.class, result.getLocation());
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 
-        assertEquals(asdf.getName(), update.getName());
+        assertEquals(task.getName(), update.getName());
 	}
 	
 	@SuppressWarnings("unused")
@@ -162,7 +166,7 @@ public class SdkTests {
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData oldTask = TestHelper.getTask(api, problem);
 		List<TaskEventUpdateRequest> events = new ArrayList<TaskEventUpdateRequest>();
-		TaskUpdateRequest asdf = null;
+		TaskUpdateRequest update = null;
 		try {
 			//##BEGIN EXAMPLE updatingtask##
 			TaskUpdateRequest task = oldTask.toRequest();
@@ -170,12 +174,12 @@ public class SdkTests {
 			ResponseData newTaskLocation = api.navigate(ResponseData.class, oldTask.getLink("update"), task);
 			//##END EXAMPLE##
 			oldTask = api.navigate(TaskData.class, oldTask.getLink("self"));
-			asdf = task;
+			update = task;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 			
-		assertEquals(oldTask.getName(), asdf.getName());
+		assertEquals(oldTask.getName(), update.getName());
 	}
 	
 	@Test
@@ -184,7 +188,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData oldTask = TestHelper.getTask(api, problem);
-		TaskUpdateRequest asdf = null;
+		TaskUpdateRequest update = null;
 		try {
 		
 			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
@@ -209,17 +213,16 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		VehicleDataSet asdf = null;
+		VehicleDataSet vehicles = null;
 		try { 
 			//##BEGIN EXAMPLE listingvehicles##
-			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
 			//##END EXAMPLE##
-			asdf = vehicles;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 		
-		assertNotNull(asdf.getItems());
+		assertNotNull(vehicles.getItems());
 	}
 	
 	@Test
@@ -228,14 +231,11 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		RouteEventDataSet asdf = null;
+		RouteEventDataSet routeEvents = null;
 		try {
 			RouteData routes = api.navigate(RouteData.class, vehicle.getLink("get-route"));
 			RouteUpdateRequest route = new RouteUpdateRequest();
 			int[] sd = {11,12};
-			route.setClientId(user.getClientId());
-			route.setProblemId(problem.getId());
-			route.setUserId(user.getId());
 			route.setSequence(sd);
 			
 			
@@ -244,12 +244,12 @@ public class SdkTests {
 			//##BEGIN EXAMPLE accessingtaskseq##
 			RouteEventDataSet events = api.navigate(RouteEventDataSet.class, vehicle.getLink("list-events"));
 			//##END EXAMPLE##
-			asdf = events;
+			routeEvents = events;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 		
-		assertNotNull(asdf);
+		assertNotNull(routeEvents);
 	}
 	
 	@Test
@@ -293,7 +293,7 @@ public class SdkTests {
 			RouteUpdateRequest route = new RouteUpdateRequest();
 			int[] sequence = {11, 12};		
 			route.setSequence(sequence);
-			ResponseData asdf = api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
+			ResponseData response = api.navigate(ResponseData.class, vehicle.getLink("set-route"), route);
 			//##END EXAMPLE##
 			
 			RouteData routeData = api.navigate(RouteData.class, vehicle.getLink("get-route"));
@@ -311,7 +311,7 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		ResponseData asdf = null;
+		ResponseData response = null;
 		try { 
 			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			
@@ -320,11 +320,11 @@ public class SdkTests {
 			update.setState("Running");
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			//##END EXAMPLE##
-			asdf = result;
+			response = result;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertNotNull(asdf);
+		assertNotNull(response);
 	}
 	
 	@Test
@@ -385,18 +385,19 @@ public class SdkTests {
 		update.setState("Running");
 	
 		try {
+            //##BEGIN EXAMPLE getprogress##
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			
 			Thread.sleep(5000);
 			
-			//##BEGIN EXAMPLE getprogress 
+
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
 			
 			while ( problem.getProgress() < 100 ) {
 				Thread.sleep(1000);
 				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			}
-			//##END EXAMPLE 
+			//##END EXAMPLE##
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
@@ -409,7 +410,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
-		ArrayList<TimeWindowData> akkuna = vehicle.getTimeWindows();
+		ArrayList<TimeWindowData> timeWindows = vehicle.getTimeWindows();
 		String updatedName = null;
 		try {
 			VehicleUpdateRequest updatedVehicle = vehicle.toRequest();
@@ -421,7 +422,7 @@ public class SdkTests {
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertEquals(vehicle.getTimeWindows().get(0).getStart(), akkuna.get(0).getStart());
+		assertEquals(vehicle.getTimeWindows().get(0).getStart(), timeWindows.get(0).getStart());
 		assertEquals(vehicle.getName(), updatedName);
 	}
 	
@@ -637,17 +638,22 @@ public class SdkTests {
 		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(10);
 		tasks.setItems(taskList);
 		ImportData r = null;
+		DepotSetImportRequest depots = new DepotSetImportRequest();
 		try {
 			//##BEGIN EXAMPLE importtasksandvehicles##
 			ImportRequest importRequest = new ImportRequest();
 			importRequest.setVehicles(vehicles);
 			importRequest.setTasks(tasks);
+			importRequest.setDepots(depots);
 			
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
 			System.out.println(response.getLocation());
 			ImportData result = api.navigate(ImportData.class, response.getLocation());
 			//##END EXAMPLE##
 			r = result;
+            //##BEGIN EXAMPLE getimportresults##
+            ImportData imp = api.navigate(ImportData.class, response.getLocation());
+            //##END EXAMPLE##
 			
 		} catch (Exception e){
 			System.out.println(e.toString());
@@ -699,7 +705,7 @@ public class SdkTests {
 		
 		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("Auto");
 		vehicle.setVehicleType("rekka");
-		List<FieldsItem> items = null;
+		List<VehiclePlanData> items = null;
 		
 		try {
 			ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicle);
@@ -718,7 +724,7 @@ public class SdkTests {
              
              //Go through the plan.
 			 items = v.getItems();
-             for (FieldsItem el : v.getItems()) {
+             for (VehiclePlanData el : v.getItems()) {
              	System.out.println(el);                      
              }
 			
@@ -760,10 +766,21 @@ public class SdkTests {
 	
 			//##BEGIN EXAMPLE applyimport##
 			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
-			//##END EXAMPLE##
+
+			routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+
+            // now we wait for NFleet to do geocoding i.e. data state turns from 'Pending' into 'Ready'
+			while (routingProblemData.getDataState().equals("Pending")) {
+				System.out.println("State is pending");
+				Thread.sleep(1000);
+				routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+			}
+            //##END EXAMPLE##
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
+		
+		
 		assertNotEquals(response, null);
 		assertNotEquals(response.getLocation(), null);
 	}
@@ -796,7 +813,7 @@ public class SdkTests {
 		RoutingProblemSettingsData before = null;
 		RoutingProblemSettingsData after = null;
 		try {
-			//##BEGIN EXAMPLE changeproblemsettings##
+			//##BEGIN EXAMPLE updatingroutingproblemsettings##
 			RoutingProblemSettingsData settings = api.navigate(RoutingProblemSettingsData.class, routingProblemData.getLink("view-settings"));
 			RoutingProblemSettingsUpdateRequest updatedSettings = new RoutingProblemSettingsUpdateRequest();
 			updatedSettings.setDefaultVehicleSpeedFactor(0.8);
@@ -879,6 +896,8 @@ public class SdkTests {
 		
 			response = api.navigate(ResponseData.class, result.getLink("apply-import"));
 			System.out.println(response);
+			
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
 			problem.setState("Running");
 			response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), problem.toRequest());
 			
@@ -959,6 +978,9 @@ public class SdkTests {
 		TaskData task1res = TestHelper.createAndGetTask(api, problem, task1);
 		TaskData task2res = TestHelper.createAndGetTask(api, problem, task2);
 		
+		RouteEventDataSet res1 = null;
+		RouteEventDataSet res2 = null;
+		
 		try {
 			api.navigate(RouteData.class, veh1res.getLink("get-route"));
 			api.navigate(RouteData.class, veh2res.getLink("get-route"));
@@ -974,22 +996,35 @@ public class SdkTests {
 			api.navigate(ResponseData.class, veh2res.getLink("set-route"), routeReq2);
 			
 		   
-		   RouteEventDataSet res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
-		   RouteEventDataSet res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
+		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
+		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 		   
+		   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   
+		   while(problem.getState().equals("Pending")) {
+			   Thread.sleep(1000);
+			   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   }
 		   for (RouteEventData re : res1.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 20000 ) {
-				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   	   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Locked");
 				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
 			   }
 		   }
 		   
+		   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   
+		   while(problem.getState().equals("Pending")) {
+			   Thread.sleep(1000);
+			   problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+		   }
+		   
 		   for (RouteEventData re : res2.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 20000 ) {
-				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   	   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Locked");
 				   api.navigate(ResponseData.class, event.getLink("lock-to-vehicle"), req);
 			   }
@@ -1025,8 +1060,8 @@ public class SdkTests {
 		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 
 		   for (RouteEventData re : res1.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 50 ) {
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Unlocked");
 				   api.navigate(ResponseData.class, event.getLink("unlock"), req);
@@ -1034,9 +1069,9 @@ public class SdkTests {
 		   }
 
 		   for (RouteEventData re : res2.getItems() ) {
-			   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
 			   if (re.getTaskEventId() < 50) {
-				   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+				   RouteEventData event = api.navigate(RouteEventData.class, re.getLink("self"));
+			   	   RouteEventUpdateRequest req = new RouteEventUpdateRequest();
 				   req.setState("Unlocked");
 				   api.navigate(ResponseData.class, event.getLink("unlock"), req);
 			   }
@@ -1060,14 +1095,16 @@ public class SdkTests {
 		   res1 = api.navigate(RouteEventDataSet.class, veh1res.getLink("list-events"));
 		   res2 = api.navigate(RouteEventDataSet.class, veh2res.getLink("list-events"));
 		   		   
-		   assertTrue(res1.getItems().size() > 0);
-		   assertTrue(res2.getItems().size() > 0);
+		   
 		   		   
 		} catch (Exception e) {
 			System.out.println("Something went wrong.");
 		}
+		assertNotNull(res1.getItems());
+		assertNotNull(res2.getItems());
 		
-		
+		assertTrue(res1.getItems().size() > 0);
+		assertTrue(res2.getItems().size() > 0);
 	}
 	/*
 	@Test
@@ -1248,7 +1285,7 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData oldTask = TestHelper.getTask(api, problem);
-		TaskUpdateRequest asdf = null;
+		TaskUpdateRequest update = null;
 		try {
 
 			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
@@ -1323,67 +1360,7 @@ public class SdkTests {
 			
 		}
 	}
-	/*
-	@Test
-	public void T37TestingTest() {
-		//test creating a case, optimizing it, changing the location of a vehicle, then optimizing again.
-		API api = TestHelper.authenticate();
-		UserData user = TestHelper.getOrCreateUser(api);
-		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		VehicleData vehicle = TestHelper.createAndGetVehicle(api, problem, TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString()));
-		try {
-			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-			RoutingProblemUpdateRequest updated = problem.toRequest();
-			updated.setState("Running");
-			ResponseData data = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updated);
-			problem = api.navigate(RoutingProblemData.class, data.getLocation());
-			
-			while( problem.getProgress() <= 100) {
-				System.out.println(problem.getState() + " " + problem.getProgress());
-				Thread.sleep(1500);
-				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-				if (!problem.getState().equals("Running")) break;
-			}
-			
-			LocationData newStart = TestHelper.createLocationWithCoordinates(Location.VEHICLE_END);
-			
-			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
-			
-			VehicleData asdf = api.navigate(VehicleData.class, vehicles.getItems().get(0).getLink("self"));
-			
-			VehicleUpdateRequest vehicleToUpdate = asdf.toRequest();  
-			
-			vehicleToUpdate.setStartLocation(newStart);
-			
-			data = api.navigate(ResponseData.class, asdf.getLink("update"), vehicleToUpdate);
-			
-			System.out.println(data);
-			
-			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-			System.out.println(problem);
-			
-			updated = problem.toRequest();
-			updated.setState("Running");
-			
-			data = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updated);
-			
-			problem = api.navigate(RoutingProblemData.class, data.getLocation());	
-			
-			while( problem.getState().equals("Running")) {
-				Thread.sleep(1500);
-				problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
-			}
-			
-			vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
-			for (VehicleData veh : vehicles.getItems()) {
-				System.out.println(veh);
-			}
-			
-		} catch (Exception e) {
-			System.out.println(e.getStackTrace());
-		}
-	}
-	*/
+
 	@Test
 	public void T38GettingVehicleWithCustomLink() {
 		API api = TestHelper.authenticate();
@@ -1451,4 +1428,414 @@ public class SdkTests {
 		assertNotNull(settingsAfterUpdate);
 		assertEquals(update.getInsertionAggressiveness(), settingsAfterUpdate.getInsertionAggressiveness(), 0.001);
 	}
+
+    @Test
+    public void T41CreateDepot() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+
+        LocationData location = new LocationData();
+        location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+        ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+        capacities.add(new CapacityData("Weight", 10));
+                
+        try {
+            //##BEGIN EXAMPLE createdepot##
+            DepotUpdateRequest request = new DepotUpdateRequest();
+            request.setLocation(location);
+            request.setCapacities(capacities);
+            request.setName("Depot01");
+            request.setType("SomeType");
+            request.setInfo1("Info");
+
+            ResponseData response = api.navigate(ResponseData.class, problem.getLink("create-depot"), request);
+            DepotData depot = api.navigate(DepotData.class, response.getLocation());
+            //##END EXAMPLE##
+
+            assertEquals(request.getName(), depot.getName());
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Test
+    public void T42CreateDepotSet() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+
+        LocationData location = new LocationData();
+        location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+        ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+        capacities.add(new CapacityData("Weight", 10));
+        
+        try {
+            //##BEGIN EXAMPLE importdepots##
+            ArrayList<DepotUpdateRequest> depots = new ArrayList<DepotUpdateRequest>();
+
+            for (int i = 1; i < 4; i++) {
+                DepotUpdateRequest depot = new DepotUpdateRequest();
+                depot.setLocation(location);
+                depot.setCapacities(capacities);
+                depot.setName("Depot0"+i);
+                depot.setType("SomeType");
+                depot.setInfo1("Info");
+                depot.setStoppingTime( (double)i + 10.0);
+                depots.add(depot);
+            }
+
+            DepotSetImportRequest request = new DepotSetImportRequest();
+            request.setItems(depots);
+
+            ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-depots"), request);
+
+            DepotDataSet result = api.navigate(DepotDataSet.class, problem.getLink("list-depots"));
+            //##END EXAMPLE##
+
+            assertEquals(3, result.getItems().size());
+            for (DepotData d : result.getItems()) {
+            	assertTrue(d.getStoppingTime() > 0);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+    
+    @Test
+    public void T43UpdateDepot() {
+    	 API api = TestHelper.authenticate();
+         UserData user = TestHelper.getOrCreateUser(api);
+         RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+
+         LocationData location = new LocationData();
+         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+
+         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+         capacities.add(new CapacityData("Weight", 10));
+         
+         try {
+             //##BEGIN EXAMPLE updatedepot##
+             DepotUpdateRequest request = new DepotUpdateRequest();
+             request.setLocation(location);
+             request.setCapacities(capacities);
+             request.setName("Depot01");
+             request.setType("SomeType");
+             request.setInfo1("Info");
+
+             ResponseData response = api.navigate(ResponseData.class, problem.getLink("create-depot"), request);
+             DepotData depot = api.navigate(DepotData.class, response.getLocation());
+             //##END EXAMPLE##
+
+             request.setInfo1("NewInfo");
+             response = api.navigate(ResponseData.class, depot.getLink("update"), request);
+             
+             depot = api.navigate(DepotData.class, depot.getLink("self"));
+                          
+             assertEquals(request.getInfo1(), depot.getInfo1());
+         } catch (Exception e) {
+
+         }
+    }
+    
+	@Test
+	public void T44ImportVehiclesAndTasksAnDepots() {
+        int vehicleCount = 3;
+        int taskCount = 3;
+        int depotCount = 2;
+
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+		List<VehicleUpdateRequest> vehicleList = new ArrayList<VehicleUpdateRequest>();
+		
+		for (int i = 0; i < vehicleCount; i++) {
+			vehicleList.add(TestHelper.createVehicleUpdateRequest("vehicle"+i));
+		}
+		vehicles.setItems(vehicleList);
+		
+		TaskSetImportRequest tasks = new TaskSetImportRequest();
+		List<TaskUpdateRequest> taskList = TestHelper.createListOfTasks(taskCount);
+		tasks.setItems(taskList);
+		ImportData r = null;
+		
+		DepotSetImportRequest depots = new DepotSetImportRequest();
+		List<DepotUpdateRequest> depotList = new ArrayList<DepotUpdateRequest>();
+		
+		for (int i = 0; i < depotCount; i++) {
+			depotList.add(TestHelper.createDepotUpdateRquest("depot" +i) );
+		}
+				
+		depots.setItems(depotList);
+		
+		try {
+			
+			ImportRequest importRequest = new ImportRequest();
+			importRequest.setVehicles(vehicles);
+			importRequest.setTasks(tasks);
+			importRequest.setDepots(depots);
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), importRequest);
+			System.out.println(response.getLocation());
+			ImportData result = api.navigate(ImportData.class, response.getLocation());
+			
+			r = result;
+           
+            ImportData imp = api.navigate(ImportData.class, response.getLocation());
+            assertTrue(imp.getErrorCount() < 1); // we can't do apply if there are any errors
+            System.out.println("Applying ...");
+            api.navigate(ResponseData.class, imp.getLink("apply-import"));
+
+            // now we wait for NFleet to do geocoding
+            while (problem.getDataState().equals("Pending")) {
+                System.out.println("state is pending, waiting");
+                Thread.sleep(1000);
+                problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
+            }
+            System.out.println("Geocoding is ready");
+
+            VehicleDataSet vs = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+            TaskDataSet ts = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+            DepotDataSet ds = api.navigate(DepotDataSet.class, problem.getLink("list-depots"));
+
+            assertEquals(vehicleCount, vs.getItems().size());
+            assertEquals(taskCount, ts.getItems().size());
+            assertEquals(depotCount, ds.getItems().size());
+
+		} catch (Exception e){
+			System.out.println(e.toString());
+		}
+		
+		assertEquals(0,  r.getErrorCount());		
+	}
+	
+	@Test
+	public void T45GettingRoutingProblemSummary() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		RoutingProblemSummaryData summary = null;
+		
+		try {
+			while (problem.getState().equals("Pending")) {
+				System.out.println("state is pending, waiting");
+				Thread.sleep(1000);
+				problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
+			}
+            //##BEGIN EXAMPLE getproblemsummary##
+			summary = api.navigate(RoutingProblemSummaryData.class, problem.getLink("summary"));
+            //##END EXAMPLE##
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(summary);
+	}
+	
+	@Test
+	public void T46GettingRoutingProblemSummaries() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		RoutingProblemSummaryDataSet summary = null;
+		
+		try {
+			while (problem.getState().equals("Pending")) {
+				System.out.println("state is pending, waiting");
+				Thread.sleep(1000);
+				problem = api.navigate(RoutingProblemData.class,  problem.getLink("self"));
+			}
+				
+			summary = api.navigate(RoutingProblemSummaryDataSet.class, user.getLink("list-summaries"));
+		
+		} catch (Exception e) {
+			
+		}
+		assertNotNull(summary);
+		
+	}
+	
+	@Test
+	public void WritingCSVFromAFinishedOptimization() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+		
+		RoutingProblemUpdateRequest requ = problem.toRequest();
+		requ.setState("Running");
+		boolean wasPending = false;
+		try {
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), requ);
+			problem = api.navigate(RoutingProblemData.class, response.getLocation());
+			while (problem.getState().equals("Running")) {
+				Thread.sleep(1000);
+				System.out.println(problem.getProgress());
+				problem = api.navigate(RoutingProblemData.class, response.getLocation());
+				if (problem.getDataState().equals("Pending")) wasPending = true;
+			}
+
+			
+			
+			PlanData plan = api.navigate(PlanData.class, problem.getLink("plan"));
+			VehicleDataSet vehicles = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles"));
+			TaskDataSet tasks = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			
+			CsvWriter csv = new CsvWriter();
+			csv.write(plan, vehicles, tasks);
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		assertEquals(problem.getState(), "Stopped");
+	}
+	
+	@Test
+	public void T47TaskMassModify() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api);
+		RoutingProblemData problem = TestHelper.createProblem(api, user);
+		
+		CapacityData capa = new CapacityData("Weight", 10);
+		ArrayList<CapacityData> list = new ArrayList<CapacityData>();
+		list.add(capa);
+	
+		LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);
+		LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
+		ResponseData r = null;
+		try {
+
+			List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+			
+
+			TaskSetImportRequest set = new TaskSetImportRequest();
+			set.setItems(tasks);
+			ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
+
+			r = result;
+			
+			ArrayList<Integer> ids = new ArrayList<Integer>();
+			ids.add(1); ids.add(3); ids.add(5);
+			
+			BatchUpdateRequest batch = new BatchUpdateRequest();
+			batch.setIds(ids);
+			
+			ModifyOperationData operation = new ModifyOperationData();
+			operation.setName("set-compatibility");
+			
+			ArrayList<String> params = new ArrayList<String>();
+			params.add("lol"); params.add("apua");
+			operation.setParams(params);
+			
+			ArrayList<ModifyOperationData> ops = new ArrayList<ModifyOperationData>();
+			ops.add(operation);
+			
+			batch.setOps(ops);
+			
+			TaskDataSet tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+			
+			result = api.navigate(ResponseData.class, tasks2.getLink("batch-edit-tasks"), batch);
+			
+			
+			tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+		
+			for (TaskData t : tasks2.getItems()) {
+				System.out.println(t.getCompatibleVehicleTypes().toString());
+			}
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		assertNotNull(r.getLocation());
+	}
+
+
+    @Test
+    public void T47TaskMassDeactivation() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblem(api, user);
+
+        CapacityData capa = new CapacityData("Weight", 10);
+        ArrayList<CapacityData> list = new ArrayList<CapacityData>();
+        list.add(capa);
+
+        LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);
+        LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
+        ResponseData r = null;
+        try {
+
+            List<TaskUpdateRequest> tasks = TestHelper.createListOfTasks(10);
+
+
+            TaskSetImportRequest set = new TaskSetImportRequest();
+            set.setItems(tasks);
+            ResponseData result = api.navigate(ResponseData.class, problem.getLink("import-tasks"), set);
+
+            r = result;
+
+            ArrayList<Integer> ids = new ArrayList<Integer>();
+            ids.add(1);
+            ids.add(3);
+            ids.add(5);
+
+            BatchUpdateRequest batch = new BatchUpdateRequest();
+            batch.setIds(ids);
+
+            ModifyOperationData operation = new ModifyOperationData();
+            operation.setName("set-activity");
+
+            ArrayList<String> params = new ArrayList<String>();
+            params.add("Inactive");
+            operation.setParams(params);
+
+            ArrayList<ModifyOperationData> ops = new ArrayList<ModifyOperationData>();
+            ops.add(operation);
+
+            batch.setOps(ops);
+
+            TaskDataSet tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+
+            result = api.navigate(ResponseData.class, tasks2.getLink("batch-edit-tasks"), batch);
+
+
+            tasks2 = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+
+            for (TaskData t : tasks2.getItems()) {
+                System.out.println(t.getActivityState());
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        assertNotNull(r.getLocation());
+    }
+    
+	/*
+    @Test
+	public void T48TestCreatingAppServiceUsers() {
+		API api = TestHelper.authenticate();
+		UserData user = TestHelper.getOrCreateUser(api); // create new user to be used later
+		
+		AppService app = new AppService("appserviceURL","appurl", "your apiKey" ,"your apiSecret" );
+
+		AppUserDataSet users = app.Root;
+		AppUserUpdateRequest req = new AppUserUpdateRequest();
+		req.setEmail("some@thing.ccom");
+		req.setPassword("password");
+		req.setUsername("user");
+		req.setId(user.getId()); // this should be the same id as the one that has been created 
+		
+		AppUserData appuser = null;
+		try {
+			ResponseData response = app.navigate(ResponseData.class, users.getLink("create-user"), req);
+			appuser = app.navigate(AppUserData.class, response.getLocation());
+			
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		assertNotNull(appuser);
+		assertEquals(1, users.Items.size());
+	}
+	*/
 } 
