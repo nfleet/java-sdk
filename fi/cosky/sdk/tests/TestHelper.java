@@ -180,6 +180,7 @@ public class TestHelper {
 			task.setName("testTask" + i);
 			task.setRelocationType("None");
 			task.setActivityState("Active");
+            task.setInfo("task " + i);
 			tasks.add(task);
 		}
 		return tasks;
@@ -201,6 +202,15 @@ public class TestHelper {
         
 	}
 	
+    static List<VehicleUpdateRequest> createListOfVehicles(int howMany) {
+        List<VehicleUpdateRequest> vehicles = new ArrayList<VehicleUpdateRequest>();
+
+        for (int i = 0; i < howMany; i++) {
+            vehicles.add(createVehicleUpdateRequest("vehicle"+i));
+        }
+        return vehicles;
+    }
+
 	static DepotUpdateRequest createDepotUpdateRquest(String name) {
 		 LocationData location = new LocationData();
          location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));

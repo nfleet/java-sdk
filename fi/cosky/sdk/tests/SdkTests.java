@@ -1838,4 +1838,100 @@ public class SdkTests {
 		assertEquals(1, users.Items.size());
 	}
 	*/
+    @Test
+    public void T50UpdatingASpecificTaskAfterImport() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblem(api, user);
+
+        TaskSetImportRequest tasks = new TaskSetImportRequest();
+        tasks.setItems(TestHelper.createListOfTasks(10));
+
+        VehicleSetImportRequest vehicles = new VehicleSetImportRequest();
+        vehicles.setItems(TestHelper.createListOfVehicles(3));
+
+        ImportRequest im = new ImportRequest();
+        im.setVehicles(vehicles);
+        im.setTasks(tasks);
+
+        try {
+            ResponseData response = api.navigate(ResponseData.class, problem.getLink("import-data"), im);
+
+            ImportData result = api.navigate(ImportData.class, response.getLocation());
+
+            response = api.navigate(ResponseData.class, result.getLink("apply-import"));
+
+            RoutingProblemData routingProblemData = api.navigate(RoutingProblemData.class, problem.getLink("self"));
+
+            while (routingProblemData.getDataState().equals("Pending")) {
+                System.out.println("State is pending");
+                Thread.sleep(1000);
+                routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+            }
+
+            TaskDataSet t = api.navigate(TaskDataSet.class, problem.getLink("list-tasks"));
+
+            //now in tasksToSelfLink there is relation between given ids in info fields and NFleet given self links
+            HashMap<String, Integer> tasksToSelfLink = new HashMap<String, Integer>();
+            for (TaskData td : t.getItems()) {
+                tasksToSelfLink.put(td.getInfo(), td.getId());
+            }
+
+            //optimize to get routes for vehicles
+            RoutingProblemUpdateRequest update = problem.toRequest();
+            update.setState("Running");
+            response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
+            problem = api.navigate(RoutingProblemData.class, response.getLocation());
+            while (problem.getState().equals("Running")) {
+                Thread.sleep(1000);
+                problem = api.navigate(RoutingProblemData.class, response.getLocation());
+                System.out.println(problem.getProgress());
+            }
+
+            //lets say we need to update task with Info of "task 5", so first get the NFleet id of it
+            int id = tasksToSelfLink.get("task 5");
+            System.out.println("finding task" + id);
+
+            PlanData plan = api.navigate(PlanData.class, problem.getLink("plan"));
+
+            //this time we do not know which vehicle has the task so lets find it
+
+            for (VehiclePlanData vpd : plan.getItems()) {
+                for (RouteEventData route : vpd.getEvents()){
+                    if (route.getTaskId() == id) {
+                        // now we found the task and can do something to it, for example lock it
+                        System.out.println("found task " + id + " on vehicle " + vpd.getName());
+                        RouteEventData event = api.navigate(RouteEventData.class, route.getLink("self"));
+                        System.out.println("lock state " + event.getLockState());
+                        RouteEventUpdateRequest req = new RouteEventUpdateRequest();
+                        req.setState("Locked");
+                        api.navigate(ResponseData.class, event.getLink("lock"), req);
+
+                        event = api.navigate(RouteEventData.class, route.getLink("self"));
+                        System.out.println("lock state " + event.getLockState() + " " + event.getArrivalTime());
+
+                        Calendar calendar = Calendar.getInstance();
+
+                        calendar.set(Calendar.HOUR_OF_DAY, 10);
+                        Date startD = calendar.getTime();
+
+                        req = new RouteEventUpdateRequest();
+                        req.setActualArrivalTime(startD);
+                        //if route event is locked with a lock, it needs to be removed when setting arrival time
+                        req.setState(null);
+
+                        api.navigate(ResponseData.class, event.getLink("lock"), req);
+
+                        event = api.navigate(RouteEventData.class, route.getLink("self"));
+                        System.out.println("lock state " + event.getLockState() + " " + event.getArrivalTime());
+
+                        break;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+
+        }
+    }
 } 
