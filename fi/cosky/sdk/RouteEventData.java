@@ -25,8 +25,11 @@ public class RouteEventData extends BaseData {
 	private String Type;
 	private int SequenceNumber;
 	private int TaskId;
-		
-	int getVersionNumber() {
+    private String LockState;
+    private String TimeState;
+
+
+    int getVersionNumber() {
 		return VersionNumber;
 	}
 	
@@ -127,5 +130,21 @@ public class RouteEventData extends BaseData {
 
 	public void setTaskId(int taskId) {
 		TaskId = taskId;
-	}	
+	}
+
+    public String getTimeState() {
+        return TimeState;
+    }
+
+    public void setTimeState(String timeState) {
+        TimeState = timeState;
+    }
+
+    public String getLockState() {
+        return LockState;
+    }
+
+    public void setLockState(String lockState) {
+        LockState = lockState;
+    }
 }
