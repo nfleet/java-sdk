@@ -21,8 +21,10 @@ public class VehicleUpdateRequest extends BaseData {
     private String SpeedProfile;
     private double SpeedFactor;
     private String RelocationType;
-    private String ActivityState;    
-    
+    private String ActivityState;
+    private String Info1;
+    private CoordinateData CurrentLocation;
+
     private double FixedCost;
     private double KilometerCost;
     private double HourCost;
@@ -185,4 +187,20 @@ public class VehicleUpdateRequest extends BaseData {
 	public void setActivityState(String activityState) {
 		ActivityState = activityState;
 	}
+
+    public String getInfo1() {
+        return Info1;
+    }
+
+    public void setInfo1(String info1) {
+        Info1 = info1;
+    }
+
+    public CoordinateData getCurrentLocation() {
+        return CurrentLocation;
+    }
+
+    public void setCurrentLocation(CoordinateData currentLocation) {
+        CurrentLocation = currentLocation;
+    }
 }
