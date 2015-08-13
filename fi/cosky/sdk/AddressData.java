@@ -6,7 +6,7 @@ package fi.cosky.sdk;
 public class AddressData {
 	
 	private double Confidence;
-	private AddressResolution Resolution;
+	private int Resolution;
 	
 	private String Region;
 	private String Country;
@@ -25,10 +25,10 @@ public class AddressData {
 	public void setConfidence(double confidence) {
 		Confidence = confidence;
 	}
-	public AddressResolution getResolution() {
+	public int getResolution() {
 		return Resolution;
 	}
-	public void setResolution(String resolution) {	Resolution = AddressResolution.valueOf(resolution); }
+	public void setResolution(int resolution) {	Resolution = resolution; }
 	public String getRegion() {
 		return Region;
 	}
