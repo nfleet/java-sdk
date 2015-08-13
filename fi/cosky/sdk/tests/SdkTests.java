@@ -785,23 +785,30 @@ public class SdkTests {
 		assertNotEquals(response.getLocation(), null);
 	}
 	
+	
 	@Test
 	public void T26TestGeocodingThruAPI() {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);				
 		RoutingProblemData routingProblemData = TestHelper.createProblem(api, user);
 					
-		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequest("TestiAuto");
+		VehicleUpdateRequest vehicle = TestHelper.createVehicleUpdateRequestWithAddress("TestiAuto");
 		VehicleData response = null;
 		try {
 			ResponseData res = api.navigate(ResponseData.class, routingProblemData.getLink("create-vehicle"), vehicle);
-			System.out.println(res);
+            routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+            while (!routingProblemData.getDataState().equals("Ready")) {
+                Thread.sleep(1000);
+                routingProblemData = api.navigate(RoutingProblemData.class, routingProblemData.getLink("self"));
+            }
 			response = api.navigate(VehicleData.class, res.getLocation());
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 		System.out.println(response);
+        System.out.println(response.getStartLocation().getAddress().getResolution());
 		assertNotEquals(0, response.getEndLocation().getCoordinate().getLatitude());
+
 	}
 
 	@Test

@@ -198,10 +198,27 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
+        vehicleRequest.setInfo1("Info1");
         return vehicleRequest;
         
 	}
 	
+    static VehicleUpdateRequest createVehicleUpdateRequestWithAddress(String name) {
+        ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
+        capacities.add(new CapacityData("Weight", 100000));
+        ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+
+        timeWindows.add(createTimeWindow(7, 20));
+
+        LocationData startLocation = createLocationWithAddress();
+        VehicleUpdateRequest vehicleRequest = new VehicleUpdateRequest(name, capacities, startLocation, startLocation);
+        vehicleRequest.setVehicleSpeedProfile( SpeedProfile.Max80Kmh.toString() );
+        vehicleRequest.setVehicleSpeedFactor(0.7);
+        vehicleRequest.setTimeWindows(timeWindows);
+        vehicleRequest.setInfo1("Info1");
+        return vehicleRequest;
+
+    }
     static List<VehicleUpdateRequest> createListOfVehicles(int howMany) {
         List<VehicleUpdateRequest> vehicles = new ArrayList<VehicleUpdateRequest>();
 
