@@ -807,7 +807,10 @@ public class SdkTests {
 			System.out.println(e.toString());
 		}
 		System.out.println(response);
-        System.out.println(response.getStartLocation().getAddress().getResolution());
+        Iterator i = response.getStartLocation().getAddress().getResolution().iterator();
+        while (i.hasNext()) {
+            System.out.println(i.next());
+        }
 		assertNotEquals(0, response.getEndLocation().getCoordinate().getLatitude());
 
 	}
