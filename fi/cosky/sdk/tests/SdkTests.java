@@ -1849,6 +1849,35 @@ public class SdkTests {
 		assertEquals(1, users.Items.size());
 	}
 	*/
+
+    @Test
+    public void T49UpdatingVehicleLocationTest() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblem(api, user);
+
+        VehicleData vehicle = TestHelper.getVehicle(api, user, problem);
+
+        CoordinateData currentLocation = new CoordinateData();
+        currentLocation.setLatitude(61.4938);
+        currentLocation.setLongitude(26.523);
+        currentLocation.setSystem(CoordinateSystem.Euclidian);
+
+        VehicleUpdateRequest update = vehicle.toRequest();
+        update.setCurrentLocation(currentLocation);
+        try {
+            vehicle.setCurrentLocation(currentLocation);
+            api.navigate(ResponseData.class, vehicle.getLink("update"), update);
+
+            vehicle = api.navigate(VehicleData.class, vehicle.getLink("self"));
+        } catch (Exception e) {
+
+        }
+        assertNotNull(vehicle.getCurrentLocation());
+        assertEquals(vehicle.getCurrentLocation().getLatitude(), 61.4938, 0.0001);
+        assertEquals(vehicle.getCurrentLocation().getLongitude(), 26.523, 0.001);
+    }
+
     @Test
     public void T50UpdatingASpecificTaskAfterImport() {
         API api = TestHelper.authenticate();
