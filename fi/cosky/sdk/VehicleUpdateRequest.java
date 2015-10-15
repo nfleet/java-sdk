@@ -10,7 +10,6 @@ public class VehicleUpdateRequest extends BaseData {
 	public static final String MimeType = VehicleData.MimeType;
     public static final double MimeVersion = VehicleData.MimeVersion;
 	
-    private int Id;
     private String Name;
     private ArrayList<CapacityData> Capacities;
     private LocationData StartLocation;
@@ -22,7 +21,10 @@ public class VehicleUpdateRequest extends BaseData {
     private String SpeedProfile;
     private double SpeedFactor;
     private String RelocationType;
-    
+    private String ActivityState;
+    private String Info1;
+    private CoordinateData CurrentLocation;
+
     private double FixedCost;
     private double KilometerCost;
     private double HourCost;
@@ -41,19 +43,13 @@ public class VehicleUpdateRequest extends BaseData {
         this.StartLocation = startLoc;
         this.Name = name;
         this.RelocationType = "None";
-    }
-
-    public int getId() {
-        return this.Id;
+        this.ActivityState = "Active";
     }
 
     public void setCapacities(ArrayList<CapacityData> capa) {
         this.Capacities = capa;
     }
 
-    public void setId(int id) {
-        this.Id = id;
-    }
 
     public void setName(String name) {
         this.Name = name;
@@ -95,7 +91,6 @@ public class VehicleUpdateRequest extends BaseData {
 	@Override
     public String toString() {
         return "VehicleData{" +
-                "Id=" + Id +
                 ", Name='" + Name + '\'' +
                 ", Capacities=" + Capacities +
                 ", StartLocation=" + StartLocation +
@@ -184,4 +179,28 @@ public class VehicleUpdateRequest extends BaseData {
 	public void setHourCost(double hourCost) {
 		HourCost = hourCost;
 	}
+
+	public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
+	}
+
+    public String getInfo1() {
+        return Info1;
+    }
+
+    public void setInfo1(String info1) {
+        Info1 = info1;
+    }
+
+    public CoordinateData getCurrentLocation() {
+        return CurrentLocation;
+    }
+
+    public void setCurrentLocation(CoordinateData currentLocation) {
+        CurrentLocation = currentLocation;
+    }
 }

@@ -6,38 +6,10 @@ public class RouteEventUpdateRequest extends BaseData {
 	public static final String MimeType = RouteEventData.MimeType;
 	public static final double MimeVersion = RouteEventData.MimeVersion;
 	
-	private int clientId;
-	private int userId;
-	private int problemId;
-	private int vehicleId;
 	private int eventSequenceNumber;
 	private Date actualArrivalTime;
 	private String state;
 	
-	public int getClientId() {
-		return clientId;
-	}
-	public void setClientId(int clientId) {
-		this.clientId = clientId;
-	}
-	public int getUserId() {
-		return userId;
-	}
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
-	public int getProblemId() {
-		return problemId;
-	}
-	public void setProblemId(int problemId) {
-		this.problemId = problemId;
-	}
-	public int getVehicleId() {
-		return vehicleId;
-	}
-	public void setVehicleId(int vehicleId) {
-		this.vehicleId = vehicleId;
-	}
 	public int getEventSequenceNumber() {
 		return eventSequenceNumber;
 	}

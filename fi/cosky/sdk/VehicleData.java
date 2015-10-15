@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class VehicleData extends BaseData {
 	public static final String MimeType = "application/vnd.jyu.nfleet.vehicle";
-    public static final double MimeVersion = 2.1;
+    public static final double MimeVersion = 2.2;
 	
     private int Id;
     private String Name;
@@ -22,10 +22,16 @@ public class VehicleData extends BaseData {
     private String SpeedProfile;
     private double SpeedFactor;
     private String RelocationType;
+    private String Info1;
     
-    private double FixedCost;
+    private String ActivityState;
+    
+	private double FixedCost;
     private double KilometerCost;
     private double HourCost;
+
+    private CoordinateData CurrentLocation;
+
 
     public RouteData getRoute() {
         return Route;
@@ -41,6 +47,7 @@ public class VehicleData extends BaseData {
         this.StartLocation = startLoc;
         this.Name = name;
         this.RelocationType = "None";
+        this.ActivityState = "Active"; //has the same possibilities as activitystate in taskdata: Active and Inactive
     }
 
     public int getId() {
@@ -155,17 +162,42 @@ public class VehicleData extends BaseData {
 	public void setRelocationType(String relocationType) {
 		RelocationType = relocationType;
 	}
+	
+    public String getActivityState() {
+		return ActivityState;
+	}
+
+	public void setActivityState(String activityState) {
+		ActivityState = activityState;
+	}
 
 	public VehicleUpdateRequest toRequest() {
 		VehicleUpdateRequest request = new VehicleUpdateRequest(Name, Capacities, StartLocation, EndLocation);
 		request.setVersionNumber(VersionNumber);
-		request.setId(Id);
 		request.setName(Name);
 		request.setTimeWindows(TimeWindows);
 		request.setRoute(Route);
 		request.setVehicleSpeedFactor(SpeedFactor);
 		request.setVehicleSpeedProfile(SpeedProfile);
 		request.setRelocationType(RelocationType);
+		request.setActivityState(ActivityState);
+        request.setInfo1(Info1);
 		return request;
 	}
+
+    public CoordinateData getCurrentLocation() {
+        return CurrentLocation;
+    }
+
+    public void setCurrentLocation(CoordinateData currentLocation) {
+        CurrentLocation = currentLocation;
+    }
+
+    public String getInfo1() {
+        return Info1;
+    }
+
+    public void setInfo1(String info1) {
+        Info1 = info1;
+    }
 }

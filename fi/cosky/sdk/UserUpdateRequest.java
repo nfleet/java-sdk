@@ -9,9 +9,6 @@ public class UserUpdateRequest extends BaseData {
 	public static final double MimeVersion = UserData.MimeVersion;
 	
 	private int VersionNumber;
-	private int ClientId;
-	private int UserId;
-	
 	private int ProblemLimit;
     private int OptimizationQueueLimit;
     private int VehicleLimit;
@@ -31,18 +28,6 @@ public class UserUpdateRequest extends BaseData {
 	}
 	void setVersionNumber(int versionNumber) {
 		VersionNumber = versionNumber;
-	}
-	public int getClientId() {
-		return ClientId;
-	}
-	public void setClientId(int clientId) {
-		ClientId = clientId;
-	}
-	public int getUserId() {
-		return UserId;
-	}
-	public void setUserId(int userId) {
-		UserId = userId;
 	}
 	public int getProblemLimit() {
 		return ProblemLimit;

@@ -10,7 +10,6 @@ public class RoutingProblemUpdateRequest extends BaseData {
 	public static final String MimeType = RoutingProblemData.MimeType;
 	public static final double MimeVersion = RoutingProblemData.MimeVersion;
 	
-    private int Id;
     private Date CreationDate;
     private Date ModifiedDate;
     private String Name;
@@ -41,10 +40,6 @@ public class RoutingProblemUpdateRequest extends BaseData {
         return new RoutingProblemUpdateRequest("exampleSolution");
     }
 
-    public void setId(int id) {
-        this.Id = id;
-    }
-
     public void setCreationDate(Date date) {
         this.CreationDate = date;
     }
@@ -56,10 +51,7 @@ public class RoutingProblemUpdateRequest extends BaseData {
     public void setName(String name) {
         this.Name = name;
     }
-    public int getId() {
-        return Id;
-    }
-
+    
     public Date getCreationDate() {
         return CreationDate;
     }

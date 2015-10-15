@@ -1,4 +1,7 @@
 package fi.cosky.sdk;
+
+import java.util.HashSet;
+
 /*
  * This file is subject to the terms and conditions defined in
  * file 'LICENSE.txt', which is part of this source code package.
@@ -6,7 +9,7 @@ package fi.cosky.sdk;
 public class AddressData {
 	
 	private double Confidence;
-	private String Resolution;
+	private int Resolution;
 	
 	private String Region;
 	private String Country;
@@ -25,12 +28,10 @@ public class AddressData {
 	public void setConfidence(double confidence) {
 		Confidence = confidence;
 	}
-	public String getResolution() {
-		return Resolution;
+	public HashSet<AddressResolution> getResolution() {
+		return AddressResolution.toAddressResolutionSet(Resolution);
 	}
-	public void setResolution(String resolution) {
-		Resolution = resolution;
-	}
+	public void setResolution(int resolution) {	Resolution = resolution; }
 	public String getRegion() {
 		return Region;
 	}

@@ -7,14 +7,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import com.google.gson.*;
 
@@ -26,7 +24,7 @@ import org.apache.commons.codec.binary.Base64;
  */
 
 /**
- * API-class to handle the communication between SDK-user and CO-SKY
+ * API-class to handle the communication between SDK-user and NFleet
  * optimization's REST-API.
  */
 public class API {
@@ -191,9 +189,9 @@ public class API {
 		this.baseUrl = baseUrl;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
 		URL serverAddress;
-		BufferedReader br;
 		String result = "";
 		HttpURLConnection connection = null;
 		String url = l.getUri().contains("://") ? l.getUri() : this.baseUrl + l.getUri();
@@ -240,7 +238,9 @@ public class API {
 			if (method.equals("POST") || method.equals("PUT")) {
 					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
 					connection.addRequestProperty("Content-Length",	json.getBytes("UTF-8").length + "");
-					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+
+					OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream(), "UTF-8" );
+
 					osw.write(json);
 					osw.flush();
 					osw.close();		
@@ -331,10 +331,10 @@ public class API {
 		return (T) newEntity;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends BaseData> T sendRequestWithAddedHeaders(Verb verb, String url, Class<T> tClass, Object object, HashMap<String, String> headers) throws IOException {
 		URL serverAddress;
 		HttpURLConnection connection;
-		BufferedReader br;
 		String result = "";
 		try {
 			serverAddress = new URL(url);
@@ -348,7 +348,7 @@ public class API {
 			
 			if (doOutput){ 
 				connection.addRequestProperty("Content-Length", "0");
-				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
+				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
 				os.write("");
 				os.flush();
 				os.close();
@@ -465,8 +465,6 @@ public class API {
 	
 	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
-		StringTokenizer st = null;
-		StringBuilder sb = null;
 		Field[] fields = null;
 		try {
 			fields = object != null ? fields = object.getClass().getDeclaredFields() : tClass.getDeclaredFields();  
@@ -494,8 +492,6 @@ public class API {
 
 	private <T> void addMimeTypeContentTypeToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
-		StringTokenizer st = null;
-		StringBuilder sb = null;
 		Field[] fields = null;
 		try {
 			fields = object != null ? fields = object.getClass().getDeclaredFields() : tClass.getDeclaredFields();
@@ -568,7 +564,7 @@ public class API {
 		StringBuilder sb = null;
 		try {
 			is = connection.getInputStream();
-			br = new BufferedReader(new InputStreamReader(is));
+			br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
 			sb = new StringBuilder();
 			String line;
