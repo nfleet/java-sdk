@@ -2034,4 +2034,23 @@ public class SdkTests {
         }
         Assert.assertNotNull(created);
     }
+
+    @Test
+    public void T52GetRouteEvents() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
+        RouteEventDataSet result = null;
+        try {
+            VehicleData vehicle = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles")).getItems().get(0);
+            //##BEGIN EXAMPLE getrouteEvents##
+            RouteEventDataSet events = api.navigate(RouteEventDataSet.class, problem.getLink("list-events"));
+            //##END EXAMPLE##
+            result = events;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+
+    }
 } 
