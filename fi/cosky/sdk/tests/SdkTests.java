@@ -1974,4 +1974,64 @@ public class SdkTests {
 
         }
     }
+    @Test
+    public void T51CreateTaskWithAddress() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblem(api, user);
+        TaskData created = null;
+        try {
+
+            //##BEGIN EXAMPLE creatingtaskwithaddress##
+            AddressData pickup = new AddressData();
+            pickup.setCity("Jyväskylä");
+            pickup.setCountry("Finland");
+            pickup.setPostalCode("40630");
+            pickup.setStreet("Pajatie");
+            pickup.setApartmentNumber(8);
+            pickup.setApartmentLetter("F");
+
+            LocationData pickupdata = new LocationData();
+            pickupdata.setAddress(pickup);
+
+            AddressData delivery = new AddressData();
+            delivery.setCity("Jyväskylä");
+            delivery.setCountry("Finland");
+            delivery.setPostalCode("40100");
+            delivery.setStreet("Mattilanniemi");
+            delivery.setApartmentNumber(2);
+
+            LocationData deliverydata = new LocationData();
+            deliverydata.setAddress(delivery);
+            ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
+            Date morning = new Date();
+            morning.setHours(7);
+            Date evening = new Date();
+            evening.setHours(16);
+            timeWindows.add(new TimeWindowData(morning, evening));
+
+            ArrayList<CapacityData> taskCapacity = new ArrayList<CapacityData>();
+            taskCapacity.add(new CapacityData("Weight", 1));
+
+            ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
+            taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupdata, taskCapacity));
+            taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliverydata, taskCapacity));
+            TaskUpdateRequest update = new TaskUpdateRequest(taskEvents);
+            update.setName("testTask");
+            taskEvents.get(0).setTimeWindows(timeWindows);
+            taskEvents.get(1).setTimeWindows(timeWindows);
+            taskEvents.get(0).setServiceTime(10);
+            taskEvents.get(1).setServiceTime(10);
+            update.setActivityState("Active");
+
+            ResponseData response = api.navigate(ResponseData.class, problem.getLink("create-task"), update);
+
+            //##END EXAMPLE##
+
+            created = api.navigate(TaskData.class, response.getLocation());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        Assert.assertNotNull(created);
+    }
 } 
