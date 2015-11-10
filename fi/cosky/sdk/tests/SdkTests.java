@@ -2050,7 +2050,35 @@ public class SdkTests {
         } catch (Exception e) {
             System.out.println(e);
         }
+        assertNotNull(result);
+    }
 
+    @Test
+    public void T53InvalidVersionNumberTest() {
+        API api = TestHelper.authenticate();
+        UserData user = TestHelper.getOrCreateUser(api);
+        RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 
+        NFleetRequestException exception = null;
+        try {
+            VehicleData vehicle = api.navigate(VehicleData.class, api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles")).getItems().get(0).getLink("self"));
+            //##BEGIN EXAMPLE invalidversionnumber##
+
+            VehicleUpdateRequest update = vehicle.toRequest();
+            update.setName("new");
+
+            api.navigate(ResponseData.class, vehicle.getLink("update"), update);
+
+            update.setName("invalid");
+            api.navigate(ResponseData.class, vehicle.getLink("update"), update);
+        } catch (NFleetRequestException e) {
+            assertEquals(412, e.getItems().get(0).getCode());
+
+            //##END EXAMPLE##
+            exception = e;
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+        Assert.assertNotNull(exception);
     }
 } 
