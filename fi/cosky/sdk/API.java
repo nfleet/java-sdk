@@ -277,8 +277,17 @@ public class API {
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_NO_CONTENT) {
 				return (T) new ResponseData();
 			}
-			
-			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
+
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
+                ErrorData d = new ErrorData();
+                d.setCode(412);
+                d.setMessage("Precondition Failed");
+                NFleetRequestException ex = new NFleetRequestException(d);
+                throw ex;
+            }
+
+
+            if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
 									" " + url + ", verb: " + method);
 				
@@ -379,7 +388,15 @@ public class API {
 				}
 				else throw new IOException("Tried to reauthenticate but failed, please check the credentials and status of NFleet-API");	
 			}
-			
+
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
+                ErrorData d = new ErrorData();
+                d.setCode(412);
+                d.setMessage("Precondition Failed");
+                NFleetRequestException ex = new NFleetRequestException(d);
+                throw ex;
+            }
+
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
 				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
 									" " + url + ", verb: " + verb);
