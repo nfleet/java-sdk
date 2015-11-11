@@ -111,22 +111,18 @@ public class SdkTests {
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 		TaskData task = null;
-		TaskUpdateRequest update = null;
+		TaskUpdateRequest update2 = null;
 
         try {
     		//##BEGIN EXAMPLE creatingtask##		      
             CoordinateData pickup = new CoordinateData(54.14454,12.108808,CoordinateSystem.Euclidian);
-
             LocationData pickupLocation = new LocationData();
             pickupLocation.setCoordinatesData(pickup);
 
             CoordinateData delivery = new CoordinateData(53.545867,10.276409,CoordinateSystem.Euclidian);
-
             LocationData deliveryLocation = new LocationData();
             deliveryLocation.setCoordinatesData(delivery);
 
-            ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-            capacities.add(new CapacityData("Weight", 100000));
             ArrayList<TimeWindowData> timeWindows = new ArrayList<TimeWindowData>();
             Date morning = new Date();
             morning.setHours(7);
