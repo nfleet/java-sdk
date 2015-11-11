@@ -140,7 +140,7 @@ public class SdkTests {
             ArrayList<TaskEventUpdateRequest> taskEvents = new ArrayList<TaskEventUpdateRequest>();
             taskEvents.add(new TaskEventUpdateRequest(Type.Pickup, pickupLocation, taskCapacity));
             taskEvents.add(new TaskEventUpdateRequest(Type.Delivery, deliveryLocation, taskCapacity));
-            update = new TaskUpdateRequest(taskEvents);
+            TaskUpdateRequest update = new TaskUpdateRequest(taskEvents);
             update.setName("testTask");
             taskEvents.get(0).setTimeWindows(timeWindows);
             taskEvents.get(1).setTimeWindows(timeWindows);
@@ -150,13 +150,13 @@ public class SdkTests {
             
             ResponseData result = api.navigate(ResponseData.class, problem.getLink("create-task"), update);
     		//##END EXAMPLE##
-
+            update2 = update;
             task = api.navigate(TaskData.class, result.getLocation());
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
 
-        assertEquals(task.getName(), update.getName());
+        assertEquals(task.getName(), update2.getName());
 	}
 	
 	@SuppressWarnings("unused")
