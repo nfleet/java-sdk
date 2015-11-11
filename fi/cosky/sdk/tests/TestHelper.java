@@ -246,13 +246,13 @@ public class TestHelper {
 		CoordinateData coordinates = new CoordinateData();
 		switch (name){
 			case TASK_PICKUP: {
-				coordinates.setLatitude(62.244958);
-				coordinates.setLongitude(25.747143);
+				coordinates.setLatitude(62.281020);
+				coordinates.setLongitude(25.802570);
 				break;
 			}
 			case TASK_DELIVERY: {
-				coordinates.setLatitude(62.244589);
-				coordinates.setLongitude(25.74892);
+				coordinates.setLatitude(62.290522);
+				coordinates.setLongitude(25.738774);
 				break;
 			}
 			case VEHICLE_END: {
@@ -269,7 +269,7 @@ public class TestHelper {
 			
 			
 		}
-		coordinates.setSystem(CoordinateSystem.Euclidian);
+		coordinates.setSystem(CoordinateSystem.WGS84);
 		LocationData data = new LocationData();
 		data.setCoordinatesData(coordinates);
 		return data;
