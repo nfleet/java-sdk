@@ -2040,7 +2040,7 @@ public class SdkTests {
         try {
             VehicleData vehicle = api.navigate(VehicleDataSet.class, problem.getLink("list-vehicles")).getItems().get(0);
             //##BEGIN EXAMPLE getrouteEvents##
-            RouteEventDataSet events = api.navigate(RouteEventDataSet.class, problem.getLink("list-events"));
+            RouteEventDataSet events = api.navigate(RouteEventDataSet.class, vehicle.getLink("list-events"));
             //##END EXAMPLE##
             result = events;
         } catch (Exception e) {
