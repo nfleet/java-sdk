@@ -182,6 +182,10 @@ public class VehicleData extends BaseData {
 		request.setRelocationType(RelocationType);
 		request.setActivityState(ActivityState);
         request.setInfo1(Info1);
+        request.setHourCost(HourCost);
+        request.setFixedCost(FixedCost);
+        request.setKilometerCost(KilometerCost);
+        request.setVehicleType(VehicleType);
 		return request;
 	}
 
