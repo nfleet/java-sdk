@@ -308,20 +308,20 @@ public class SdkTests {
 		API api = TestHelper.authenticate();
 		UserData user = TestHelper.getOrCreateUser(api);
 		RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
-		ResponseData response = null;
+		ResponseData result = null;
 		try { 
 			problem = api.navigate(RoutingProblemData.class, problem.getLink("self"));
 			
 			//##BEGIN EXAMPLE startingopt##
 			RoutingProblemUpdateRequest update = problem.toRequest();
 			update.setState("Running");
-			ResponseData result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			//##END EXAMPLE##
-			response = result;
+			result = response;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-		assertNotNull(response);
+		assertNotNull(result);
 	}
 	
 	@Test
