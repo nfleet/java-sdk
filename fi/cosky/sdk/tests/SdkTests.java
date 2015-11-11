@@ -388,10 +388,6 @@ public class SdkTests {
 		try {
             //##BEGIN EXAMPLE getprogress##
 			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
-			
-			Thread.sleep(5000);
-			
-
 			problem = api.navigate(RoutingProblemData.class, response.getLocation());
 			
 			while ( problem.getProgress() < 100 ) {
