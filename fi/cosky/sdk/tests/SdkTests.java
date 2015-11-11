@@ -335,13 +335,14 @@ public class SdkTests {
 			
 			RoutingProblemUpdateRequest update = problem.toRequest();
 			update.setState("Running");
-			result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
+			api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), update);
 			
 			//##BEGIN EXAMPLE stoppingopt##
 			RoutingProblemUpdateRequest updateRequest = problem.toRequest();
 			updateRequest.setState("Stopped");
-			result = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updateRequest);
+			ResponseData response = api.navigate(ResponseData.class, problem.getLink("toggle-optimization"), updateRequest);
 			//##END EXAMPLE##
+            result = response;
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
