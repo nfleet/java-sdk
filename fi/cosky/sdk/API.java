@@ -317,21 +317,6 @@ public class API {
 		return new Link("authenticate", "/tokens", "POST", "", true);
 	}
 
-	private String method(Verb verb) {
-		switch (verb) {
-			case GET:
-				return "GET";
-			case PUT:
-				return "PUT";
-			case POST:
-				return "POST";
-			case DELETE:
-				return "DELETE";
-			case PATCH:
-				return "PATCH";
-		}
-		return "";
-	}
 	
 	private Link parseLocationLinkFromString(String s) {
 		if (!s.contains("/tokens"))
@@ -339,16 +324,6 @@ public class API {
 		return new Link("location", s, "GET", "", true);
 	}
 
-	private boolean doOutput(Verb verb) {
-		switch (verb) {
-		case GET:
-		case DELETE:
-			return false;
-		default:
-			return true;
-		}
-	}
-	
 	private boolean doOutput(String verb) {
 		return (verb.equals("POST") || verb.equals("PUT") || verb.equals("PATCH"));
 	}
