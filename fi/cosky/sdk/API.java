@@ -270,7 +270,8 @@ public class API {
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
 				if (retry) {
 					System.out.println("Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-					return waitAndRetry(connection, l, tClass, object, headers);
+                    connection.disconnect();
+					return waitAndRetry(l, tClass, object, headers);
 				} else {
 					System.out.println("Requst caused internal server error, please contact dev@nfleet.fi");
 					String errorString = readErrorStreamAndCloseConnection(connection);
@@ -281,7 +282,8 @@ public class API {
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY) {
 				if (retry) {
 					System.out.println("Could not connect to NFleet-API, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-					return waitAndRetry(connection, l, tClass, object, headers);
+                    connection.disconnect();
+					return waitAndRetry(l, tClass, object, headers);
 				} else {
 					System.out.println("Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
 					String errorString = readErrorStreamAndCloseConnection(connection);
@@ -451,7 +453,7 @@ public class API {
 		return sb.toString();
 	}
 	
-	private <T extends BaseData> T waitAndRetry(HttpURLConnection connection, Link l, Class<T> tClass, Object object, HashMap<String, String> headers) {
+	private <T extends BaseData> T waitAndRetry(Link l, Class<T> tClass, Object object, HashMap<String, String> headers) {
 		try {
 			retry = false;
 			Thread.sleep(RETRY_WAIT_TIME);
