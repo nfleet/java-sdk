@@ -95,59 +95,9 @@ public class API {
 		return navigate(tClass, l, null);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
-		Object result;
-		retry = true;
-		long start = 0; 
-		long end;
-		
-		if (isTimed()) {
-			start = System.currentTimeMillis();
-		}
-		
-		if (tClass.equals(TokenData.class)) {
-			result = sendRequest(l, tClass, null);
-			return (T) result;
-		}
-
-		if (l.getRel().equals("authenticate")) {
-			HashMap<String, String> headers = new HashMap<String, String>();
-			String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
-			headers.put("authorization", authorization);
-			result = sendRequestWithAddedHeaders(Verb.POST,	this.baseUrl + l.getUri(), tClass, null, headers);
-			return (T) result;
-		}
-
-		String uri = l.getUri();
-		if (l.getMethod().equals("GET") && queryParameters != null	&& !queryParameters.isEmpty()) {
-			StringBuilder sb = new StringBuilder(uri + "?");
-
-			for (String key : queryParameters.keySet()) {
-				sb.append(key + "=" + queryParameters.get(key) + "&");
-			}
-			sb.deleteCharAt(sb.length() - 1);
-			uri = sb.toString();
-		}
-
-		if (l.getMethod().equals("GET") && !uri.contains(":")) {
-			result = sendRequest(l, tClass, null);
-		} else if (l.getMethod().equals("PUT")) {
-			result = sendRequest(l, tClass, null);
-		} else if (l.getMethod().equals("POST")) {
-			result = sendRequest(l, tClass, null);
-		} else if (l.getMethod().equals("DELETE")) {
-			result = sendRequest(l, tClass, new Object());
-		} else {
-			result = sendRequest(l, tClass, null);
-		}
-		if (isTimed()) {
-			end = System.currentTimeMillis();
-			long time = end - start;
-			System.out.println("Method " + l.getMethod() + " on " + l.getUri() + " doing " + l.getRel() + " took " + time + " ms.");
-		}
-		return (T) result;
-	}
+    public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
+        return navigate(tClass, l, object, null);
+    }
 
 	/**
 	 * Navigate method for sending data
@@ -159,21 +109,42 @@ public class API {
 	 * @throws	IOException  when there is problems with infrastructure ( connection etc.. )
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
-		long start = 0; 
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object, HashMap<String, String> queryParameters) throws IOException {
+        long start = 0;
 		long end;
-		
-		if (isTimed()) {
-			start = System.currentTimeMillis();
-		}
-							
-		Object result = sendRequest(l, tClass, object);
+
+        HashMap<String, String> auth = null;
+        if (l.getRel().equals("authenticate")) {
+            auth = new HashMap<String, String>();
+            String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
+            auth.put("authorization", authorization);
+        }
+
+        if (l.getMethod().equals("GET") && queryParameters != null	&& !queryParameters.isEmpty()) {
+            String uri = l.getUri();
+            StringBuilder sb = new StringBuilder(uri + "?");
+
+            for (String key : queryParameters.keySet()) {
+                sb.append(key + "=" + queryParameters.get(key) + "&");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            l.setUri(sb.toString());
+        }
+
+        if (l.getMethod().equals(Verb.DELETE)) object = new Object();
+
+        if (isTimed()) {
+            start = System.currentTimeMillis();
+        }
+
+		Object result = sendRequest(l, tClass, object, auth);
 				
 		if (isTimed()) {
 			end = System.currentTimeMillis();
 			long time = end - start;
 			System.out.println("Method " + l.getMethod() + " on " + l.getUri() + " took " + time + " ms.");
 		}
+
 		return (T) result;
 	}
 
