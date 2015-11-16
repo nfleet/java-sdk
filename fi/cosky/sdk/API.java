@@ -319,7 +319,6 @@ public class API {
 		return new Link("authenticate", "/tokens", "POST", "", true);
 	}
 
-	
 	private Link parseLocationLinkFromString(String s) {
 		if (!s.contains("/tokens"))
 			s = s.substring(s.lastIndexOf("/users"));
@@ -330,10 +329,7 @@ public class API {
 		return (verb.equals("POST") || verb.equals("PUT") || verb.equals("PATCH"));
 	}
 	
-	private enum Verb {
-		GET, PUT, POST, DELETE, PATCH
-	}
-	
+	private enum Verb { GET, PUT, POST, DELETE, PATCH }
 	
 	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
