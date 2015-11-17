@@ -137,7 +137,7 @@ public class API {
             start = System.currentTimeMillis();
         }
 
-		Object result = sendRequest(l, tClass, object, auth);
+        Object result = sendRequest(l, tClass, object);
 				
 		if (isTimed()) {
 			end = System.currentTimeMillis();
@@ -161,7 +161,7 @@ public class API {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object, HashMap<String,String> headers) throws IOException {
+	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
 		URL serverAddress;
 		String result = "";
 		HttpURLConnection connection = null;
@@ -237,7 +237,7 @@ public class API {
 					retry = false;
 					if( authenticate() ) {
 						System.out.println("Reauthentication success, will continue with " + l.getMethod() + " request on " + l.getRel());
-						return sendRequest(l, tClass, object, null);
+						return sendRequest(l, tClass, object);
 					}
 				}		
 				else throw new IOException("Tried to reauthenticate but failed, please check the credentials and status of NFleet-API");	
@@ -453,7 +453,7 @@ public class API {
 		try {
 			retry = false;
 			Thread.sleep(RETRY_WAIT_TIME);
-			return sendRequest(l, tClass, object, headers);
+			return sendRequest(l, tClass, object);
 		} catch (InterruptedException e) {
 			return null;
 		} catch (IOException e) {
