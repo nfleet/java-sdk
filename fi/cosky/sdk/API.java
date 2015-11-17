@@ -382,7 +382,7 @@ public class API {
 		}
 	}
 	
-	private void addVersionNumberToHeader(Object object, String url, HttpURLConnection connection) {
+	private void addVersionNumberToHeader(String url, HttpURLConnection connection) {
 		Field f = null;
 		Object fromCache = null;
 		if (objectCache.containsUri(url))  {
