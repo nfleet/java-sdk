@@ -113,13 +113,6 @@ public class API {
         long start = 0;
 		long end;
 
-        HashMap<String, String> auth = null;
-        if (l.getRel().equals("authenticate")) {
-            auth = new HashMap<String, String>();
-            String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
-            auth.put("authorization", authorization);
-        }
-
         if (l.getMethod().equals("GET") && queryParameters != null	&& !queryParameters.isEmpty()) {
             String uri = l.getUri();
             StringBuilder sb = new StringBuilder(uri + "?");
@@ -199,14 +192,17 @@ public class API {
 			
 			if (!useMimeTypes)
 				connection.setRequestProperty("Content-Type", "application/json");
-			
+
+            if (l.getRel().equals("authenticate")) {
+                String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
+                connection.setRequestProperty("Authorization", authorization);
+            }
+
 			if (tokenData != null) {
 				connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
 			}
-			if (headers != null) {
-                connection.setRequestProperty("Authorization", headers.get("authorization"));
-            }
-			addVersionNumberToHeader(object, url, connection);
+
+			addVersionNumberToHeader(url, connection);
 			
 			if (method.equals("POST") || method.equals("PUT")) {
 					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
