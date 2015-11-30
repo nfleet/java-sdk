@@ -13,6 +13,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gson.*;
 
@@ -247,22 +248,38 @@ public class API {
 				return (T) new ResponseData();
 			}
 
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
-                ErrorData d = new ErrorData();
-                d.setCode(412);
-                d.setMessage("Precondition Failed");
-                NFleetRequestException ex = new NFleetRequestException(d);
-                throw ex;
-            }
-
-
             if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
-									" " + url + ", verb: " + method);
-				
-				String errorString = readErrorStreamAndCloseConnection(connection);
-                throw gson.fromJson(errorString, NFleetRequestException.class);
+                NFleetRequestException ex = null;
+                String errorString = readErrorStreamAndCloseConnection(connection);
+
+                ex = gson.fromJson(errorString, NFleetRequestException.class);
+
+                if (ex.getItems() == null || ex.getItems().size() == 0) {
+                    ErrorData d = new ErrorData();
+                    d.setCode(connection.getResponseCode());
+                    d.setMessage(connection.getResponseMessage());
+                    List<ErrorData> errors = new ArrayList<ErrorData>();
+                    errors.add(d);
+                    ex.setItems(errors);
+                }
+
+                throw ex;
+
+                /*
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
+                    ErrorData d = new ErrorData();
+                    d.setCode(412);
+                    d.setMessage("Precondition Failed");
+                    ex = new NFleetRequestException(d);
+                } else {
+                    String errorString = readErrorStreamAndCloseConnection(connection);
+                    System.out.println(errorString);
+                    ex = gson.fromJson(errorString, NFleetRequestException.class);
+                }
+                throw ex;
+                */
 			}
+
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
 				if (retry) {
 					System.out.println("Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
