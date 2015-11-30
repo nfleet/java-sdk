@@ -199,6 +199,7 @@ public class TestHelper {
 		vehicleRequest.setVehicleSpeedFactor(0.7);
         vehicleRequest.setTimeWindows(timeWindows);
         vehicleRequest.setInfo1("Info1");
+        vehicleRequest.setVehicleType("Rekka");
         return vehicleRequest;
         
 	}
