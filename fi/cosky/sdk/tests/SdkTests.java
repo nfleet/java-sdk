@@ -1440,7 +1440,7 @@ public class SdkTests {
         RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 
         LocationData location = new LocationData();
-        location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+        location.setCoordinatesData(new CoordinateData( 62.231023, 25.698652, CoordinateSystem.WGS84 ));
 
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 10));
@@ -1471,7 +1471,7 @@ public class SdkTests {
         RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 
         LocationData location = new LocationData();
-        location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+        location.setCoordinatesData(new CoordinateData( 62.231023, 25.698652, CoordinateSystem.WGS84 ));
 
         ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
         capacities.add(new CapacityData("Weight", 10));
@@ -1515,7 +1515,7 @@ public class SdkTests {
          RoutingProblemData problem = TestHelper.createProblemWithDemoData(api, user);
 
          LocationData location = new LocationData();
-         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+         location.setCoordinatesData(new CoordinateData( 62.231023, 25.698652, CoordinateSystem.WGS84 ));
 
          ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
          capacities.add(new CapacityData("Weight", 10));
