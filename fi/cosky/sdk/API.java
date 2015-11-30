@@ -264,27 +264,12 @@ public class API {
                 }
 
                 throw ex;
-
-                /*
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
-                    ErrorData d = new ErrorData();
-                    d.setCode(412);
-                    d.setMessage("Precondition Failed");
-                    ex = new NFleetRequestException(d);
-                } else {
-                    String errorString = readErrorStreamAndCloseConnection(connection);
-                    System.out.println(errorString);
-                    ex = gson.fromJson(errorString, NFleetRequestException.class);
-                }
-                throw ex;
-                */
 			}
 
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
 				if (retry) {
 					System.out.println("Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-                    connection.disconnect();
-					return waitAndRetry(l, tClass, object);
+                    return waitAndRetry(l, tClass, object);
 				} else {
 					System.out.println("Requst caused internal server error, please contact dev@nfleet.fi");
 					String errorString = readErrorStreamAndCloseConnection(connection);
@@ -295,8 +280,7 @@ public class API {
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY) {
 				if (retry) {
 					System.out.println("Could not connect to NFleet-API, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-                    connection.disconnect();
-					return waitAndRetry(l, tClass, object);
+                    return waitAndRetry(l, tClass, object);
 				} else {
 					System.out.println("Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
 					String errorString = readErrorStreamAndCloseConnection(connection);
