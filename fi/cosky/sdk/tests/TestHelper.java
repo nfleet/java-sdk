@@ -230,7 +230,7 @@ public class TestHelper {
 
 	static DepotUpdateRequest createDepotUpdateRquest(String name) {
 		 LocationData location = new LocationData();
-         location.setCoordinatesData(new CoordinateData( 0.0, 0.0, CoordinateSystem.Euclidian ));
+         location.setCoordinatesData(new CoordinateData( 62.231023, 25.698652, CoordinateSystem.WGS84 ));
 
          ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
          capacities.add(new CapacityData("Weight", 1000));
@@ -260,14 +260,11 @@ public class TestHelper {
 				coordinates.setLongitude(25.727949);
 				break;
 			}
-			case VEHICLE_START:
-			default: {
-	            coordinates.setLatitude(62.247906);
-	            coordinates.setLongitude(25.867395);
-	            break;
-			}
-			
-			
+			case VEHICLE_START: {
+                coordinates.setLatitude(62.247906);
+                coordinates.setLongitude(25.867395);
+                break;
+            }
 		}
 		coordinates.setSystem(CoordinateSystem.WGS84);
 		LocationData data = new LocationData();
