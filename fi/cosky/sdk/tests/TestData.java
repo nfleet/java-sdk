@@ -17,19 +17,8 @@ public class TestData {
 	
 	@SuppressWarnings("deprecation")
 	public static void CreateDemoData(RoutingProblemData problem, API api) {
-		
-		LocationData locationData = TestHelper.createLocationWithCoordinates(Location.VEHICLE_START);
-        LocationData pickupLocation = TestHelper.createLocationWithCoordinates(Location.TASK_PICKUP);      
-        LocationData deliveryLocation = TestHelper.createLocationWithCoordinates(Location.TASK_DELIVERY);
-        
-        ArrayList<CapacityData> capacities = new ArrayList<CapacityData>();
-        capacities.add(new CapacityData("Weight", 100000));
-        TimeWindowData twd = TestHelper.createTimeWindow(7, 20);
-        List<TimeWindowData> tws = new ArrayList<TimeWindowData>();
-        //tws.add(twd);
-        
         VehicleUpdateRequest vehicleRequest = TestHelper.createVehicleUpdateRequest(UUID.randomUUID().toString());
-        
+
         try {
         	api.navigate(ResponseData.class, problem.getLink("create-vehicle"), vehicleRequest);
         	

@@ -13,6 +13,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gson.*;
 
@@ -95,59 +96,9 @@ public class API {
 		return navigate(tClass, l, null);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters) throws IOException {
-		Object result;
-		retry = true;
-		long start = 0; 
-		long end;
-		
-		if (isTimed()) {
-			start = System.currentTimeMillis();
-		}
-		
-		if (tClass.equals(TokenData.class)) {
-			result = sendRequest(l, tClass, null);
-			return (T) result;
-		}
-
-		if (l.getRel().equals("authenticate")) {
-			HashMap<String, String> headers = new HashMap<String, String>();
-			String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
-			headers.put("authorization", authorization);
-			result = sendRequestWithAddedHeaders(Verb.POST,	this.baseUrl + l.getUri(), tClass, null, headers);
-			return (T) result;
-		}
-
-		String uri = l.getUri();
-		if (l.getMethod().equals("GET") && queryParameters != null	&& !queryParameters.isEmpty()) {
-			StringBuilder sb = new StringBuilder(uri + "?");
-
-			for (String key : queryParameters.keySet()) {
-				sb.append(key + "=" + queryParameters.get(key) + "&");
-			}
-			sb.deleteCharAt(sb.length() - 1);
-			uri = sb.toString();
-		}
-
-		if (l.getMethod().equals("GET") && !uri.contains(":")) {
-			result = sendRequest(l, tClass, null);
-		} else if (l.getMethod().equals("PUT")) {
-			result = sendRequest(l, tClass, null);
-		} else if (l.getMethod().equals("POST")) {
-			result = sendRequest(l, tClass, null);
-		} else if (l.getMethod().equals("DELETE")) {
-			result = sendRequest(l, tClass, new Object());
-		} else {
-			result = sendRequest(l, tClass, null);
-		}
-		if (isTimed()) {
-			end = System.currentTimeMillis();
-			long time = end - start;
-			System.out.println("Method " + l.getMethod() + " on " + l.getUri() + " doing " + l.getRel() + " took " + time + " ms.");
-		}
-		return (T) result;
-	}
+    public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
+        return navigate(tClass, l, object, null);
+    }
 
 	/**
 	 * Navigate method for sending data
@@ -159,21 +110,35 @@ public class API {
 	 * @throws	IOException  when there is problems with infrastructure ( connection etc.. )
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
-		long start = 0; 
+	public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object, HashMap<String, String> queryParameters) throws IOException {
+        long start = 0;
 		long end;
-		
-		if (isTimed()) {
-			start = System.currentTimeMillis();
-		}
-							
-		Object result = sendRequest(l, tClass, object);
+
+        if (l.getMethod().equals("GET") && queryParameters != null	&& !queryParameters.isEmpty()) {
+            String uri = l.getUri();
+            StringBuilder sb = new StringBuilder(uri + "?");
+
+            for (String key : queryParameters.keySet()) {
+                sb.append(key + "=" + queryParameters.get(key) + "&");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            l.setUri(sb.toString());
+        }
+
+        if (l.getMethod().equals(Verb.DELETE)) object = new Object();
+
+        if (isTimed()) {
+            start = System.currentTimeMillis();
+        }
+
+        Object result = sendRequest(l, tClass, object);
 				
 		if (isTimed()) {
 			end = System.currentTimeMillis();
 			long time = end - start;
 			System.out.println("Method " + l.getMethod() + " on " + l.getUri() + " took " + time + " ms.");
 		}
+
 		return (T) result;
 	}
 
@@ -228,12 +193,17 @@ public class API {
 			
 			if (!useMimeTypes)
 				connection.setRequestProperty("Content-Type", "application/json");
-			
+
+            if (l.getRel().equals("authenticate")) {
+                String authorization = "Basic " + Base64.encodeBase64String((this.ClientKey + ":" + this.ClientSecret).getBytes());
+                connection.setRequestProperty("Authorization", authorization);
+            }
+
 			if (tokenData != null) {
 				connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
 			}
-					
-			addVersionNumberToHeader(object, url, connection);
+
+			addVersionNumberToHeader(url, connection);
 			
 			if (method.equals("POST") || method.equals("PUT")) {
 					String json = object != null ? gson.toJson(object) : ""; //should handle the case when POST without object.
@@ -278,26 +248,28 @@ public class API {
 				return (T) new ResponseData();
 			}
 
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
-                ErrorData d = new ErrorData();
-                d.setCode(412);
-                d.setMessage("Precondition Failed");
-                NFleetRequestException ex = new NFleetRequestException(d);
-                throw ex;
-            }
-
-
             if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
-									" " + url + ", verb: " + method);
-				
-				String errorString = readErrorStreamAndCloseConnection(connection);
-				throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
+                NFleetRequestException ex = null;
+                String errorString = readErrorStreamAndCloseConnection(connection);
+
+                ex = gson.fromJson(errorString, NFleetRequestException.class);
+
+                if (ex.getItems() == null || ex.getItems().size() == 0) {
+                    ErrorData d = new ErrorData();
+                    d.setCode(connection.getResponseCode());
+                    d.setMessage(connection.getResponseMessage());
+                    List<ErrorData> errors = new ArrayList<ErrorData>();
+                    errors.add(d);
+                    ex.setItems(errors);
+                }
+
+                throw ex;
 			}
+
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
 				if (retry) {
 					System.out.println("Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-					return waitAndRetry(connection, l, tClass, object);
+                    return waitAndRetry(l, tClass, object);
 				} else {
 					System.out.println("Requst caused internal server error, please contact dev@nfleet.fi");
 					String errorString = readErrorStreamAndCloseConnection(connection);
@@ -308,7 +280,7 @@ public class API {
 			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY) {
 				if (retry) {
 					System.out.println("Could not connect to NFleet-API, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-					return waitAndRetry(connection, l, tClass, object);
+                    return waitAndRetry(l, tClass, object);
 				} else {
 					System.out.println("Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
 					String errorString = readErrorStreamAndCloseConnection(connection);
@@ -340,145 +312,21 @@ public class API {
 		return (T) newEntity;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T extends BaseData> T sendRequestWithAddedHeaders(Verb verb, String url, Class<T> tClass, Object object, HashMap<String, String> headers) throws IOException {
-		URL serverAddress;
-		HttpURLConnection connection;
-		String result = "";
-		try {
-			serverAddress = new URL(url);
-			connection = (HttpURLConnection) serverAddress.openConnection();
-			connection.setInstanceFollowRedirects(false);
-			boolean doOutput = doOutput(verb);
-			connection.setDoOutput(doOutput);
-			connection.setRequestMethod(method(verb));
-			connection.setRequestProperty("Authorization", headers.get("authorization"));
-			connection.addRequestProperty("Accept", "application/json");
-			
-			if (doOutput){ 
-				connection.addRequestProperty("Content-Length", "0");
-				OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
-				os.write("");
-				os.flush();
-				os.close();
-			}
-			connection.connect();
-
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER || connection.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
-				Link location = parseLocationLinkFromString(connection.getHeaderField("Location"));
-				Link l = new Link("self", "/tokens", "GET","", true);
-				ArrayList<Link> links = new ArrayList<Link>();
-				links.add(l);
-				links.add(location);
-				ResponseData data = new ResponseData();
-				data.setLocation(location);
-				data.setLinks(links);
-				return (T) data;
-			}
-
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-				System.out.println("Authentication expired: " + connection.getResponseMessage());
-				if ( retry && this.tokenData != null ) {
-					retry = false;
-					this.tokenData = null;
-					if( authenticate() ) {
-						System.out.println("Reauthentication success, will continue with " + verb + " request on " + url);
-						return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
-					}
-				}
-				else throw new IOException("Tried to reauthenticate but failed, please check the credentials and status of NFleet-API");	
-			}
-
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_PRECON_FAILED) {
-                ErrorData d = new ErrorData();
-                d.setCode(412);
-                d.setMessage("Precondition Failed");
-                NFleetRequestException ex = new NFleetRequestException(d);
-                throw ex;
-            }
-
-			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-				System.out.println("ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
-									" " + url + ", verb: " + verb);
-				
-				String errorString = readErrorStreamAndCloseConnection(connection);
-				throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
-			}
-			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
-				if (retry) {
-					System.out.println("Server responded with internal server error, trying again in " + RETRY_WAIT_TIME + " msec.");
-					try {
-						retry = false;
-						Thread.sleep(RETRY_WAIT_TIME);
-						return sendRequestWithAddedHeaders(verb, url, tClass, object, headers);
-					} catch (InterruptedException e) {
-						
-					}
-				} else {
-					System.out.println("Server responded with internal server error, please contact dev@nfleet.fi");
-				}
-				
-				String errorString = readErrorStreamAndCloseConnection(connection);
-				throw new IOException(errorString);
-			}
-
-			result = readDataFromConnection(connection);
-		} catch (MalformedURLException e) {
-			throw e;
-		} catch (ProtocolException e) {
-			throw e;
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		} catch (IOException e) {
-			throw e;
-		}
-		return (T) gson.fromJson(result, tClass);
-	}
-
 	private Link getAuthLink() {
 		return new Link("authenticate", "/tokens", "POST", "", true);
 	}
 
-	private String method(Verb verb) {
-		switch (verb) {
-			case GET:
-				return "GET";
-			case PUT:
-				return "PUT";
-			case POST:
-				return "POST";
-			case DELETE:
-				return "DELETE";
-			case PATCH:
-				return "PATCH";
-		}
-		return "";
-	}
-	
 	private Link parseLocationLinkFromString(String s) {
 		if (!s.contains("/tokens"))
 			s = s.substring(s.lastIndexOf("/users"));
 		return new Link("location", s, "GET", "", true);
 	}
 
-	private boolean doOutput(Verb verb) {
-		switch (verb) {
-		case GET:
-		case DELETE:
-			return false;
-		default:
-			return true;
-		}
-	}
-	
 	private boolean doOutput(String verb) {
 		return (verb.equals("POST") || verb.equals("PUT") || verb.equals("PATCH"));
 	}
 	
-	private enum Verb {
-		GET, PUT, POST, DELETE, PATCH
-	}
-	
+	private enum Verb { GET, PUT, POST, DELETE, PATCH }
 	
 	private <T> void addMimeTypeAcceptToRequest(Object object, Class<T> tClass, HttpURLConnection connection) {
 		Field f = null;
@@ -535,7 +383,7 @@ public class API {
 		}
 	}
 	
-	private void addVersionNumberToHeader(Object object, String url, HttpURLConnection connection) {
+	private void addVersionNumberToHeader(String url, HttpURLConnection connection) {
 		Field f = null;
 		Object fromCache = null;
 		if (objectCache.containsUri(url))  {
@@ -598,7 +446,7 @@ public class API {
 		return sb.toString();
 	}
 	
-	private <T extends BaseData> T waitAndRetry(HttpURLConnection connection, Link l, Class<T> tClass, Object object) {
+	private <T extends BaseData> T waitAndRetry(Link l, Class<T> tClass, Object object) {
 		try {
 			retry = false;
 			Thread.sleep(RETRY_WAIT_TIME);
