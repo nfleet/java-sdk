@@ -285,7 +285,11 @@ public class API {
 					String errorString = readErrorStreamAndCloseConnection(connection);
 					throw new IOException(errorString);
 				}
-				
+			}
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_VERSION_NOT_SUPPORTED) {
+				System.out.println("Could not connect to NFleet-API.");
+				String errorString = readErrorStreamAndCloseConnection(connection);
+				throw new IOException(errorString);
 			}
 			
 			result = readDataFromConnection(connection);
