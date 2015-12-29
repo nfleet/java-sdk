@@ -41,6 +41,7 @@ public class API {
 	private MimeTypeHelper helper;
 	
 	private static int RETRY_WAIT_TIME = 2000;
+	private static int UNAVAILABLE_RETRY_WAIT_TIME = 30000;
 	
 	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
 	
@@ -265,8 +266,7 @@ public class API {
 
                 throw ex;
 			}
-
-			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR && connection.getResponseCode() < HttpURLConnection.HTTP_BAD_GATEWAY) {
 				if (retry) {
 					System.out.println("Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
                     return waitAndRetry(l, tClass, object);
@@ -276,10 +276,9 @@ public class API {
 					throw new IOException(errorString);
 				}
 			}
-			
-			if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY) {
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY && connection.getResponseCode() < HttpURLConnection.HTTP_VERSION_NOT_SUPPORTED) {
 				if (retry) {
-					System.out.println("Could not connect to NFleet-API, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
+					System.out.println("Could not connect to NFleet-API, waiting "+ UNAVAILABLE_RETRY_WAIT_TIME + " ms and trying again.");
                     return waitAndRetry(l, tClass, object);
 				} else {
 					System.out.println("Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
