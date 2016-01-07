@@ -276,7 +276,7 @@ public class API {
 					throw new IOException(errorString);
 				}
 			}
-			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY && connection.getResponseCode() < HttpURLConnection.HTTP_VERSION_NOT_SUPPORTED) {
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY && connection.getResponseCode() < HttpURLConnection.HTTP_VERSION) {
 				if (retry) {
 					System.out.println("Could not connect to NFleet-API, waiting "+ UNAVAILABLE_RETRY_WAIT_TIME + " ms and trying again.");
                     return waitAndRetry(l, tClass, object);
@@ -286,7 +286,7 @@ public class API {
 					throw new IOException(errorString);
 				}
 			}
-			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_VERSION_NOT_SUPPORTED) {
+			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_VERSION) {
 				System.out.println("Could not connect to NFleet-API.");
 				String errorString = readErrorStreamAndCloseConnection(connection);
 				throw new IOException(errorString);
