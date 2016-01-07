@@ -11,6 +11,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.*;
 
@@ -21,11 +23,12 @@ public class AppService {
 		private String baseUrl;
 		private String ClientKey;
 		private String ClientSecret;
-		private boolean retry;
 		public AppUserDataSet Root;	
 		private String user;
 		private String password;
-		private static int RETRY_WAIT_TIME = 2000;
+		private static int RETRY_WAIT_TIME_FACTOR = 1000;
+        private static int UNAVAILABLE_RETRY_WAIT_TIME_FACTOR = 10000;
+        private static int REQUEST_ATTEMPTS = 3;
 		private String appServiceUrl;
 		private AppTokenData token;
 		private int currentAppUserId;
@@ -35,7 +38,6 @@ public class AppService {
 		
 		public AppService(String appServiceUrl,String appUrl, String clientKey, String clientSecret) {
 			this.baseUrl = appServiceUrl + "/appusers";
-			this.retry  = true;
 			this.ClientKey = clientKey;
 			this.ClientSecret = clientSecret;
 			this.appServiceUrl = appServiceUrl;
@@ -77,14 +79,13 @@ public class AppService {
 		@SuppressWarnings("unchecked")
 		public <T extends BaseData> T navigate(Class<T> tClass, Link l,	HashMap<String, String> queryParameters, String user, String password) throws IOException {
 			Object result;
-			retry = true;
 						
 			String uri = l.getUri();
 			//check
 			if (l.getMethod().equals("DELETE")) {
-				result = sendRequest(l, tClass, new Object(), user, password);
+				result = sendRequest(l, tClass, new Object(), user, password, REQUEST_ATTEMPTS);
 			} else {
-				result = sendRequest(l, tClass, null, user, password);
+				result = sendRequest(l, tClass, null, user, password, REQUEST_ATTEMPTS);
 			}
 			return (T) result;
 		}
@@ -100,11 +101,11 @@ public class AppService {
 		 */
 		@SuppressWarnings("unchecked")
 		public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object, String user, String password) throws IOException {
-			 return (T) sendRequest(l, tClass, object, user, password);
+			 return (T) sendRequest(l, tClass, object, user, password, REQUEST_ATTEMPTS);
 		}
 
 		public <T extends BaseData> T navigate(Class<T> tClass, Link l, Object object) throws IOException {
-			 return (T) sendRequest(l, tClass, object, null, null);
+			 return (T) sendRequest(l, tClass, object, null, null, REQUEST_ATTEMPTS);
 		}
 		public Link getRoot() {
 			return new Link("self", baseUrl, "GET","", true);
@@ -118,7 +119,7 @@ public class AppService {
 			this.baseUrl = baseUrl;
 		}
 
-		private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object, String user, String password) throws IOException {
+		private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object, String user, String password, int attempts) throws IOException {
 			URL serverAddress;
 			BufferedReader br;
 			String result = "";
@@ -175,36 +176,39 @@ public class AppService {
 				}
 				
 				if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-					System.out.println("App: ErrorCode: " + connection.getResponseCode() + " " + connection.getResponseMessage() +
-										" " + url + ", verb: " + method);
-					
-					String errorString = readErrorStreamAndCloseConnection(connection);
-					throw (NFleetRequestException) gson.fromJson(errorString, NFleetRequestException.class);
+					System.out.println("App: " + connection.getResponseCode() + " " + connection.getResponseMessage() + " " + url + ", verb: " + method);
+                    createException(connection);
 				}
-				else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR ) {
-					if (retry) {
-						
-						System.out.println("App: Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-						System.out.println("Url was " + url);
-						return waitAndRetry(connection, l, tClass, object, user, password);
-					} else {
-						System.out.println("App: Request caused internal server error, please contact dev@nfleet.fi");
-						String errorString = readErrorStreamAndCloseConnection(connection);
-						throw new IOException(errorString);
-					}
-				}
-				
-				if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY) {
-					if (retry) {
-						System.out.println("App: Could not connect to NFleet-API, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-						return waitAndRetry(connection, l, tClass, object, user, password);
-					} else {
-						System.out.println("App: Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
-						String errorString = readErrorStreamAndCloseConnection(connection);
-						throw new IOException(errorString);
-					}
-					
-				}
+                else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR && connection.getResponseCode() < HttpURLConnection.HTTP_BAD_GATEWAY) {
+                    if (attempts > 0) {
+                        int attempt = REQUEST_ATTEMPTS - attempts + 1;
+                        int waiting = attempt * attempt * RETRY_WAIT_TIME_FACTOR;
+                        System.out.println("App: Request caused internal server error, waiting " + waiting + "ms and trying again (attempt " + attempt + " of " + REQUEST_ATTEMPTS + ").");
+                        wait(waiting);
+                        return sendRequest(l, tClass, object, user, password, attempts - 1);
+                    } else {
+                        System.out.println("App: Request caused internal server error, please contact support at dev@nfleet.fi.");
+                        String errorString = readErrorStreamAndCloseConnection(connection);
+                        createException(connection);
+                    }
+                }
+                else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY && connection.getResponseCode() < HttpURLConnection.HTTP_VERSION) {
+                    if (attempts > 0) {
+                        int attempt = REQUEST_ATTEMPTS - attempts + 1;
+                        int waiting = attempt * attempt * UNAVAILABLE_RETRY_WAIT_TIME_FACTOR;
+                        System.out.println("App: NFleet App is unavailable, waiting " + waiting + "ms and trying again (attempt " + attempt + " of " + REQUEST_ATTEMPTS + ").");
+                        wait(waiting);
+                        return sendRequest(l, tClass, object, user, password, attempts - 1);
+                    } else {
+                        System.out.println("App: NFleet App is unavailable, please try again later. If the problem persists, contact support at dev@nfleet.fi.");
+                        createException(connection);
+                    }
+                }
+                else if (connection.getResponseCode() >= HttpURLConnection.HTTP_VERSION) {
+                    System.out.println("App: Could not connect to NFleet App.");
+                    String errorString = readErrorStreamAndCloseConnection(connection);
+                    throw new IOException(errorString);
+                }
 				
 				result = readDataFromConnection(connection);
 				
@@ -226,6 +230,25 @@ public class AppService {
 			}
 			return (T) gson.fromJson(result, tClass);
 		}
+        
+        private NFleetRequestException createException(HttpURLConnection connection) throws IOException {
+            NFleetRequestException ex = null;
+            String errorString = readErrorStreamAndCloseConnection(connection);
+
+            ex = gson.fromJson(errorString, NFleetRequestException.class);
+
+            if (ex.getItems() == null || ex.getItems().size() == 0) {
+                ErrorData d = new ErrorData();
+                d.setCode(connection.getResponseCode());
+                d.setMessage(connection.getResponseMessage());
+                List<ErrorData> errors = new ArrayList<ErrorData>();
+                errors.add(d);
+                ex.setItems(errors);
+            }
+            ex.setStatusCode(connection.getResponseCode());
+
+            return ex;
+        }
 	
 		private String method(Verb verb) {
 			switch (verb) {
@@ -309,17 +332,14 @@ public class AppService {
 			return sb.toString();
 		}
 		
-		private <T extends BaseData> T waitAndRetry(HttpURLConnection connection, Link l, Class<T> tClass, Object object, String user, String password) {
-			try {
-				retry = false;
-				Thread.sleep(RETRY_WAIT_TIME);
-				return sendRequest(l, tClass, object, user, password);
-			} catch (InterruptedException e) {
-				return null;
-			} catch (IOException e) {
-				return null;
-			}
-		}
+		private void wait(int timeInMilliseconds)
+        {
+            try {
+                Thread.sleep(timeInMilliseconds);
+            } catch (InterruptedException e) {
+                // no action
+            }
+        }
 		
 		public boolean Login(String user, String password) throws IOException {
 			Link l = new Link("signin", appServiceUrl + "/signin", "GET","" , true);

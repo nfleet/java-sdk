@@ -25,8 +25,8 @@ import org.apache.commons.codec.binary.Base64;
  */
 
 /**
- * API-class to handle the communication between SDK-user and NFleet
- * optimization's REST-API.
+ * API class to handle the communication between SDK user and NFleet
+ * optimization's REST API.
  */
 public class API {
 	private String baseUrl;
@@ -36,12 +36,12 @@ public class API {
 	private TokenData tokenData;
 	private boolean timed;
 	private ObjectCache objectCache;
-	private boolean retry;
 	private boolean useMimeTypes;
 	private MimeTypeHelper helper;
 	
-	private static int RETRY_WAIT_TIME = 2000;
-	private static int UNAVAILABLE_RETRY_WAIT_TIME = 30000;
+	private static int RETRY_WAIT_TIME_FACTOR = 1000;
+	private static int UNAVAILABLE_RETRY_WAIT_TIME_FACTOR = 10000;
+    private static int REQUEST_ATTEMPTS = 3;
 	
 	static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'").create();
 	
@@ -49,7 +49,6 @@ public class API {
 		this.baseUrl = baseUrl;
 		this.objectCache = new ObjectCache();
 		this.timed = false;
-		this.retry  = true;
 		this.useMimeTypes = true; //change this when production will support mimetypes.
 		this.helper = new MimeTypeHelper();
 		
@@ -60,26 +59,27 @@ public class API {
 
 	private boolean authenticate() {
 		return authenticate(this.ClientKey, this.ClientSecret);
-	}
-	
+	}	
 	
 	public boolean authenticate(String username, String password) {
 		this.ClientKey = username;
 		this.ClientSecret = password;
-		System.out.println("Authenticating API with username: " +username + " and pass: " + password);
+		System.out.println("Authenticating API user " + username);
 		try {
 			ResponseData result = navigate(ResponseData.class, getAuthLink());
 
 			if (result == null || result.getItems() != null) {
-				System.out.println("Could not authenticate, please check credentials and service status from http://status.nfleet.fi");
+				System.out.println("Unexpected authentication response. Please check credentials and service status.");
 				return false;
 			}
 
 			TokenData authenticationData = navigate(TokenData.class, result.getLocation());
 
 			this.tokenData = authenticationData;
+        } catch (NFleetRequestException e) {
+            return false;        
 		} catch (Exception e) {
-			System.out.println( e.toString());
+            System.out.println("Authentication failed: " + e.toString());
 			return false;
 		}
 		return true;
@@ -132,7 +132,7 @@ public class API {
             start = System.currentTimeMillis();
         }
 
-        Object result = sendRequest(l, tClass, object);
+        Object result = sendRequest(l, tClass, object, REQUEST_ATTEMPTS);
 				
 		if (isTimed()) {
 			end = System.currentTimeMillis();
@@ -156,7 +156,7 @@ public class API {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object) throws IOException {
+	private <T extends BaseData> T sendRequest(Link l, Class<T> tClass, Object object, int attempts) throws IOException {
 		URL serverAddress;
 		String result = "";
 		HttpURLConnection connection = null;
@@ -229,16 +229,18 @@ public class API {
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-				System.out.println("Authentication expired " + connection.getResponseMessage() + " trying to reauthenticate");
-				if (retry && this.tokenData != null) {
-					this.tokenData = null;
-					retry = false;
-					if( authenticate() ) {
-						System.out.println("Reauthentication success, will continue with " + l.getMethod() + " request on " + l.getRel());
-						return sendRequest(l, tClass, object);
-					}
-				}		
-				else throw new IOException("Tried to reauthenticate but failed, please check the credentials and status of NFleet-API");	
+                if (tokenData == null) {
+                    System.out.println("Authentication failed. Make sure you have invoked authenticate() with correct credentials.");
+                }
+                else {                    
+                    System.out.println("Access token has expired. Trying to reauthenticate.");
+                    this.tokenData = null;
+                    if( authenticate() ) {
+                        System.out.println("Reauthentication success, continuing " + l.getRel() + ".");
+                        return sendRequest(l, tClass, object, attempts - 1);
+                    }
+                    else throw new IOException("Reauthentication failed. Please check the credentials and service status.");
+                }
 			}
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
@@ -250,44 +252,34 @@ public class API {
 			}
 
             if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST && connection.getResponseCode() < HttpURLConnection.HTTP_INTERNAL_ERROR) {
-                NFleetRequestException ex = null;
-                String errorString = readErrorStreamAndCloseConnection(connection);
-
-                ex = gson.fromJson(errorString, NFleetRequestException.class);
-
-                if (ex.getItems() == null || ex.getItems().size() == 0) {
-                    ErrorData d = new ErrorData();
-                    d.setCode(connection.getResponseCode());
-                    d.setMessage(connection.getResponseMessage());
-                    List<ErrorData> errors = new ArrayList<ErrorData>();
-                    errors.add(d);
-                    ex.setItems(errors);
-                }
-
-                throw ex;
+                throw createException(connection);                
 			}
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_INTERNAL_ERROR && connection.getResponseCode() < HttpURLConnection.HTTP_BAD_GATEWAY) {
-				if (retry) {
-					System.out.println("Request caused internal server error, waiting "+ RETRY_WAIT_TIME + " ms and trying again.");
-                    return waitAndRetry(l, tClass, object);
+				if (attempts > 0) {
+                    int attempt = REQUEST_ATTEMPTS - attempts + 1;
+                    int waiting = attempt * attempt * RETRY_WAIT_TIME_FACTOR;
+					System.out.println("Request caused internal server error, waiting " + waiting + "ms and trying again (attempt " + attempt + " of " + REQUEST_ATTEMPTS + ").");
+                    wait(waiting);
+                    return sendRequest(l, tClass, object, attempts - 1);
 				} else {
-					System.out.println("Requst caused internal server error, please contact dev@nfleet.fi");
-					String errorString = readErrorStreamAndCloseConnection(connection);
-					throw new IOException(errorString);
+					System.out.println("Request caused internal server error, please contact support at dev@nfleet.fi.");
+					throw createException(connection);
 				}
 			}
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_GATEWAY && connection.getResponseCode() < HttpURLConnection.HTTP_VERSION) {
-				if (retry) {
-					System.out.println("Could not connect to NFleet-API, waiting "+ UNAVAILABLE_RETRY_WAIT_TIME + " ms and trying again.");
-                    return waitAndRetry(l, tClass, object);
+				if (attempts > 0) {
+                    int attempt = REQUEST_ATTEMPTS - attempts + 1;
+                    int waiting = attempt * attempt * UNAVAILABLE_RETRY_WAIT_TIME_FACTOR;
+					System.out.println("NFleet service is unavailable, waiting " + waiting + "ms and trying again (attempt " + attempt + " of " + REQUEST_ATTEMPTS + ").");
+                    wait(waiting);
+                    return sendRequest(l, tClass, object, attempts - 1);
 				} else {
-					System.out.println("Could not connect to NFleet-API, please check service status from http://status.nfleet.fi and try again later.");
-					String errorString = readErrorStreamAndCloseConnection(connection);
-					throw new IOException(errorString);
+					System.out.println("NFleet service is unavailable, please try again later. If the problem persists, contact support at dev@nfleet.fi.");
+					throw createException(connection);
 				}
 			}
 			else if (connection.getResponseCode() >= HttpURLConnection.HTTP_VERSION) {
-				System.out.println("Could not connect to NFleet-API.");
+				System.out.println("Could not connect to NFleet service.");
 				String errorString = readErrorStreamAndCloseConnection(connection);
 				throw new IOException(errorString);
 			}
@@ -314,6 +306,25 @@ public class API {
 		objectCache.addUri(url, newEntity);
 		return (T) newEntity;
 	}
+    
+    private NFleetRequestException createException(HttpURLConnection connection) throws IOException {
+        NFleetRequestException ex = null;
+        String errorString = readErrorStreamAndCloseConnection(connection);
+
+        ex = gson.fromJson(errorString, NFleetRequestException.class);
+
+        if (ex.getItems() == null || ex.getItems().size() == 0) {
+            ErrorData d = new ErrorData();
+            d.setCode(connection.getResponseCode());
+            d.setMessage(connection.getResponseMessage());
+            List<ErrorData> errors = new ArrayList<ErrorData>();
+            errors.add(d);
+            ex.setItems(errors);
+        }
+        ex.setStatusCode(connection.getResponseCode());
+
+        return ex;
+    }
 
 	private Link getAuthLink() {
 		return new Link("authenticate", "/tokens", "POST", "", true);
@@ -444,23 +455,19 @@ public class API {
 				sb.insert(sb.lastIndexOf("}"), ",\"VersionNumber\":" + eTag	+ "");
 			}
 		} catch (IOException e) {
-			System.out.println("Could not read data from connection");
+			System.out.println("Could not read data from connection.");
 		} 
 		return sb.toString();
-	}
-	
-	private <T extends BaseData> T waitAndRetry(Link l, Class<T> tClass, Object object) {
-		try {
-			retry = false;
-			Thread.sleep(RETRY_WAIT_TIME);
-			return sendRequest(l, tClass, object);
-		} catch (InterruptedException e) {
-			return null;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-	
+	}	
+    
+    private void wait(int timeInMilliseconds)
+    {
+        try {
+            Thread.sleep(timeInMilliseconds);
+        } catch (InterruptedException e) {
+            // no action
+        }
+    }
 	
 	public TokenData getTokenData() {
 		return this.tokenData;
@@ -486,4 +493,3 @@ public class API {
 		this.timed = timed;
 	}
 }
-
