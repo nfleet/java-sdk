@@ -10,6 +10,7 @@ public class TaskEventData extends BaseData {
     private int Id;
     private Type Type;
     private String Info;
+    private String Name;
     private State State;
     private List<TimeWindowData> TimeWindows;
     private LocationData Location;
@@ -31,6 +32,14 @@ public class TaskEventData extends BaseData {
 
     public void setId(int id) {
         Id = id;
+    }
+    
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        this.Name = name;
     }
 
     public String getInfo() {

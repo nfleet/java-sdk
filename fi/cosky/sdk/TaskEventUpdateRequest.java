@@ -9,6 +9,7 @@ import java.util.List;
 public class TaskEventUpdateRequest extends BaseData {
 	private int TaskEventId;
     private Type Type;
+    private String Name;
     private List<TimeWindowData> TimeWindows;
     private LocationData Location;
     private int ServiceTime;
@@ -30,6 +31,15 @@ public class TaskEventUpdateRequest extends BaseData {
     public void setType(Type type) {
         this.Type = type;
     }
+    
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        this.Name = name;
+    }
+    
     public int getTaskEventId() {
 		return TaskEventId;
 	}
