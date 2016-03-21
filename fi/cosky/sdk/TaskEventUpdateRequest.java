@@ -1,5 +1,6 @@
 package fi.cosky.sdk;
 import java.util.List;
+import java.util.Date;
 
 /*
  * This file is subject to the terms and conditions defined in
@@ -15,7 +16,10 @@ public class TaskEventUpdateRequest extends BaseData {
     private int ServiceTime;
     private int StoppingTime;
     private List<CapacityData> Capacities;
-    
+    private String VehicleId;
+    private int SequenceNumber;
+    private boolean IsLocked;
+    private Date PresetArrivalTime;
 
     //Constructor uses only the required fields, others can be accessed via getters and setters
     public TaskEventUpdateRequest(Type type, LocationData location, List<CapacityData> capacities) {
@@ -86,5 +90,37 @@ public class TaskEventUpdateRequest extends BaseData {
 
     public void setCapacities(List<CapacityData> capacities) {
         Capacities = capacities;
+    }
+    
+    public void setVehicleId(String vehicleId) {
+        VehicleId = vehicleId;
+    }
+    
+    public String getVehicleId() {
+        return VehicleId;
+    }
+    
+    public void setSequenceNumber(int sequenceNumber) {
+        SequenceNumber = sequenceNumber;
+    }
+    
+    public int getSequenceNumber() {
+        return SequenceNumber;
+    }
+     
+    public void setIsLocked(boolean isLocked) {
+        IsLocked = isLocked;
+    }
+    
+    public boolean getIsLocked() {
+        return IsLocked;
+    }
+    
+    public Date getPresetArrivalTime() {
+        return PresetArrivalTime;
+    }
+    
+    public void setPresetArrivalTime(Date presetArrivalTime) {
+        PresetArrivalTime = presetArrivalTime;
     }
 }
