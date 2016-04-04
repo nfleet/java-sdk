@@ -437,7 +437,7 @@ public class API {
 		return sb.toString();
 	}
 	
-	private String readDataFromConnection(HttpURLConnection connection) {
+	private String readDataFromConnection(HttpURLConnection connection) throws IOException {
 		InputStream is = null;
 		BufferedReader br = null;
 		StringBuilder sb = null;
@@ -455,7 +455,8 @@ public class API {
 				sb.insert(sb.lastIndexOf("}"), ",\"VersionNumber\":" + eTag	+ "");
 			}
 		} catch (IOException e) {
-			System.out.println("Could not read data from connection.");
+			System.out.println("Could not read data from connection: " + e.getMessage() );
+            throw e;
 		} 
 		return sb.toString();
 	}	
