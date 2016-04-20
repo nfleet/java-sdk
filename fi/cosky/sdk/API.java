@@ -129,6 +129,7 @@ public class API {
         if (l.getMethod().equals(Verb.DELETE)) object = new Object();
 
         if (isTimed()) {
+			System.out.println("Doing " + l.getMethod() + " on " + l.getUri() + ".");
             start = System.currentTimeMillis();
         }
 
