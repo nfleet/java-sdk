@@ -49,7 +49,7 @@ public class API {
 		this.baseUrl = baseUrl;
 		this.objectCache = new ObjectCache();
 		this.timed = false;
-		this.useMimeTypes = true; //change this when production will support mimetypes.
+		this.useMimeTypes = true;
 		this.helper = new MimeTypeHelper();
 	} 
 
