@@ -155,7 +155,7 @@ public class AppService {
 				
 				if (connection.getRequestProperty("Accept") == null)
 					connection.setRequestProperty("Accept", "application/json");
-				if (connection.getRequestProperty("Content-Type") == null);
+				if (connection.getRequestProperty("Content-Type") == null)
 					connection.setRequestProperty("Content-Type", "application/json");
 
 				connection.connect();
