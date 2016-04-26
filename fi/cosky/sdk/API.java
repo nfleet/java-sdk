@@ -220,6 +220,9 @@ public class API {
 			}
 
 			connection.connect();
+			
+			if (connection.getResponseCode() == -1)
+				throw new IOException("Invalid HTTP response received.");
 
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_CREATED || connection.getResponseCode() == HttpURLConnection.HTTP_SEE_OTHER ) {
 				ResponseData data = new ResponseData();
