@@ -51,10 +51,6 @@ public class API {
 		this.timed = false;
 		this.useMimeTypes = true; //change this when production will support mimetypes.
 		this.helper = new MimeTypeHelper();
-		
-		//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
-		//this hopefully helps with that.
-		System.setProperty("http.keepAlive", "false");
 	} 
 
 	private boolean authenticate() {

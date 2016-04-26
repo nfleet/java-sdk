@@ -42,9 +42,6 @@ public class AppService {
 			this.ClientSecret = clientSecret;
 			this.appServiceUrl = appServiceUrl;
 			this.appUrl = appUrl;
-			//Delete-Verb causes connection to keep something somewhere that causes the next request to fail.
-			//this hopefully helps with that.
-			System.setProperty("http.keepAlive", "false");
 			this.Root = getAppUserDataSet();
 		} 
 
