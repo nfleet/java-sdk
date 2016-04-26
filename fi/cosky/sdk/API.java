@@ -204,6 +204,11 @@ public class API {
 			if (tokenData != null) {
 				connection.addRequestProperty("Authorization", tokenData.getTokenType() + " " + tokenData.getAccessToken());
 			}
+			
+			if (connection.getRequestProperty("Accept") == null)
+				connection.setRequestProperty("Accept", "application/json");
+			if (connection.getRequestProperty("Content-Type") == null);
+				connection.setRequestProperty("Content-Type", "application/json");
 
 			addVersionNumberToHeader(url, connection);
 			

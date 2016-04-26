@@ -155,6 +155,11 @@ public class AppService {
 						osw.flush();
 						osw.close();		
 				}
+				
+				if (connection.getRequestProperty("Accept") == null)
+					connection.setRequestProperty("Accept", "application/json");
+				if (connection.getRequestProperty("Content-Type") == null);
+					connection.setRequestProperty("Content-Type", "application/json");
 
 				connection.connect();
 
