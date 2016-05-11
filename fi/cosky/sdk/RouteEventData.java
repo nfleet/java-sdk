@@ -27,6 +27,10 @@ public class RouteEventData extends BaseData {
 	private int TaskId;
     private String LockState;
     private String TimeState;
+	private String Info;
+	private String Info2;
+	private String Info3;
+	private String Info4;
 
 
     int getVersionNumber() {
@@ -147,4 +151,36 @@ public class RouteEventData extends BaseData {
     public void setLockState(String lockState) {
         LockState = lockState;
     }
+	
+	public String getInfo() {
+		return Info;
+	}
+
+	public void setInfo(String info) {
+		Info = info;
+	}
+	
+	public String getInfo2() {
+		return Info2;
+	}
+
+	public void setInfo2(String info2) {
+		Info2 = info2;
+	}
+	
+	public String getInfo3() {
+		return Info3;
+	}
+
+	public void setInfo3(String info3) {
+		Info3 = info3;
+	}
+	
+	public String getInfo4() {
+		return Info4;
+	}
+
+	public void setInfo4(String info4) {
+		Info4 = info4;
+	}
 }
