@@ -22,6 +22,7 @@ public class TaskUpdateRequest extends BaseData {
     private int UserId;
     private List<String> IncompatibleVehicleTypes;
     private List<String> CompatibleVehicleTypes;
+	private Boolean IsLockedToVehicle;
     
     @Deprecated
     private double Profit;
@@ -169,5 +170,12 @@ public class TaskUpdateRequest extends BaseData {
 		RelocationType = relocationType;
 	}
 
+	public Boolean getIsLockedToVehicle() {
+		return IsLockedToVehicle;
+	}
+
+	public void setIsLockedToVehicle(Boolean isLockedToVehicle) {
+		IsLockedToVehicle = isLockedToVehicle;
+	}
 	
 }
