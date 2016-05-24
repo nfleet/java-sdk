@@ -24,6 +24,7 @@ public class VehicleUpdateRequest extends BaseData {
     private String ActivityState;
     private String Info1;
     private CoordinateData CurrentLocation;
+    private Boolean IsLocked;
 
     private double FixedCost;
     private double KilometerCost;
@@ -202,5 +203,13 @@ public class VehicleUpdateRequest extends BaseData {
 
     public void setCurrentLocation(CoordinateData currentLocation) {
         CurrentLocation = currentLocation;
+    }
+
+    public Boolean getIsLocked() {
+        return IsLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked) {
+        IsLocked = isLocked;
     }
 }
