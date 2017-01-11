@@ -21,6 +21,7 @@ public class RouteEventData extends BaseData {
 	private Date DepartureTime;
 	private String State;
 	private KPIData KPIs;
+	private LocationData Location;
 	private List<Float> Geometry;
 	private String Type;
 	private int SequenceNumber;
@@ -103,6 +104,14 @@ public class RouteEventData extends BaseData {
 	public void setKPIs(KPIData kPIs) {
 		KPIs = kPIs;
 	}
+
+    public LocationData getLocation() {
+        return Location;
+    }
+
+    public void setLocation(LocationData location) {
+        Location = location;
+    }
 
 	public List<Float> getGeometry() {
 		return Geometry;
