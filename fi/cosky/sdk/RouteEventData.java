@@ -24,6 +24,7 @@ public class RouteEventData extends BaseData {
 	private LocationData Location;
 	private List<Float> Geometry;
 	private String Type;
+	private String Style;
 	private int SequenceNumber;
 	private int TaskId;
     private String LockState;
@@ -128,6 +129,14 @@ public class RouteEventData extends BaseData {
 	public void setType(String type) {
 		Type = type;
 	}
+
+	public String getStyle() {
+        return Style;
+    }
+
+	public void setStyle(String style) {
+        Style = style;
+    }
 
 	public int getSequenceNumber() {
 		return SequenceNumber;

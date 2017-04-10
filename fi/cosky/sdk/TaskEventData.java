@@ -12,6 +12,7 @@ public class TaskEventData extends BaseData {
     private String Info;
     private String Name;
     private State State;
+    private String Style;
     private List<TimeWindowData> TimeWindows;
     private LocationData Location;
     private int ServiceTime;
@@ -64,6 +65,14 @@ public class TaskEventData extends BaseData {
 
     public void setState(State state) {
         State = state;
+    }
+    
+    public String getStyle() {
+        return Style;
+    }
+
+    public void setStyle(String style) {
+        Style = style;
     }
 
     public List<TimeWindowData> getTimeWindows() {

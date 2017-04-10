@@ -17,6 +17,7 @@ public class TaskEventUpdateRequest extends BaseData {
     private int StoppingTime;
     private List<CapacityData> Capacities;
     private String VehicleId;
+    private String Style;
     private int SequenceNumber;
     private boolean IsLocked;
     private Date PresetArrivalTime;
@@ -98,6 +99,14 @@ public class TaskEventUpdateRequest extends BaseData {
     
     public String getVehicleId() {
         return VehicleId;
+    }
+
+    public void setStyle(String style) {
+        Style = style;
+    }
+    
+    public String getStyle() {
+        return Style;
     }
     
     public void setSequenceNumber(int sequenceNumber) {
