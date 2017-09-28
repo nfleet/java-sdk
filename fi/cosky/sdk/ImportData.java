@@ -15,6 +15,8 @@ public class ImportData extends BaseData {
 	private List<VehicleError> Vehicles;
 	private List<TaskError> Tasks;
     private List<DepotError> Depots;
+	private List<ModificationError> Modifications;
+	private List<ModificationAreaError> ModificationAreas;
 	
 	public int getVersionNumber() {
 		return VersionNumber;
@@ -48,4 +50,20 @@ public class ImportData extends BaseData {
 	}
     public List<DepotError> getDepots() { return Depots; }
     public void setDepots(List<DepotError> depots) { Depots = depots; }
+
+	public List<ModificationError> getModifications(){
+		return Modifications;
+	}
+
+	public void setModifications(List<ModificationError> modifications){
+		Modifications = modifications;
+	}
+
+	public List<ModificationAreaError> getModificationAreas(){
+		return ModificationAreas;
+	}
+
+	public void setModificationAreas(List<ModificationAreaError> modificationAreas){
+		ModificationAreas = modificationAreas;
+	}
 }

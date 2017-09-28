@@ -10,6 +10,8 @@ public class ImportRequest {
 	private VehicleSetImportRequest Vehicles;
 	private TaskSetImportRequest Tasks;
 	private DepotSetImportRequest Depots;
+	private ModificationSetImportRequest Modifications;
+	private ModificationAreaSetImportRequest ModificationAreas;
 	
 	public VehicleSetImportRequest getVehicles() {
 		return Vehicles;
@@ -28,5 +30,21 @@ public class ImportRequest {
 	}
 	public void setDepots(DepotSetImportRequest depots) {
 		Depots = depots;
+	}
+
+	public ModificationSetImportRequest getModifications(){
+		return Modifications;
+	}
+
+	public void setModifications(ModificationSetImportRequest modifications){
+		Modifications = modifications;
+	}
+	
+	public ModificationAreaSetImportRequest getModificationAreas(){
+		return ModificationAreas;
+	}
+
+	public void setModificationAreas(ModificationAreaSetImportRequest modificationAreas){
+		ModificationAreas = modificationAreas;
 	}
 }
